@@ -429,3 +429,12 @@
 | **Descripción** |El microservicio debe tener un manejador global de excepciones (@RestControllerAdvice) que capture todos los errores y retorne respuestas HTTP con estructura uniforme: código de estado, mensaje descriptivo y timestamp. Ningún endpoint debe retornar stack traces ni mensajes de excepción de Java en texto plano. |
 | **Criterio de aceptacion** | Toda excepción no controlada retorna una respuesta JSON con estructura {status, message, timestamp}. Los errores de validación de campos retornan 400 con el detalle de cada campo inválido. Nunca se expone un stack trace en la respuesta HTTP. |
 | **Categoría** | Mantenibilidad |
+
+# Diagrama de contexto
+ ![alt text](<../images/Diagrama de contexto Users and Players.png>)
+
+# Diagrama de contenedores
+![alt text](<../images/Diagrama de contexto Users and Players.png>)
+
+# Diagrama de Entidad Relacion
+![alt text](<../images/Diagrama ER users and players.png>)
