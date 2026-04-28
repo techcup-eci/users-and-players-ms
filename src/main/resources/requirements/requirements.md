@@ -434,7 +434,7 @@
  ![alt text](<../images/Diagrama de contexto Users and Players.png>)
 
 # Diagrama de contenedores
-![alt text](<../images/Diagrama de contexto Users and Players.png>)
+![alt text](<../images/Diagrama contenedores Usuers and Players.png>)
 
 # Diagrama de Entidad Relacion
 ![alt text](<../images/Diagrama ER users and players.png>)
