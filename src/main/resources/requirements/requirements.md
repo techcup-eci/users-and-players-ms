@@ -1,434 +1,546 @@
-# 📄 1. Requerimientos del Sistema – TECHCUP FÚTBOL:
+Requirements
+===========
 
-# 1.1 Lista de requerimientos fucionales para usarios y jugadores:
+Functional Requirements
+-----------------------
 
-1. Consultar perfil de usuario — El usuario autenticado puede ver su información personal registrada en el sistema como nombre, correo, programa y estado.
-   
-2. Actualizar información básica del usuario — El usuario puede modificar sus datos personales como nombre, relación con la Escuela y semestre, excepto correo y contraseña.
-   
-3. Inactivar usuario — El administrador puede desactivar un usuario siempre que no esté vinculado a un equipo en torneo activo o en progreso.
-   
-4. Listar y buscar usuarios — El administrador puede consultar y filtrar usuarios por nombre, correo, relación con la Escuela o estado de forma paginada.
-   
-5. Crear perfil deportivo — El jugador puede registrar su perfil deportivo indicando posición, número dorsal y foto.
-   
-6. Consultar perfil deportivo — Jugadores, capitanes y organizadores pueden ver el perfil deportivo completo de un jugador incluyendo su foto y estado de vinculación.
-   
-7. Actualizar perfil deportivo — El jugador puede modificar su posición, dorsal o foto siempre que no esté vinculado a un equipo en torneo activo.
-   
-8. Bloquear eliminación de perfil deportivo — El sistema rechaza cualquier intento de eliminar un perfil deportivo para preservar la integridad histórica del torneo.
-   
-9.  Buscar jugadores para invitar — El capitán puede buscar jugadores registrados en el sistema visualizando únicamente su nombre y estado (disponible o no), para decidir a cuál enviarle una invitación a su equipo.
-    
-10. Enviar solicitud de vinculación a equipo — Un jugador puede enviar una única solicitud activa para unirse a un equipo disponible, notificando al Servicio de Equipos.
-    
-11. Consultar solicitudes enviadas — El jugador puede ver el estado actual e historial de sus solicitudes de vinculación a equipos.
-    
-12. Cancelar solicitud de vinculación — El jugador puede cancelar su solicitud activa siempre que esté en estado pendiente, quedando disponible para enviar una nueva.
-    
-13. Recibir invitación de un equipo — El sistema registra invitaciones enviadas por capitanes desde el Servicio de Equipos hacia jugadores disponibles.
-    
-14. Consultar invitaciones recibidas — El jugador puede ver todas las invitaciones que ha recibido de equipos junto con su estado actual.
-    
-15. Aceptar o rechazar invitación — El jugador puede responder una invitación pendiente, confirmando la vinculación al equipo o descartándola y manteniendo su disponibilidad.
-    
-16. Registrar log de auditoría — El sistema registra automáticamente todas las acciones relevantes sobre usuarios y jugadores con usuario, acción, timestamp y datos modificados.
+1. Query user profile — The authenticated user can view their personal information registered in the system such as name, email, program and status.
+2. Update basic user information — The user can modify their personal data such as name, school relation and semester, except email and password.
+3. Deactivate user — The administrator can deactivate a user as long as they are not linked to a team in an active or in-progress tournament.
+4. List and search users — The administrator can query and filter users by name, email, school relation or status in a paginated way.
+5. Create sports profile — The player can register their sports profile indicating position, jersey number and photo, storing the image in MongoDB.
+6. Query sports profile — Players, captains and organizers can view the complete sports profile of a player including their photo and team linkage status.
+7. Update sports profile — The player can modify their position, jersey number or photo as long as they are not linked to a team in an active tournament.
+8. Block sports profile deletion — The system rejects any attempt to delete a sports profile to preserve the historical integrity of the tournament.
+9. Search players to invite — The captain can search registered players by name and view only their availability status to decide who to send a team invitation to.
+10. Send team linkage request — A player can send a single active request to join an available team, notifying the Teams Service.
+11. Query sent requests — The player can view the current status and history of their team linkage requests.
+12. Cancel linkage request — The player can cancel their active request as long as it is in pending status, becoming available to send a new one.
+13. Receive team invitation — The system registers invitations sent by captains from the Teams Service to available players.
+14. Query received invitations — The player can view all invitations they have received from teams along with their current status.
+15. Accept or reject invitation — The player can respond to a pending invitation, confirming team linkage or discarding it and maintaining their availability.
+16. Register audit log — The system automatically registers all relevant actions on users and players with user, action, timestamp and modified data.
+17. Display user profile view — The frontend displays a screen where the authenticated user can view and edit their personal information in a clear and intuitive form.
+18. Display sports profile view — The frontend displays a screen where the player can create, view and update their sports profile including photo upload with preview.
+19. Display player search view — The frontend displays a search screen for captains to find players by name and view their availability status with an option to send an invitation directly.
+20. Display requests and invitations view — The frontend displays a unified screen where the player can see their sent requests and received invitations with their statuses and action buttons to accept or reject.
+21. Display user management view — The frontend displays an administration panel where the administrator can search, filter, view and deactivate users from a paginated table.
 
-# 1.2 Requisitos no funcionales: 
+Functional Requirement Specifications
+------------------------------------
 
-1. Autenticación mediante JWT — Todos los endpoints requieren token JWT válido generado por el Servicio de Identidad, retornando 401 ante tokens ausentes, malformados o expirados.
-   
-2. Control de acceso por rol — Cada endpoint valida que el rol del token tiene permisos para la operación solicitada, retornando 403 si el rol es insuficiente.
-   
-3. Comunicación segura entre servicios — Toda comunicación entre microservicios ocurre sobre HTTPS sin exponer datos sensibles en logs ni en respuestas de error.
-   
-4. Separación de almacenamiento PostgreSQL y MongoDB — Los datos estructurados se persisten en PostgreSQL y las fotos de perfil exclusivamente en MongoDB, referenciadas por ID.
-   
-5. Integridad referencial en base de datos — El esquema garantiza que no existan perfiles huérfanos, solicitudes activas duplicadas ni invitaciones duplicadas para el mismo jugador y equipo.
-   
-6. Arquitectura en capas obligatoria — El microservicio separa estrictamente controlador, servicio, adaptador y repositorio sin dependencias cruzadas entre capas no adyacentes.
-   
-7. Integración desacoplada con microservicios externos — La comunicación con el Servicio de Equipos usa WebClient o Feign Client, manejando errores y timeouts con respuesta 503 controlada.
-   
-8. Cobertura de código con JaCoCo — La cobertura mínima de pruebas es del 80%, con fallo automático del build si no se alcanza el umbral configurado.
-   
-9.  Análisis de calidad con SonarQube — El código debe pasar el Quality Gate sin bugs críticos, vulnerabilidades de seguridad ni code smells de severidad alta.
-    
-10. Documentación de API con Swagger/OpenAPI — Todos los endpoints están documentados con springdoc-openapi incluyendo parámetros, body, códigos de respuesta y ejemplos.
-    
-11. Manejo centralizado de excepciones — Un @RestControllerAdvice global captura todos los errores retornando respuestas JSON uniformes sin exponer stack traces.
-    
-# 2. Especificacion de Requerimientos: 
+## RF-01 Query user profile
 
-## 2.1 Consultar perfil de usuario
-
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RF-01 |
-| **Nombre del requerimiento** | Consultar perfil de usuario |
-| **Descripción** | El sistema debe permitir que un usuario autenticado consulte su propia información personal registrada en el sistema. |
-| **Precondiciones** | El usuario debe estar autenticado con un JWT válido. El usuario debe existir en el sistema. |
-| **Actor** | Estudiante, Graduado, Profesor, Personal Administrativo, Familiar, Administrador |
-| **Flujo principal** | 1. El actor envía una solicitud GET a /users/{id} con su JWT. 2. El sistema valida el token y verifica que el ID corresponde al usuario autenticado o que es administrador. 3. El sistema consulta la base de datos PostgreSQL. 4. El sistema retorna nombre completo, correo, relación con la Escuela, programa académico, semestre, estado, fecha de nacimiento e identificación. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF1.png) ![alt text](./../images/RF1-.png)|
-| **Poscondiciones** | El usuario recibe su información personal. La acción queda registrada en el log de auditoría. |
+| **Requirement Name** | Query user profile |
+| **Description** | The system must allow an authenticated user to view their own personal information registered in the system. |
+| **Preconditions** | The user must be authenticated with a valid JWT. The user must exist in the system. |
+| **Actor** | Student, Graduate, Professor, Administrative Staff, Family Member, Administrator |
+| **Main Flow** | 1. The actor sends a GET request to /users/{id} with their JWT. 2. The system validates the token and verifies the ID belongs to the authenticated user or an administrator. 3. The system queries PostgreSQL. 4. The system returns full name, email, school relation, academic program, semester, status, birth date, and identification. |
+| **Use Case Diagram** | ![alt text](./../images/RF1.png) ![alt text](./../images/RF1-.png) |
+| **Postconditions** | The user receives their personal information. The action is recorded in the audit log. |
 
 ---
 
-## 2.2 Actualizar información básica del usuario
+## RF-02 Update basic user information
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RF-02 |
-| **Nombre del requerimiento** | Actualizar información básica del usuario |
-| **Descripción** |El sistema debe permitir que un usuario autenticado o el administrador actualicen los datos personales básicos del usuario, excluyendo correo y contraseña. |
-| **Precondiciones** | El usuario debe estar autenticado con un JWT válido. El usuario debe existir y estar en estado Activo. |
-| **Actor** | Estudiante, Graduado, Profesor, Personal Administrativo, Familiar, Administrador. |
-| **Flujo principal** | 1. El actor envía una solicitud PUT a /users/{id} con los campos a actualizar. 2. El sistema valida que el JWT corresponde al usuario o es administrador. 3. El sistema valida que no se intenta modificar correo ni contraseña. 4. El sistema valida que el semestre solo se envíe si la relación es estudiante. 5. El sistema actualiza los datos en PostgreSQL. 6. El sistema registra la acción en auditoría y retorna los datos actualizados. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF2.png)![alt text](./../images/RF2-.png) |
-| **Poscondiciones** | Los datos del usuario quedan actualizados en base de datos. La acción queda registrada en el log de auditoría. |
+| **Requirement Name** | Update basic user information |
+| **Description** | The system must allow an authenticated user or administrator to update basic personal data, excluding email and password. |
+| **Preconditions** | The user must be authenticated with a valid JWT. The user must exist and be Active. |
+| **Actor** | Student, Graduate, Professor, Administrative Staff, Family Member, Administrator |
+| **Main Flow** | 1. The actor sends a PUT request to /users/{id} with fields to update. 2. The system validates the JWT belongs to the user or an administrator. 3. The system validates email and password are not modified. 4. The system validates semester is only sent when relation is student. 5. The system updates data in PostgreSQL. 6. The system records the action in audit and returns the updated data. |
+| **Use Case Diagram** | ![alt text](./../images/RF2.png) ![alt text](./../images/RF2-.png) |
+| **Postconditions** | The user data is updated in the database. The action is recorded in the audit log. |
 
 ---
 
-## 2.3 Inactivar usuario
+## RF-03 Deactivate user
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-03|
-| **Nombre del requerimiento** | Inactivar usuario |
-| **Descripción** |El sistema debe permitir al administrador cambiar el estado de un usuario a Inactivo, siempre que no esté vinculado a un equipo inscrito en un torneo Activo o En Progreso. |
-| **Precondiciones** | El actor debe tener rol Administrador. El usuario a inactivar debe existir y estar en estado Activo. |
-| **Actor** |  Administrador. |
-| **Flujo principal** | 1. El administrador envía PATCH a /users/{id}/status con {status: "INACTIVO"}. 2. El sistema valida el rol del token. 3. El sistema consulta al Servicio de Equipos si el usuario está vinculado a un equipo en torneo Activo o En Progreso. 4. Si no hay vínculo activo, el sistema actualiza el estado del usuario a INACTIVO en PostgreSQL. 5. El sistema registra la acción en auditoría y retorna confirmación. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF3.png) ![alt text](./../images/RF3-.png) |
-| **Poscondiciones** | El usuario queda con estado INACTIVO en base de datos. La acción queda registrada en auditoría. |
+| **ID** | RF-03 |
+| **Requirement Name** | Deactivate user |
+| **Description** | The system must allow an administrator to set a user status to Inactive if the user is not linked to a team in an Active or In-Progress tournament. |
+| **Preconditions** | The actor must have the Administrator role. The user to deactivate must exist and be Active. |
+| **Actor** | Administrator |
+| **Main Flow** | 1. The administrator sends PATCH to /users/{id}/status with {status: "INACTIVE"}. 2. The system validates the role. 3. The system queries the Teams Service to check active/in-progress linkage. 4. If no active linkage, the system updates status to INACTIVE in PostgreSQL. 5. The system records the action in audit and returns confirmation. |
+| **Use Case Diagram** | ![alt text](./../images/RF3.png) ![alt text](./../images/RF3-.png) |
+| **Postconditions** | The user is marked INACTIVE in the database. The action is recorded in audit. |
 
 ---
 
-## 2.4 Listar y buscar usuarios
+## RF-04 List and search users
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RF-04 |
-| **Nombre del requerimiento** | Listar y buscar usuarios |
-| **Descripción** |El sistema debe permitir al administrador consultar la lista de usuarios aplicando filtros por nombre, correo, relación con la Escuela y estado. |
-| **Precondiciones** | El actor debe tener rol Administrador con JWT válido. |
-| **Actor** |  Administrador. |
-| **Flujo principal** | 1. El administrador envía GET a /users con parámetros opcionales: name, email, relation, status. 2. El sistema valida el rol. 3. El sistema aplica los filtros enviados en la consulta a PostgreSQL. 4. El sistema retorna la lista paginada de usuarios con sus datos básicos. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF4.png) ![alt text](./../images/RF4-.png) |
-| **Poscondiciones** | El administrador recibe la lista de usuarios filtrada y paginada. |
+| **Requirement Name** | List and search users |
+| **Description** | The system must allow an administrator to query users with filters by name, email, school relation, and status. |
+| **Preconditions** | The actor must have the Administrator role with a valid JWT. |
+| **Actor** | Administrator |
+| **Main Flow** | 1. The administrator sends GET to /users with optional parameters: name, email, relation, status. 2. The system validates the role. 3. The system applies filters to PostgreSQL. 4. The system returns a paginated list of users with basic data. |
+| **Use Case Diagram** | ![alt text](./../images/RF4.png) ![alt text](./../images/RF4-.png) |
+| **Postconditions** | The administrator receives the filtered, paginated list of users. |
 
 ---
 
-## 2.5 Crear perfil deportivo
+## RF-05 Create sports profile
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-05|
-| **Nombre del requerimiento** | Crear perfil deportivo |
-| **Descripción** |El sistema debe permitir que un usuario con rol Jugador cree su perfil deportivo indicando posición, número dorsal y foto. Cada usuario solo puede tener un perfil deportivo. |
-| **Precondiciones** | El actor debe estar autenticado con JWT válido y tener rol Jugador. El usuario no debe tener un perfil deportivo previamente creado. |
-| **Actor** |  Jugador |
-| **Flujo principal** | 1. El jugador envía POST a /players/profile con posición, dorsal y foto. 2. El sistema valida que el token tiene rol Jugador. 3. El sistema verifica que no existe ya un perfil para ese usuario. 4. El sistema persiste los datos del perfil (posición y dorsal) en PostgreSQL. 5. El sistema almacena la foto en MongoDB. 6. El sistema retorna el perfil creado con código 201 Created. 7. La acción queda registrada en auditoría. |
-| **Diagrama de caso de uso** |![alt text](./../images/RF5.png)![alt text](./../images/RF5-.png) |
-| **Poscondiciones** | El perfil deportivo del jugador queda registrado en PostgreSQL y la foto en MongoDB. La acción queda registrada en auditoría. |
+| **ID** | RF-05 |
+| **Requirement Name** | Create sports profile |
+| **Description** | The system must allow a user with Player role to create a sports profile with position, jersey number, and photo. Each user can have only one sports profile. |
+| **Preconditions** | The actor must be authenticated with a valid JWT and have Player role. The user must not have an existing sports profile. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends POST to /players/profile with position, jersey number, and photo. 2. The system validates Player role. 3. The system verifies no existing profile. 4. The system stores profile data in PostgreSQL. 5. The system stores the photo in MongoDB. 6. The system returns the created profile with 201 Created. 7. The action is recorded in audit. |
+| **Use Case Diagram** | ![alt text](./../images/RF5.png) ![alt text](./../images/RF5-.png) |
+| **Postconditions** | The sports profile is stored in PostgreSQL and the photo in MongoDB. The action is recorded in audit. |
 
 ---
 
-## 2.6 Consultar perfil deportivo
+## RF-06 Query sports profile
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-06|
-| **Nombre del requerimiento** |Consultar perfil deportivo |
-| **Descripción** |El sistema debe permitir consultar el perfil deportivo de un jugador, incluyendo su posición, dorsal y foto. |
-| **Precondiciones** | El actor debe estar autenticado con JWT válido. El perfil deportivo debe existir. |
-| **Actor** |  Jugador, Capitán, Organizador, Administrador.|
-| **Flujo principal** | 1. El actor envía GET a /players/profile/{userId}. 2. El sistema valida el token y el rol. 3. El sistema consulta los datos del perfil en PostgreSQL. 4. El sistema recupera la foto desde MongoDB. 5. El sistema retorna el perfil completo ensamblado: posición, dorsal, foto y estado de vinculación a equipo. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF6.png)![alt text](./../images/RF6-.png) |
-| **Poscondiciones** | El actor recibe la información completa del perfil deportivo del jugador. |
+| **ID** | RF-06 |
+| **Requirement Name** | Query sports profile |
+| **Description** | The system must allow querying a player sports profile, including position, jersey number, photo, and team linkage status. |
+| **Preconditions** | The actor must be authenticated with a valid JWT. The sports profile must exist. |
+| **Actor** | Player, Captain, Organizer, Administrator |
+| **Main Flow** | 1. The actor sends GET to /players/profile/{userId}. 2. The system validates the token and role. 3. The system retrieves profile data from PostgreSQL. 4. The system retrieves the photo from MongoDB. 5. The system returns the assembled profile. |
+| **Use Case Diagram** | ![alt text](./../images/RF6.png) ![alt text](./../images/RF6-.png) |
+| **Postconditions** | The actor receives the full sports profile information. |
 
 ---
 
-## 2.7 Actualizar perfil deportivo
+## RF-07 Update sports profile
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-07|
-| **Nombre del requerimiento** | Actualizar perfil deportivo |
-| **Descripción** |El sistema debe permitir que un jugador actualice su posición, dorsal o foto, siempre que no esté vinculado a un equipo inscrito en torneo Activo o En Progreso. |
-| **Precondiciones** | El actor debe estar autenticado con JWT válido y tener rol Jugador. El perfil deportivo debe existir. |
-| **Actor** |  Jugador.|
-| **Flujo principal** | 1. El jugador envía PUT a /players/profile con los campos a modificar. 2. El sistema valida el token y el rol. 3. El sistema consulta al Servicio de Equipos si el jugador está en un equipo con torneo Activo o En Progreso. 4. Si no hay bloqueo, el sistema actualiza los datos en PostgreSQL. 5. Si se envía nueva foto, se actualiza el documento en MongoDB. 6. El sistema retorna el perfil actualizado. 7. La acción queda registrada en auditoría. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF7.png)![alt text](./../images/RF7-.png) |
-| **Poscondiciones** | El perfil deportivo queda actualizado en PostgreSQL y/o MongoDB. La acción queda registrada en auditoría. |
+| **ID** | RF-07 |
+| **Requirement Name** | Update sports profile |
+| **Description** | The system must allow a player to update position, jersey number, or photo as long as they are not linked to a team in an Active or In-Progress tournament. |
+| **Preconditions** | The actor must be authenticated with a valid JWT and have Player role. The sports profile must exist. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends PUT to /players/profile with fields to modify. 2. The system validates token and role. 3. The system checks Teams Service for Active/In-Progress linkage. 4. If no lock, the system updates PostgreSQL. 5. If a new photo is provided, the system updates MongoDB. 6. The system returns the updated profile. 7. The action is recorded in audit. |
+| **Use Case Diagram** | ![alt text](./../images/RF7.png) ![alt text](./../images/RF7-.png) |
+| **Postconditions** | The sports profile is updated in PostgreSQL and/or MongoDB. The action is recorded in audit. |
 
 ---
 
-## 2.8 Eliminar perfil deportivo 
+## RF-08 Block sports profile deletion
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-08|
-| **Nombre del requerimiento** | Bloquear eliminación de perfil deportivo |
-| **Descripción** |El sistema no debe permitir la eliminación de perfiles deportivos bajo ninguna circunstancia para preservar la integridad histórica del torneo. |
-| **Precondiciones** | N/A. |
-| **Actor** |  Cualquier actor.|
-| **Flujo principal** |1. El actor envía DELETE a /players/profile/{userId}. 2. El sistema retorna 405 Method Not Allowed con el mensaje: "La eliminación de perfiles deportivos no está permitida." |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF8.png)![alt text](./../images/RF8-.png) |
-| **Poscondiciones** | El perfil deportivo permanece intacto en base de datos. |
+| **ID** | RF-08 |
+| **Requirement Name** | Block sports profile deletion |
+| **Description** | The system must not allow sports profile deletion to preserve the historical integrity of the tournament. |
+| **Preconditions** | N/A |
+| **Actor** | Any actor |
+| **Main Flow** | 1. The actor sends DELETE to /players/profile/{userId}. 2. The system returns 405 Method Not Allowed with a message indicating deletion is not permitted. |
+| **Use Case Diagram** | ![alt text](./../images/RF8.png) ![alt text](./../images/RF8-.png) |
+| **Postconditions** | The sports profile remains unchanged in the database. |
 
 ---
 
-## 2.9  Buscar jugadores para invitar
+## RF-09 Search players to invite
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-09|
-| **Nombre del requerimiento** | Buscar jugadores para invitar |
-| **Descripción** |El sistema debe permitir al capitán buscar jugadores registrados en el sistema visualizando su nombre y estado de disponibilidad para decidir a cuál enviarle una invitación a su equipo. |
-| **Precondiciones** | El actor debe estar autenticado con JWT válido y tener rol Capitán. |
-| **Actor** |  Capitán.|
-| **Flujo principal** |1. El capitán envía GET a /players?name= con el nombre del jugador a buscar. 2. El sistema valida el token y el rol. 3. El sistema consulta en PostgreSQL los jugadores que coincidan con el nombre. 4. El sistema retorna la lista de jugadores con su nombre y estado de disponibilidad. |
-| **Diagrama de caso de uso** |![alt text](./../images/RF9.png)![alt text](./../images/RF9-.png) |
-| **Poscondiciones** | El capitán recibe la lista de jugadores con su nombre y estado, pudiendo seleccionar a quién invitar. |
+| **ID** | RF-09 |
+| **Requirement Name** | Search players to invite |
+| **Description** | The system must allow a captain to search registered players by name and view their availability status to decide who to invite. |
+| **Preconditions** | The actor must be authenticated with a valid JWT and have Captain role. |
+| **Actor** | Captain |
+| **Main Flow** | 1. The captain sends GET to /players?name= with the player name. 2. The system validates token and role. 3. The system queries PostgreSQL for matching players. 4. The system returns the list with names and availability status. |
+| **Use Case Diagram** | ![alt text](./../images/RF9.png) ![alt text](./../images/RF9-.png) |
+| **Postconditions** | The captain receives the player list with availability status. |
 
 ---
 
-## 2.10  Enviar solicitud de vinculación a equipo
+## RF-10 Send team linkage request
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-010|
-| **Nombre del requerimiento** | Enviar solicitud de vinculación a equipo |
-| **Descripción** |El sistema debe permitir que un jugador envíe una solicitud para unirse a un equipo disponible, permitiendo solo una solicitud activa por jugador a la vez. |
-| **Precondiciones** | El actor debe estar autenticado con rol Jugador. El jugador no debe estar ya vinculado a un equipo. El jugador no debe tener una solicitud en estado PENDIENTE. |
-| **Actor** |  Jugador. |
-| **Flujo principal** |1. El jugador envía POST a /players/requests con el ID del equipo al que desea vincularse. 2. El sistema valida el token y el rol. 3. El sistema verifica que el jugador no tenga una solicitud activa (estado PENDIENTE). 4. El sistema verifica que el jugador no esté ya en un equipo. 5. El sistema crea la solicitud con estado PENDIENTE en PostgreSQL. 6. El sistema notifica al Servicio de Equipos sobre la nueva solicitud. 7. El sistema retorna la solicitud creada con código 201. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF10.png)![alt text](./../images/RF10-.png)|
-| **Poscondiciones** | La solicitud queda registrada en estado PENDIENTE. El Servicio de Equipos es notificado. La acción queda en auditoría. |
+| **ID** | RF-10 |
+| **Requirement Name** | Send team linkage request |
+| **Description** | The system must allow a player to send a request to join an available team, allowing only one active request at a time. |
+| **Preconditions** | The actor must be authenticated with Player role. The player must not be linked to a team. The player must not have a pending request. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends POST to /players/requests with the team ID. 2. The system validates token and role. 3. The system verifies no pending request exists. 4. The system verifies the player is not already in a team. 5. The system creates a request with PENDING status in PostgreSQL. 6. The system notifies the Teams Service. 7. The system returns the created request with 201 status. |
+| **Use Case Diagram** | ![alt text](./../images/RF10.png) ![alt text](./../images/RF10-.png) |
+| **Postconditions** | The request is stored with PENDING status. The Teams Service is notified. The action is recorded in audit. |
 
 ---
 
-## 2.11  Consultar solicitudes enviadas
+## RF-11 Query sent requests
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-011|
-| **Nombre del requerimiento** | Consultar solicitudes de vinculación |
-| **Descripción** |El sistema debe permitir que un jugador consulte el estado de su solicitud de vinculación activa e historial de solicitudes anteriores. |
-| **Precondiciones** | El actor debe estar autenticado con rol Jugador. |
-| **Actor** |  Jugador. |
-| **Flujo principal** |1. El jugador envía GET a /players/requests. 2. El sistema valida el token. 3. El sistema retorna la solicitud activa (si existe) y el historial de solicitudes anteriores con sus estados y fechas. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF11.png)![alt text](./../images/RF11-.png) |
-| **Poscondiciones** | El jugador recibe el estado actualizado de sus solicitudes. |
+| **ID** | RF-11 |
+| **Requirement Name** | Query sent requests |
+| **Description** | The system must allow a player to view the current status and history of their team linkage requests. |
+| **Preconditions** | The actor must be authenticated with Player role. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends GET to /players/requests. 2. The system validates the token. 3. The system returns the active request (if any) and the history of previous requests with statuses and dates. |
+| **Use Case Diagram** | ![alt text](./../images/RF11.png) ![alt text](./../images/RF11-.png) |
+| **Postconditions** | The player receives the updated request status and history. |
 
 ---
 
-## 2.12  Cancelar solicitud de vinculación
+## RF-12 Cancel linkage request
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-012|
-| **Nombre del requerimiento** | Cancelar solicitud de vinculación |
-| **Descripción** |El sistema debe permitir que un jugador cancele su solicitud de vinculación siempre que esta esté en estado PENDIENTE. |
-| **Precondiciones** | El actor debe estar autenticado con rol Jugador. Debe existir una solicitud en estado PENDIENTE del jugador. |
-| **Actor** |  Jugador. |
-| **Flujo principal** |1. El jugador envía PATCH a /players/requests/{id}/cancel. 2. El sistema valida el token y que la solicitud pertenece al jugador. 3. El sistema verifica que la solicitud está en estado PENDIENTE. 4. El sistema cambia el estado a CANCELADA en PostgreSQL. 5. El sistema notifica al Servicio de Equipos de la cancelación. 6. El sistema retorna confirmación. |
-| **Diagrama de caso de uso** |![alt text](./../images/RF12.png) ![alt text](./../images/RF12-.png)|
-| **Poscondiciones** |La solicitud queda en estado CANCELADA. El jugador queda disponible para enviar una nueva solicitud. La acción queda en auditoría. |
+| **ID** | RF-12 |
+| **Requirement Name** | Cancel linkage request |
+| **Description** | The system must allow a player to cancel a linkage request while it is in PENDING status. |
+| **Preconditions** | The actor must be authenticated with Player role. A PENDING request must exist for the player. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends PATCH to /players/requests/{id}/cancel. 2. The system validates the token and request ownership. 3. The system verifies the request is PENDING. 4. The system updates status to CANCELED in PostgreSQL. 5. The system notifies the Teams Service. 6. The system returns confirmation. |
+| **Use Case Diagram** | ![alt text](./../images/RF12.png) ![alt text](./../images/RF12-.png) |
+| **Postconditions** | The request is marked CANCELED. The player is available to send a new request. The action is recorded in audit. |
 
 ---
 
-## 2.13   Recibir invitación de un equipo
+## RF-13 Receive team invitation
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-013|
-| **Nombre del requerimiento** | Recibir invitación de equipo |
-| **Descripción** |El sistema debe permitir que el Servicio de Equipos registre una invitación dirigida a un jugador, la cual quedará visible para que el jugador la gestione. |
-| **Precondiciones** | El jugador invitado debe existir y estar en estado Activo. El jugador no debe estar ya vinculado a un equipo. La solicitud debe provenir del Servicio de Equipos autenticado. |
-| **Actor** | Servicio de Equipos (llamada interna), Capitán (indirectamente). |
-| **Flujo principal** |1. El Servicio de Equipos envía POST a /players/invitations con el ID del jugador y el ID del equipo. 2. El sistema valida la solicitud. 3. El sistema verifica que el jugador no esté ya en un equipo. 4. El sistema registra la invitación con estado PENDIENTE en PostgreSQL. 5. El sistema retorna confirmación con código 201. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF13.png)![alt text](./../images/RF13-.png) |
-| **Poscondiciones** |La invitación queda registrada en estado PENDIENTE asociada al jugador.|
+| **ID** | RF-13 |
+| **Requirement Name** | Receive team invitation |
+| **Description** | The system must allow the Teams Service to register an invitation for a player, visible for player management. |
+| **Preconditions** | The invited player must exist and be Active. The player must not be linked to a team. The request must come from the authenticated Teams Service. |
+| **Actor** | Teams Service (internal call), Captain (indirect) |
+| **Main Flow** | 1. The Teams Service sends POST to /players/invitations with player and team IDs. 2. The system validates the request. 3. The system verifies the player is not in a team. 4. The system creates the invitation with PENDING status in PostgreSQL. 5. The system returns confirmation with 201 status. |
+| **Use Case Diagram** | ![alt text](./../images/RF13.png) ![alt text](./../images/RF13-.png) |
+| **Postconditions** | The invitation is stored with PENDING status for the player. |
 
 ---
 
-## 2.14    Consultar invitaciones recibidas
+## RF-14 Query received invitations
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-014|
-| **Nombre del requerimiento** |  Consultar invitaciones recibidas |
-| **Descripción** |El sistema debe permitir que un jugador consulte todas las invitaciones que ha recibido de equipos, con sus estados actuales. |
-| **Precondiciones** |El actor debe estar autenticado con rol Jugador. |
-| **Actor** | Jugador.  |
-| **Flujo principal** |1. El jugador envía GET a /players/invitations. 2. El sistema valida el token. 3. El sistema retorna todas las invitaciones del jugador con estado, nombre del equipo y fecha de invitación. |
-| **Diagrama de caso de uso** | ![alt text](./../images/RF14.png) ![alt text](./../images/RF14-.png)|
-| **Poscondiciones** | El jugador recibe la lista completa de sus invitaciones con sus estados. |
+| **ID** | RF-14 |
+| **Requirement Name** | Query received invitations |
+| **Description** | The system must allow a player to view all invitations received from teams with their current status. |
+| **Preconditions** | The actor must be authenticated with Player role. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends GET to /players/invitations. 2. The system validates the token. 3. The system returns all invitations for the player with status, team name, and invitation date. |
+| **Use Case Diagram** | ![alt text](./../images/RF14.png) ![alt text](./../images/RF14-.png) |
+| **Postconditions** | The player receives the complete invitation list with status. |
 
 ---
 
-## 2.15  Aceptar o rechazar invitación
+## RF-15 Accept or reject invitation
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-015|
-| **Nombre del requerimiento** |   Aceptar o rechazar invitación |
-| **Descripción** |El sistema debe permitir que un jugador acepte o rechace una invitación pendiente. Al aceptar, el sistema confirma la vinculación con el Servicio de Equipos y cancela automáticamente las demás invitaciones pendientes del jugador. |
-| **Precondiciones** | El actor debe estar autenticado con rol Jugador. La invitación debe existir en estado PENDIENTE y pertenecer al jugador autenticado. |
-| **Actor** | Jugador.  |
-| **Flujo principal** |1. El jugador envía PATCH a /players/invitations/{id} con {action: "ACCEPT"} o {action: "REJECT"}. 2. El sistema valida el token y que la invitación pertenece al jugador. 3. El sistema verifica que la invitación está en estado PENDIENTE. 4a. Si la acción es ACCEPT: el sistema cambia el estado a ACEPTADA, llama al Servicio de Equipos para confirmar la vinculación, y cambia todas las demás invitaciones pendientes del jugador a RECHAZADA. 4b. Si la acción es REJECT: el sistema cambia el estado a RECHAZADA. 5. El sistema retorna la invitación con su nuevo estado. 6. La acción queda registrada en auditoría.|
-| **Diagrama de caso de uso** | ![alt text](./../images/RF15.png)![alt text](./../images/RF15-.png) |
-| **Poscondiciones** |La invitación queda en estado ACEPTADA o RECHAZADA. Si fue aceptada, el jugador queda vinculado al equipo en el Servicio de Equipos y sus demás invitaciones quedan rechazadas. La acción queda en auditoría. |
+| **ID** | RF-15 |
+| **Requirement Name** | Accept or reject invitation |
+| **Description** | The system must allow a player to accept or reject a pending invitation. On acceptance, the system confirms linkage with Teams Service and cancels other pending invitations. |
+| **Preconditions** | The actor must be authenticated with Player role. The invitation must exist in PENDING status and belong to the authenticated player. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player sends PATCH to /players/invitations/{id} with {action: "ACCEPT"} or {action: "REJECT"}. 2. The system validates the token and ownership. 3. The system verifies PENDING status. 4a. If ACCEPT: set status to ACCEPTED, confirm linkage with Teams Service, and reject other pending invitations. 4b. If REJECT: set status to REJECTED. 5. The system returns the updated invitation. 6. The action is recorded in audit. |
+| **Use Case Diagram** | ![alt text](./../images/RF15.png) ![alt text](./../images/RF15-.png) |
+| **Postconditions** | The invitation is ACCEPTED or REJECTED. If accepted, the player is linked to the team and other invitations are rejected. The action is recorded in audit. |
 
 ---
 
-## 2.16 Registrar log de auditoría
+## RF-16 Register audit log
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RF-016|
-| **Nombre del requerimiento** |   Registrar log de auditoría |
-| **Descripción** |El sistema debe registrar automáticamente todas las acciones relevantes realizadas sobre usuarios y jugadores para garantizar trazabilidad completa. |
-| **Precondiciones** |El sistema debe estar en ejecución. La acción auditada debe haberse ejecutado exitosamente.|
-| **Actor** | Sistema.  |
-| **Flujo principal** |1. Tras ejecutar cualquier acción relevante (actualización de usuario, inactivación, creación/actualización de perfil, envío/cancelación/aceptación/rechazo de solicitudes e invitaciones), el sistema registra automáticamente en la tabla audit_log: ID del usuario que ejecutó la acción, tipo de acción, timestamp, datos anteriores (snapshot) y datos nuevos. 2. El administrador puede consultar el log mediante GET a /audit?userId=&action=&from=&to=.|
-| **Diagrama de caso de uso** | N/A (SISTEMA) |
-| **Poscondiciones** |Cada acción relevante queda registrada en la tabla audit_log con todos sus metadatos. |
+| **ID** | RF-16 |
+| **Requirement Name** | Register audit log |
+| **Description** | The system must automatically register all relevant actions on users and players for traceability. |
+| **Preconditions** | The system is running. The audited action was executed successfully. |
+| **Actor** | System |
+| **Main Flow** | 1. After relevant actions (user update, deactivation, profile create/update, request/invitation changes), the system writes an audit_log record with user ID, action, timestamp, previous data snapshot, and new data. 2. The administrator can query logs via GET /audit?userId=&action=&from=&to=. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | Each relevant action is stored in audit_log with full metadata. |
 
 ---
-# 3. Especificacion de requiriminientos no funcionales: 
 
-## 3.1 Seguridad: Autenticación por JWT
+## RF-17 Display user profile view
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RNF-01|
-| **Nombre del requerimiento** |   Autenticación mediante JWT |
-| **Descripción** |Todos los endpoints del microservicio deben requerir un token JWT válido en el header Authorization: Bearer {token}. El token es generado por el Servicio de Identidad y este microservicio solo lo valida (firma y expiración). |
-| **Criterio de aceptacion** |Cualquier request sin token o con token malformado/expirado retorna 401 Unauthorized. El microservicio nunca genera tokens, solo los valida.|
-| **Categoría** | Seguridad  |
+| **ID** | RF-17 |
+| **Requirement Name** | Display user profile view |
+| **Description** | The frontend must display a screen where the authenticated user can view and edit their personal information in a clear and intuitive form. |
+| **Preconditions** | The user must be authenticated in the frontend and have valid session state. |
+| **Actor** | Authenticated user |
+| **Main Flow** | 1. The user navigates to the profile screen. 2. The frontend fetches user data from the API. 3. The frontend renders editable fields and shows validation hints. 4. The user saves changes and receives feedback. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | The user can view and submit updates to their profile data. |
 
 ---
 
-## 3.2  Seguridad: Control de acceso por rol
+## RF-18 Display sports profile view
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RNF-02|
-| **Nombre del requerimiento** |   Control de acceso por rol. |
-| **Descripción** |Cada endpoint debe validar que el rol contenido en el JWT tiene permisos para ejecutar la operación solicitada. Un jugador no puede acceder a endpoints de administrador y viceversa. |
-| **Criterio de aceptacion** |Un request con token válido pero rol insuficiente retorna 403 Forbidden. La validación de rol ocurre en la capa de controlador mediante anotaciones de Spring Security (@PreAuthorize).|
-| **Categoría** | Seguridad  |
+| **ID** | RF-18 |
+| **Requirement Name** | Display sports profile view |
+| **Description** | The frontend must display a screen where the player can create, view, and update their sports profile with photo upload and preview. |
+| **Preconditions** | The user must be authenticated and have Player role. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player opens the sports profile screen. 2. The frontend loads current data (if any). 3. The player uploads a photo and edits fields. 4. The frontend validates inputs and submits changes. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | The player can view and update the sports profile with a photo preview. |
 
 ---
 
-## 3.3 Seguridad: Cifrado de datos sensibles en tránsito
+## RF-19 Display player search view
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| **ID** | RNF-03|
-| **Nombre del requerimiento** |   Comunicación segura entre servicios |
-| **Descripción** |Toda comunicación entre el microservicio Users & Players y otros microservicios (Equipos, Identidad) debe realizarse sobre HTTPS. Los datos de identificación y fecha de nacimiento del usuario no deben exponerse en logs ni en respuestas de error. |
-| **Criterio de aceptacion** |Ninguna respuesta de error expone datos sensibles del usuario. Los logs del sistema no contienen números de identificación ni fechas de nacimiento en texto plano.|
+| **ID** | RF-19 |
+| **Requirement Name** | Display player search view |
+| **Description** | The frontend must display a search screen for captains to find players by name and see availability with an option to invite directly. |
+| **Preconditions** | The user must be authenticated and have Captain role. |
+| **Actor** | Captain |
+| **Main Flow** | 1. The captain opens the player search view. 2. The captain enters a name filter. 3. The frontend queries the API and displays results with availability status. 4. The captain sends an invitation from the result list. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | The captain can search players and send invitations from the view. |
 
 ---
 
-## 3.4 Persistencia: Separación de almacenamiento por tipo de dato
+## RF-20 Display requests and invitations view
 
-| Campo | Descripción |
+| Field | Description |
+|-------|-------------|
+| **ID** | RF-20 |
+| **Requirement Name** | Display requests and invitations view |
+| **Description** | The frontend must display a unified screen where the player can see sent requests and received invitations with statuses and action buttons. |
+| **Preconditions** | The user must be authenticated and have Player role. |
+| **Actor** | Player |
+| **Main Flow** | 1. The player opens the requests and invitations view. 2. The frontend loads requests and invitations from the API. 3. The frontend displays status chips and action buttons. 4. The player accepts or rejects invitations. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | The player can manage requests and invitations from a single screen. |
+
+---
+
+## RF-21 Display user management view
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RF-21 |
+| **Requirement Name** | Display user management view |
+| **Description** | The frontend must display an administration panel where the administrator can search, filter, view, and deactivate users from a paginated table. |
+| **Preconditions** | The user must be authenticated and have Administrator role. |
+| **Actor** | Administrator |
+| **Main Flow** | 1. The administrator opens the user management view. 2. The frontend loads paginated user data. 3. The administrator applies filters and selects a user. 4. The administrator deactivates a user and receives confirmation. |
+| **Use Case Diagram** | añadir diagrama de casos de uso |
+| **Postconditions** | The administrator can manage users from the panel with pagination. |
+
+Non-Functional Requirements
+---------------------------
+
+1. JWT authentication — All endpoints require a valid JWT token generated by the Identity Service, returning 401 for absent, malformed or expired tokens.
+2. Role-based access control — Each endpoint validates that the role in the token has permission for the requested operation, returning 403 if the role is insufficient.
+3. Secure communication between services — All communication between microservices occurs over HTTPS without exposing sensitive data in logs or error responses.
+4. PostgreSQL and MongoDB storage separation — Structured data is persisted in PostgreSQL and sports profile photos exclusively in MongoDB, referenced by ID.
+5. Database referential integrity — The schema guarantees no orphan profiles, duplicate active requests or duplicate active invitations for the same player and team exist.
+6. Mandatory layered architecture — The microservice strictly separates controller, service, adapter and repository layers with no cross dependencies between non-adjacent layers.
+7. Decoupled integration with external microservices — Communication with the Teams Service uses WebClient or Feign Client, handling errors and timeouts with a controlled 503 response.
+8. Code coverage with JaCoCo — Minimum test coverage of 80%, with automatic build failure if the configured threshold is not reached.
+9. Code quality analysis with SonarQube — The code must pass the Quality Gate with no critical bugs, security vulnerabilities or high severity code smells.
+10. API documentation with Swagger/OpenAPI — All endpoints are documented with springdoc-openapi including parameters, request body, response codes and examples.
+11. Centralized exception handling — A global @RestControllerAdvice captures all errors returning uniform JSON responses without exposing stack traces.
+12. Frontend responsiveness — The user interface must be responsive and functional on desktop and mobile devices, adapting correctly to different screen sizes using the React framework with TypeScript.
+13. Frontend input validation — All forms in the frontend must validate required fields, data formats and character limits before sending requests to the API, showing clear error messages to the user.
+14. Frontend JWT session management — The frontend must store the JWT token securely, attach it automatically to every API request and redirect the user to the login screen when the token expires.
+15. Frontend user experience — Screen transitions, loading states and error or success messages must be handled consistently across all views so the user always knows what state the application is in.
+
+Non-Functional Requirement Specifications
+----------------------------------------
+
+## RNF-01 JWT authentication
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-01 |
+| **Requirement Name** | JWT authentication |
+| **Description** | All endpoints must require a valid JWT token generated by the Identity Service, returning 401 for absent, malformed, or expired tokens. |
+| **Acceptance Criteria** | Requests without a valid token return 401 Unauthorized. The microservice only validates tokens and never issues them. |
+| **Category** | Security |
+
+---
+
+## RNF-02 Role-based access control
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-02 |
+| **Requirement Name** | Role-based access control |
+| **Description** | Each endpoint must validate that the role in the JWT has permission for the requested operation, returning 403 if the role is insufficient. |
+| **Acceptance Criteria** | A valid token with insufficient role returns 403 Forbidden. Role checks are enforced at controller level (e.g., @PreAuthorize). |
+| **Category** | Security |
+
+---
+
+## RNF-03 Secure communication between services
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-03 |
+| **Requirement Name** | Secure communication between services |
+| **Description** | All communication between microservices must use HTTPS and must not expose sensitive data in logs or error responses. |
+| **Acceptance Criteria** | All service-to-service calls use HTTPS. Logs and error responses never include sensitive data (e.g., identifiers, birth dates). |
+| **Category** | Security |
+
+---
+
+## RNF-04 PostgreSQL and MongoDB storage separation
+
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-04 |
-| **Nombre del requerimiento** | Separación de almacenamiento PostgreSQL y MongoDB |
-| **Descripción** |Los datos estructurados del usuario y jugador (campos de texto, números, estados, relaciones) deben persistirse en PostgreSQL. Las fotos del perfil deportivo deben almacenarse exclusivamente en MongoDB. Ningún dato estructurado debe guardarse en MongoDB ni ninguna imagen en PostgreSQL. |
-| **Criterio de aceptacion** |El endpoint de creación de perfil deportivo almacena foto en MongoDB y retorna solo el ID del documento. PostgreSQL almacena ese ID como referencia. Una consulta al perfil ensambla ambas fuentes antes de retornar la respuesta.|
-| **Categoría** | Persistencia |
+| **Requirement Name** | PostgreSQL and MongoDB storage separation |
+| **Description** | Structured data is persisted in PostgreSQL and sports profile photos are stored exclusively in MongoDB, referenced by ID. |
+| **Acceptance Criteria** | Sports profile photo data is stored in MongoDB only. PostgreSQL stores the MongoDB document ID and assembles responses by joining both sources. |
+| **Category** | Persistence |
 
 ---
 
-## 3.5 Persistencia: Integridad referencial de datos
+## RNF-05 Database referential integrity
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-05 |
-| **Nombre del requerimiento** | Integridad referencial en base de datos |
-| **Descripción** | La base de datos debe garantizar que no existan perfiles deportivos huérfanos (sin usuario asociado), solicitudes duplicadas activas por jugador, ni invitaciones duplicadas activas para el mismo jugador y equipo. |
-| **Criterio de aceptacion** | Las restricciones de unicidad y llaves foráneas están definidas a nivel de esquema en PostgreSQL. Las validaciones de negocio se aplican también en la capa de servicio antes de llegar a la base de datos. |
-| **Categoría** | Persistencia |
+| **Requirement Name** | Database referential integrity |
+| **Description** | The schema must prevent orphan profiles, duplicate active requests, and duplicate active invitations for the same player and team. |
+| **Acceptance Criteria** | Uniqueness constraints and foreign keys enforce integrity at the schema level. Service logic also validates duplicates before insert. |
+| **Category** | Persistence |
 
 ---
 
-## 3.6 Arquitectura: Separación por capas
+## RNF-06 Mandatory layered architecture
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-06 |
-| **Nombre del requerimiento** | Arquitectura en capas obligatoria |
-| **Descripción** | El microservicio debe seguir estrictamente la separación en cuatro capas: controlador (recibe y valida el request HTTP), servicio/lógica (aplica reglas de negocio), adaptador (gestiona comunicación con servicios externos), repositorio/datos (acceso a PostgreSQL y MongoDB). Ninguna capa debe saltar a otra no adyacente. |
-| **Criterio de aceptacion** | Un controlador nunca accede directamente a un repositorio. Un repositorio nunca contiene lógica de negocio. La revisión de código en SonarQube no reporta dependencias cruzadas entre capas. |
-| **Categoría** | Arquitectura |
+| **Requirement Name** | Mandatory layered architecture |
+| **Description** | The microservice must strictly separate controller, service, adapter, and repository layers with no cross dependencies between non-adjacent layers. |
+| **Acceptance Criteria** | Controllers do not access repositories directly. Repositories contain no business logic. Static analysis shows no cross-layer dependencies. |
+| **Category** | Architecture |
 
 ---
 
-## 3.7 Arquitectura: Integración con otros microservicios mediante API REST
+## RNF-07 Decoupled integration with external microservices
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-07 |
-| **Nombre del requerimiento** | Integración desacoplada con microservicios externos |
-| **Descripción** |La comunicación con el Servicio de Equipos debe realizarse mediante llamadas HTTP REST usando WebClient o Feign Client. El microservicio no debe compartir base de datos ni clases de dominio directamente con otros servicios. Si el Servicio de Equipos no está disponible, este microservicio debe manejar el error de forma controlada sin caer. |
-| **Criterio de aceptacion** | Existe una capa adaptadora dedicada para cada servicio externo. Si el Servicio de Equipos retorna error o timeout, el microservicio retorna 503 Service Unavailable con mensaje descriptivo en lugar de lanzar una excepción no controlada. |
-| **Categoría** | Arquitectura |
+| **Requirement Name** | Decoupled integration with external microservices |
+| **Description** | Communication with the Teams Service uses WebClient or Feign Client and handles errors and timeouts with a controlled 503 response. |
+| **Acceptance Criteria** | Each external service has a dedicated adapter. Timeouts or errors return 503 Service Unavailable with a descriptive message. |
+| **Category** | Architecture |
 
 ---
 
-## 3.8 Calidad: Cobertura de pruebas mínima del 80%
+## RNF-08 Code coverage with JaCoCo
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-08 |
-| **Nombre del requerimiento** | Cobertura de código con JaCoCo |
-| **Descripción** |El microservicio debe mantener una cobertura de pruebas unitarias e integración mínima del 80% medida con JaCoCo. Las pruebas deben cubrir la capa de servicio completa, los casos de éxito y los flujos alternos de error de cada requerimiento funcional. |
-| **Criterio de aceptacion** | El reporte de JaCoCo muestra cobertura ≥ 80% en la capa de servicio. El build de Maven falla automáticamente si la cobertura cae por debajo del umbral configurado. Las integraciones con servicios externos se prueban con mocks (Mockito). |
-| **Categoría** | Calidad |
+| **Requirement Name** | Code coverage with JaCoCo |
+| **Description** | Minimum test coverage is 80%, with build failure if the configured threshold is not reached. |
+| **Acceptance Criteria** | JaCoCo reports at least 80% coverage for service layer tests. Maven build fails if coverage drops below the threshold. |
+| **Category** | Quality |
 
 ---
 
-## 3.9 Calidad: Calidad: Análisis estático con SonarQube
+## RNF-09 Code quality analysis with SonarQube
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-09 |
-| **Nombre del requerimiento** | Análisis de calidad con SonarQube |
-| **Descripción** |El código del microservicio debe pasar el Quality Gate de SonarQube sin bugs críticos ni bloqueantes, sin vulnerabilidades de seguridad reportadas y sin code smells de severidad alta. |
-| **Criterio de aceptacion** | El Quality Gate de SonarQube retorna estado passed en cada integración. No existen vulnerabilidades de tipo BLOCKER o CRITICAL. La deuda técnica acumulada no supera 1 día de trabajo por sprint. |
-| **Categoría** | Calidad |
+| **Requirement Name** | Code quality analysis with SonarQube |
+| **Description** | The microservice must pass the SonarQube Quality Gate with no critical or blocker bugs, no reported security vulnerabilities, and no high-severity code smells. |
+| **Acceptance Criteria** | The Quality Gate returns PASSED on each integration. No BLOCKER or CRITICAL vulnerabilities exist. Technical debt does not exceed one day per sprint. |
+| **Category** | Quality |
 
 ---
 
-## 3.10 Mantenibilidad: Documentación de API con OpenAPI
+## RNF-10 API documentation with Swagger/OpenAPI
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-10 |
-| **Nombre del requerimiento** | Documentación automática de endpoints con Swagger/OpenAPI |
-| **Descripción** |Todos los endpoints del microservicio deben estar documentados mediante springdoc-openapi, incluyendo descripción, parámetros, body de request, posibles códigos de respuesta y ejemplos. La documentación debe estar disponible en /swagger-ui.html en el entorno de desarrollo. |
-| **Criterio de aceptacion** | Cada endpoint tiene anotaciones @Operation, @ApiResponse y @Parameter completas. Un desarrollador externo puede entender y consumir el API sin necesidad de leer el código fuente. |
-| **Categoría** | Mantenibilidad |
+| **Requirement Name** | API documentation with Swagger/OpenAPI |
+| **Description** | All endpoints must be documented with springdoc-openapi including description, parameters, request body, response codes, and examples. Documentation must be available at /swagger-ui.html in development. |
+| **Acceptance Criteria** | Each endpoint includes @Operation, @ApiResponse, and @Parameter annotations. A developer can consume the API without reading source code. |
+| **Category** | Maintainability |
 
 ---
 
-## 3.11 Mantenibilidad: Manejo centralizado de errores
+## RNF-11 Centralized exception handling
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
 | **ID** | RNF-11 |
-| **Nombre del requerimiento** | Manejo centralizado de excepciones |
-| **Descripción** |El microservicio debe tener un manejador global de excepciones (@RestControllerAdvice) que capture todos los errores y retorne respuestas HTTP con estructura uniforme: código de estado, mensaje descriptivo y timestamp. Ningún endpoint debe retornar stack traces ni mensajes de excepción de Java en texto plano. |
-| **Criterio de aceptacion** | Toda excepción no controlada retorna una respuesta JSON con estructura {status, message, timestamp}. Los errores de validación de campos retornan 400 con el detalle de cada campo inválido. Nunca se expone un stack trace en la respuesta HTTP. |
-| **Categoría** | Mantenibilidad |
+| **Requirement Name** | Centralized exception handling |
+| **Description** | A global @RestControllerAdvice must capture errors and return uniform JSON responses without exposing stack traces. |
+| **Acceptance Criteria** | Unhandled exceptions return {status, message, timestamp}. Validation errors return 400 with field-level details. No stack traces are exposed in HTTP responses. |
+| **Category** | Maintainability |
+
+---
+
+## RNF-12 Frontend responsiveness
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-12 |
+| **Requirement Name** | Frontend responsiveness |
+| **Description** | The UI must be responsive on desktop and mobile, adapting correctly to different screen sizes using React with TypeScript. |
+| **Acceptance Criteria** | All core views render correctly at common breakpoints (mobile, tablet, desktop) without layout breakage. |
+| **Category** | Usability |
+
+---
+
+## RNF-13 Frontend input validation
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-13 |
+| **Requirement Name** | Frontend input validation |
+| **Description** | All frontend forms must validate required fields, data formats, and character limits before sending requests to the API. |
+| **Acceptance Criteria** | Invalid inputs are blocked client-side with clear error messages. Requests are not sent when validation fails. |
+| **Category** | Usability |
+
+---
+
+## RNF-14 Frontend JWT session management
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-14 |
+| **Requirement Name** | Frontend JWT session management |
+| **Description** | The frontend must store the JWT securely, attach it to every API request, and redirect to login when the token expires. |
+| **Acceptance Criteria** | All API calls include the JWT. Expired tokens trigger a redirect to the login screen and a user-facing message. |
+| **Category** | Security |
+
+---
+
+## RNF-15 Frontend user experience
+
+| Field | Description |
+|-------|-------------|
+| **ID** | RNF-15 |
+| **Requirement Name** | Frontend user experience |
+| **Description** | Screen transitions, loading states, and error/success messages must be consistent across all views. |
+| **Acceptance Criteria** | Each view shows a standardized loading indicator and consistent success/error feedback. Navigation states are predictable. |
+| **Category** | Usability |
 
 # Diagrama de contexto
  ![alt text](<../images/Diagrama de contexto Users and Players.png>)
