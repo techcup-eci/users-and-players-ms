@@ -1,12 +1,11 @@
 package edu.eci.userService.entities;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,7 +20,8 @@ public class AthleticProfileEntity {
     private int dorsalNumber;
 
     @Column(nullable = false)
-    private Date dateOfBirth;
+    @OneToOne()
+    private String email;
 
     @Column(nullable = false)
     private String position;
@@ -39,8 +39,8 @@ public class AthleticProfileEntity {
         this.dorsalNumber = dorsalNumber;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPosition(String position) {
@@ -63,8 +63,8 @@ public class AthleticProfileEntity {
         return dorsalNumber;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    public String getEmail() {
+        return email;
     }
 
     public String getPosition() {

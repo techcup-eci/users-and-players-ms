@@ -1,11 +1,9 @@
 package edu.eci.userService.dto;
 
-import java.util.Date;
-
 public class AthleticProfileDTO {
 
     private int dorsalNumber;
-    private Date dateOfBirth;
+    private String email;
     private String position;
     private String laterality;
     private String stature;
@@ -14,10 +12,10 @@ public class AthleticProfileDTO {
     public AthleticProfileDTO() {
     }
 
-    public AthleticProfileDTO(int dorsalNumber, Date dateOfBrith, String position, String laterality, String stature,
+    public AthleticProfileDTO(int dorsalNumber, String email, String position, String laterality, String stature,
             String state) {
         this.dorsalNumber = dorsalNumber;
-        this.dateOfBirth = dateOfBrith;
+        this.email = email;
         this.position = position;
         this.laterality = laterality;
         this.stature = stature;
@@ -28,8 +26,8 @@ public class AthleticProfileDTO {
         return dorsalNumber;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    public String getEmail() {
+        return email;
     }
 
     public String getPosition() {
@@ -52,8 +50,8 @@ public class AthleticProfileDTO {
         this.dorsalNumber = dorsalNumber;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPosition(String position) {
