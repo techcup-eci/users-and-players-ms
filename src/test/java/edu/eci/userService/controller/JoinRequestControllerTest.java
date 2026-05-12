@@ -1,14 +1,14 @@
-package edu.eci.userService.controller;
+package com.techcup.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.eci.userService.dto.SendJoinRequestRequest;
-import edu.eci.userService.exception.PendingJoinRequestException;
-import edu.eci.userService.exception.TeamNotAvailableException;
-import edu.eci.userService.exception.UserNotFoundException;
-import edu.eci.userService.model.JoinRequest;
-import edu.eci.userService.model.User;
-import edu.eci.userService.model.enums.JoinRequestStatus;
-import edu.eci.userService.service.JoinRequestService;
+import com.techcup.users.dto.SendJoinRequestRequest;
+import com.techcup.users.exception.PendingJoinRequestException;
+import com.techcup.users.exception.TeamNotAvailableException;
+import com.techcup.users.exception.UserNotFoundException;
+import com.techcup.users.model.JoinRequest;
+import com.techcup.users.model.User;
+import com.techcup.users.model.enums.JoinRequestStatus;
+import com.techcup.users.service.JoinRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

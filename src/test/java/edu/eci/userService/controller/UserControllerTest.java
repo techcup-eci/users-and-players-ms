@@ -1,13 +1,13 @@
-package edu.eci.userService.controller;
+package com.techcup.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.eci.userService.dto.UpdateUserRequest;
-import edu.eci.userService.exception.UserLinkedToActiveTournamentException;
-import edu.eci.userService.exception.UserNotFoundException;
-import edu.eci.userService.model.User;
-import edu.eci.userService.model.enums.SchoolRelation;
-import edu.eci.userService.model.enums.UserStatus;
-import edu.eci.userService.service.UserService;
+import com.techcup.users.dto.UpdateUserRequest;
+import com.techcup.users.exception.UserLinkedToActiveTournamentException;
+import com.techcup.users.exception.UserNotFoundException;
+import com.techcup.users.model.User;
+import com.techcup.users.model.enums.SchoolRelation;
+import com.techcup.users.model.enums.UserStatus;
+import com.techcup.users.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,11 +1,11 @@
-package edu.eci.userService.service;
+package com.techcup.users.service;
 
-import edu.eci.userService.exception.UserLinkedToActiveTournamentException;
-import edu.eci.userService.exception.UserNotFoundException;
-import edu.eci.userService.model.User;
-import edu.eci.userService.model.enums.SchoolRelation;
-import edu.eci.userService.model.enums.UserStatus;
-import edu.eci.userService.repository.UserRepository;
+import com.techcup.users.exception.UserLinkedToActiveTournamentException;
+import com.techcup.users.exception.UserNotFoundException;
+import com.techcup.users.model.User;
+import com.techcup.users.model.enums.SchoolRelation;
+import com.techcup.users.model.enums.UserStatus;
+import com.techcup.users.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

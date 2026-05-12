@@ -1,7 +1,7 @@
-package edu.eci.userService.domain;
+package com.techcup.users.domain;
 
-import edu.eci.userService.model.SportProfile;
-import edu.eci.userService.model.enums.PlayingPosition;
+import com.techcup.users.model.SportProfile;
+import com.techcup.users.model.enums.PlayingPosition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

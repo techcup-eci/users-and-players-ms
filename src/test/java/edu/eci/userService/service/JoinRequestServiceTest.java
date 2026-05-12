@@ -1,13 +1,13 @@
-package edu.eci.userService.service;
+package com.techcup.users.service;
 
-import edu.eci.userService.exception.PendingJoinRequestException;
-import edu.eci.userService.exception.TeamNotAvailableException;
-import edu.eci.userService.exception.UserNotFoundException;
-import edu.eci.userService.model.JoinRequest;
-import edu.eci.userService.model.User;
-import edu.eci.userService.model.enums.JoinRequestStatus;
-import edu.eci.userService.repository.JoinRequestRepository;
-import edu.eci.userService.repository.UserRepository;
+import com.techcup.users.exception.PendingJoinRequestException;
+import com.techcup.users.exception.TeamNotAvailableException;
+import com.techcup.users.exception.UserNotFoundException;
+import com.techcup.users.model.JoinRequest;
+import com.techcup.users.model.User;
+import com.techcup.users.model.enums.JoinRequestStatus;
+import com.techcup.users.repository.JoinRequestRepository;
+import com.techcup.users.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
