@@ -10,7 +10,9 @@ public class AthleticProfileMapper {
     public AthleticProfileDTO toDTO(AthleticProfileEntity entity) {
         AthleticProfileDTO dto = new AthleticProfileDTO();
         dto.setDorsalNumber(entity.getDorsalNumber());
-        dto.setEmail(entity.getEmail());
+        dto.setId(entity.getId());
+        dto.setUser(entity.getUser());
+        dto.setNickName(entity.getNickName());
         dto.setPosition(entity.getPosition());
         dto.setLaterality(entity.getLaterality());
         dto.setStature(entity.getStature());
@@ -21,7 +23,8 @@ public class AthleticProfileMapper {
     public AthleticProfileEntity toEntity(AthleticProfileDTO dto) {
         AthleticProfileEntity entity = new AthleticProfileEntity();
         entity.setDorsalNumber(dto.getDorsalNumber());
-        entity.setEmail(dto.getEmail());
+        entity.setId(dto.getId());
+        entity.setNickName(dto.getNickName());
         entity.setPosition(dto.getPosition());
         entity.setLaterality(dto.getLaterality());
         entity.setStature(dto.getStature());
