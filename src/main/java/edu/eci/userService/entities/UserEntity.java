@@ -124,7 +124,7 @@ public class UserEntity {
     public void setRole(UserRoleEnum role) {
         this.role = role;
     }
-w
+
     public void setRelationShip(String relationship) {
         this.relationship = relationship;
     }

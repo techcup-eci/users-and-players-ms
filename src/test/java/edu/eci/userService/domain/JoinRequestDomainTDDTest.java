@@ -1,8 +1,8 @@
-package com.techcup.users.domain;
+package edu.eci.userService.domain;
 
-import com.techcup.users.model.JoinRequest;
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.JoinRequestStatus;
+import edu.eci.userService.model.JoinRequest;
+import edu.eci.userService.model.User;
+import edu.eci.userService.model.enums.JoinRequestStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,23 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/*
- * TDD tests for the JoinRequest domain model.
- *
- * These tests define the expected behavior of the JoinRequest class
- * before the implementation exists. Every test marked with "Must fail"
- * means the test will not pass until the corresponding logic is implemented.
- *
- * Covered rules from TECHCUP FOOTBALL document (section 7.2):
- *   - Default values on creation
- *   - Status transition rules (a request can only move forward, never backward)
- *   - Business rule: a player can only have one pending request at a time
- *   - Business rule: only a PENDING request can be accepted or rejected
- *   - Business rule: a captain can only manage requests directed to their team
- *   - Audit fields presence
- *
- * Reference: TECHCUP FOOTBALL document - Section 7.2
- */
 @DisplayName("JoinRequest - Domain TDD Tests")
 class JoinRequestDomainTDDTest {
 
@@ -48,318 +31,149 @@ class JoinRequestDomainTDDTest {
         joinRequest.setStatus(JoinRequestStatus.PENDING);
     }
 
-    // ----------------------------------------------------------------
-    // Default values on creation
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Default values on creation")
+    @Nested @DisplayName("Default values on creation")
     class DefaultValuesTests {
-
-        @Test
-        @DisplayName("Must fail - a new join request must have PENDING status by default")
-        void newJoinRequestMustHavePendingStatusByDefault() {
-            JoinRequest request = new JoinRequest();
-
-            assertThat(request.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
+        @Test void newJoinRequestMustHavePendingStatusByDefault() {
+            assertThat(new JoinRequest().getStatus()).isEqualTo(JoinRequestStatus.PENDING);
         }
-
-        @Test
-        @DisplayName("Must fail - a new join request must have null player by default")
-        void newJoinRequestMustHaveNullPlayerByDefault() {
-            JoinRequest request = new JoinRequest();
-
-            assertThat(request.getPlayer()).isNull();
+        @Test void newJoinRequestMustHaveNullPlayerByDefault() {
+            assertThat(new JoinRequest().getPlayer()).isNull();
         }
-
-        @Test
-        @DisplayName("Must fail - a new join request must have null teamId by default")
-        void newJoinRequestMustHaveNullTeamIdByDefault() {
-            JoinRequest request = new JoinRequest();
-
-            assertThat(request.getTeamId()).isNull();
+        @Test void newJoinRequestMustHaveNullTeamIdByDefault() {
+            assertThat(new JoinRequest().getTeamId()).isNull();
         }
     }
 
-    // ----------------------------------------------------------------
-    // Field validations
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Field validations")
+    @Nested @DisplayName("Field validations")
     class FieldValidationTests {
-
-        @Test
-        @DisplayName("Must fail - must reject null player when setting")
-        void mustRejectNullPlayer() {
-            JoinRequest request = new JoinRequest();
-
-            assertThatThrownBy(() -> request.setPlayer(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("player");
+        @Test void mustRejectNullPlayer() {
+            assertThatThrownBy(() -> new JoinRequest().setPlayer(null))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("player");
         }
-
-        @Test
-        @DisplayName("Must fail - must reject null teamId when setting")
-        void mustRejectNullTeamId() {
-            JoinRequest request = new JoinRequest();
-
-            assertThatThrownBy(() -> request.setTeamId(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("team");
+        @Test void mustRejectNullTeamId() {
+            assertThatThrownBy(() -> new JoinRequest().setTeamId(null))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("team");
         }
-
-        @Test
-        @DisplayName("Must fail - must reject negative teamId")
-        void mustRejectNegativeTeamId() {
-            JoinRequest request = new JoinRequest();
-
-            assertThatThrownBy(() -> request.setTeamId(-1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("team");
+        @Test void mustRejectNegativeTeamId() {
+            assertThatThrownBy(() -> new JoinRequest().setTeamId(-1L))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("team");
         }
-
-        @Test
-        @DisplayName("Must accept valid player and teamId")
-        void mustAcceptValidPlayerAndTeamId() {
+        @Test void mustAcceptValidPlayerAndTeamId() {
             JoinRequest request = new JoinRequest();
             request.setPlayer(player);
             request.setTeamId(5L);
-
             assertThat(request.getPlayer()).isEqualTo(player);
             assertThat(request.getTeamId()).isEqualTo(5L);
         }
     }
 
-    // ----------------------------------------------------------------
-    // isPending business rule
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("isPending business rule")
+    @Nested @DisplayName("isPending business rule")
     class IsPendingRuleTests {
-
-        @Test
-        @DisplayName("Must fail - isPending must return true when status is PENDING")
-        void isPendingMustReturnTrueWhenStatusIsPending() {
+        @Test void isPendingMustReturnTrueWhenStatusIsPending() {
             joinRequest.setStatus(JoinRequestStatus.PENDING);
-
             assertThat(joinRequest.isPending()).isTrue();
         }
-
-        @Test
-        @DisplayName("Must fail - isPending must return false when status is ACCEPTED")
-        void isPendingMustReturnFalseWhenStatusIsAccepted() {
+        @Test void isPendingMustReturnFalseWhenStatusIsAccepted() {
             joinRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
             assertThat(joinRequest.isPending()).isFalse();
         }
-
-        @Test
-        @DisplayName("Must fail - isPending must return false when status is REJECTED")
-        void isPendingMustReturnFalseWhenStatusIsRejected() {
+        @Test void isPendingMustReturnFalseWhenStatusIsRejected() {
             joinRequest.setStatus(JoinRequestStatus.REJECTED);
-
             assertThat(joinRequest.isPending()).isFalse();
         }
     }
 
-    // ----------------------------------------------------------------
-    // canBeAccepted business rule
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("canBeAccepted business rule")
+    @Nested @DisplayName("canBeAccepted business rule")
     class CanBeAcceptedRuleTests {
-
-        @Test
-        @DisplayName("Must fail - canBeAccepted must return true when status is PENDING")
-        void canBeAcceptedMustReturnTrueWhenStatusIsPending() {
+        @Test void canBeAcceptedMustReturnTrueWhenStatusIsPending() {
             joinRequest.setStatus(JoinRequestStatus.PENDING);
-
             assertThat(joinRequest.canBeAccepted()).isTrue();
         }
-
-        @Test
-        @DisplayName("Must fail - canBeAccepted must return false when status is ACCEPTED")
-        void canBeAcceptedMustReturnFalseWhenAlreadyAccepted() {
+        @Test void canBeAcceptedMustReturnFalseWhenAlreadyAccepted() {
             joinRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
             assertThat(joinRequest.canBeAccepted()).isFalse();
         }
-
-        @Test
-        @DisplayName("Must fail - canBeAccepted must return false when status is REJECTED")
-        void canBeAcceptedMustReturnFalseWhenAlreadyRejected() {
+        @Test void canBeAcceptedMustReturnFalseWhenAlreadyRejected() {
             joinRequest.setStatus(JoinRequestStatus.REJECTED);
-
             assertThat(joinRequest.canBeAccepted()).isFalse();
         }
     }
 
-    // ----------------------------------------------------------------
-    // canBeRejected business rule
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("canBeRejected business rule")
+    @Nested @DisplayName("canBeRejected business rule")
     class CanBeRejectedRuleTests {
-
-        @Test
-        @DisplayName("Must fail - canBeRejected must return true when status is PENDING")
-        void canBeRejectedMustReturnTrueWhenStatusIsPending() {
+        @Test void canBeRejectedMustReturnTrueWhenStatusIsPending() {
             joinRequest.setStatus(JoinRequestStatus.PENDING);
-
             assertThat(joinRequest.canBeRejected()).isTrue();
         }
-
-        @Test
-        @DisplayName("Must fail - canBeRejected must return false when status is ACCEPTED")
-        void canBeRejectedMustReturnFalseWhenAlreadyAccepted() {
+        @Test void canBeRejectedMustReturnFalseWhenAlreadyAccepted() {
             joinRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
             assertThat(joinRequest.canBeRejected()).isFalse();
         }
-
-        @Test
-        @DisplayName("Must fail - canBeRejected must return false when status is REJECTED")
-        void canBeRejectedMustReturnFalseWhenAlreadyRejected() {
+        @Test void canBeRejectedMustReturnFalseWhenAlreadyRejected() {
             joinRequest.setStatus(JoinRequestStatus.REJECTED);
-
             assertThat(joinRequest.canBeRejected()).isFalse();
         }
     }
 
-    // ----------------------------------------------------------------
-    // belongsToTeam business rule
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("belongsToTeam business rule")
+    @Nested @DisplayName("belongsToTeam business rule")
     class BelongsToTeamRuleTests {
-
-        @Test
-        @DisplayName("Must fail - belongsToTeam must return true when teamId matches")
-        void belongsToTeamMustReturnTrueWhenTeamIdMatches() {
+        @Test void belongsToTeamMustReturnTrueWhenTeamIdMatches() {
             joinRequest.setTeamId(5L);
-
             assertThat(joinRequest.belongsToTeam(5L)).isTrue();
         }
-
-        @Test
-        @DisplayName("Must fail - belongsToTeam must return false when teamId does not match")
-        void belongsToTeamMustReturnFalseWhenTeamIdDoesNotMatch() {
+        @Test void belongsToTeamMustReturnFalseWhenTeamIdDoesNotMatch() {
             joinRequest.setTeamId(5L);
-
             assertThat(joinRequest.belongsToTeam(9L)).isFalse();
         }
-
-        @Test
-        @DisplayName("Must fail - belongsToTeam must return false when provided teamId is null")
-        void belongsToTeamMustReturnFalseWhenProvidedTeamIdIsNull() {
+        @Test void belongsToTeamMustReturnFalseWhenProvidedTeamIdIsNull() {
             joinRequest.setTeamId(5L);
-
             assertThat(joinRequest.belongsToTeam(null)).isFalse();
         }
     }
 
-    // ----------------------------------------------------------------
-    // Status transition rules
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Status transition rules")
+    @Nested @DisplayName("Status transition rules")
     class StatusTransitionTests {
-
-        @Test
-        @DisplayName("Must fail - status must change from PENDING to ACCEPTED")
-        void statusMustChangeFromPendingToAccepted() {
+        @Test void statusMustChangeFromPendingToAccepted() {
             joinRequest.setStatus(JoinRequestStatus.PENDING);
             joinRequest.accept();
-
             assertThat(joinRequest.getStatus()).isEqualTo(JoinRequestStatus.ACCEPTED);
         }
-
-        @Test
-        @DisplayName("Must fail - status must change from PENDING to REJECTED")
-        void statusMustChangeFromPendingToRejected() {
+        @Test void statusMustChangeFromPendingToRejected() {
             joinRequest.setStatus(JoinRequestStatus.PENDING);
             joinRequest.reject();
-
             assertThat(joinRequest.getStatus()).isEqualTo(JoinRequestStatus.REJECTED);
         }
-
-        @Test
-        @DisplayName("Must fail - accept must throw exception when status is not PENDING")
-        void acceptMustThrowExceptionWhenStatusIsNotPending() {
+        @Test void acceptMustThrowExceptionWhenStatusIsNotPending() {
             joinRequest.setStatus(JoinRequestStatus.REJECTED);
-
-            assertThatThrownBy(() -> joinRequest.accept())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("not pending");
+            assertThatThrownBy(joinRequest::accept)
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("not pending");
         }
-
-        @Test
-        @DisplayName("Must fail - reject must throw exception when status is not PENDING")
-        void rejectMustThrowExceptionWhenStatusIsNotPending() {
+        @Test void rejectMustThrowExceptionWhenStatusIsNotPending() {
             joinRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
-            assertThatThrownBy(() -> joinRequest.reject())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("not pending");
+            assertThatThrownBy(joinRequest::reject)
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("not pending");
         }
-
-        @Test
-        @DisplayName("Must fail - accept must throw exception when request is already accepted")
-        void acceptMustThrowExceptionWhenAlreadyAccepted() {
+        @Test void acceptMustThrowExceptionWhenAlreadyAccepted() {
             joinRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
-            assertThatThrownBy(() -> joinRequest.accept())
-                .isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(joinRequest::accept).isInstanceOf(IllegalStateException.class);
         }
     }
 
-    // ----------------------------------------------------------------
-    // JoinRequestStatus enum
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("JoinRequestStatus enum")
+    @Nested @DisplayName("JoinRequestStatus enum")
     class JoinRequestStatusEnumTests {
-
-        @Test
-        @DisplayName("Must fail - JoinRequestStatus enum must contain exactly three values")
-        void joinRequestStatusEnumMustContainExactlyThreeValues() {
+        @Test void joinRequestStatusEnumMustContainExactlyThreeValues() {
             assertThat(JoinRequestStatus.values()).containsExactlyInAnyOrder(
-                JoinRequestStatus.PENDING,
-                JoinRequestStatus.ACCEPTED,
-                JoinRequestStatus.REJECTED
-            );
+                JoinRequestStatus.PENDING, JoinRequestStatus.ACCEPTED, JoinRequestStatus.REJECTED);
         }
     }
 
-    // ----------------------------------------------------------------
-    // Audit fields
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Audit fields")
+    @Nested @DisplayName("Audit fields")
     class AuditFieldsTests {
-
-        @Test
-        @DisplayName("Must fail - JoinRequest entity must expose createdAt field")
-        void joinRequestEntityMustExposeCreatedAtField() {
-            JoinRequest request = new JoinRequest();
-
-            assertThatCode(request::getCreatedAt).doesNotThrowAnyException();
+        @Test void joinRequestEntityMustExposeCreatedAtField() {
+            assertThatCode(new JoinRequest()::getCreatedAt).doesNotThrowAnyException();
         }
-
-        @Test
-        @DisplayName("Must fail - JoinRequest entity must expose updatedAt field")
-        void joinRequestEntityMustExposeUpdatedAtField() {
-            JoinRequest request = new JoinRequest();
-
-            assertThatCode(request::getUpdatedAt).doesNotThrowAnyException();
+        @Test void joinRequestEntityMustExposeUpdatedAtField() {
+            assertThatCode(new JoinRequest()::getUpdatedAt).doesNotThrowAnyException();
         }
     }
 }

@@ -10,14 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/*
+/**
  * Unit tests for AthleticProfileMapper.
- *
  * No mocks needed. The mapper is tested directly since it has no dependencies.
- * Covers both toDTO and toEntity conversion methods completely.
- *
- * Pattern: AAA (Arrange - Act - Assert)
- * Framework: JUnit 5
+ * Adapted to the actual fields: dorsalNumber, position, laterality, stature, state, nickName.
  */
 @DisplayName("AthleticProfileMapper - Unit Tests")
 class AthleticProfileMapperTest {
@@ -31,164 +27,108 @@ class AthleticProfileMapperTest {
         mapper = new AthleticProfileMapper();
 
         baseEntity = new AthleticProfileEntity();
-        baseEntity.setEmail("player@escuela.edu.co");
         baseEntity.setDorsalNumber(10);
         baseEntity.setPosition("FORWARD");
         baseEntity.setLaterality("RIGHT");
         baseEntity.setStature("180cm");
         baseEntity.setState("ACTIVE");
+        baseEntity.setNickName("El Pibe");
 
-        baseDTO = new AthleticProfileDTO(10, "player@escuela.edu.co", "FORWARD", "RIGHT", "180cm", "ACTIVE");
+        baseDTO = new AthleticProfileDTO();
+        baseDTO.setDorsalNumber(10);
+        baseDTO.setPosition("FORWARD");
+        baseDTO.setLaterality("RIGHT");
+        baseDTO.setStature("180cm");
+        baseDTO.setState("ACTIVE");
+        baseDTO.setNickName("El Pibe");
     }
 
-    // ----------------------------------------------------------------
-    // toDTO
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("toDTO - Entity to DTO conversion")
+    @Nested @DisplayName("toDTO - Entity to DTO conversion")
     class ToDTOTests {
 
-        @Test
-        @DisplayName("Must return a non-null DTO when entity is valid")
+        @Test @DisplayName("Must return a non-null DTO when entity is valid")
         void mustReturnNonNullDTOWhenEntityIsValid() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result).isNotNull();
+            assertThat(mapper.toDTO(baseEntity)).isNotNull();
         }
 
-        @Test
-        @DisplayName("Must map email from entity to DTO correctly")
-        void mustMapEmailFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getEmail()).isEqualTo("player@escuela.edu.co");
-        }
-
-        @Test
-        @DisplayName("Must map dorsalNumber from entity to DTO correctly")
+        @Test @DisplayName("Must map dorsalNumber from entity to DTO correctly")
         void mustMapDorsalNumberFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getDorsalNumber()).isEqualTo(10);
+            assertThat(mapper.toDTO(baseEntity).getDorsalNumber()).isEqualTo(10);
         }
 
-        @Test
-        @DisplayName("Must map position from entity to DTO correctly")
+        @Test @DisplayName("Must map position from entity to DTO correctly")
         void mustMapPositionFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getPosition()).isEqualTo("FORWARD");
+            assertThat(mapper.toDTO(baseEntity).getPosition()).isEqualTo("FORWARD");
         }
 
-        @Test
-        @DisplayName("Must map laterality from entity to DTO correctly")
+        @Test @DisplayName("Must map laterality from entity to DTO correctly")
         void mustMapLateralityFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getLaterality()).isEqualTo("RIGHT");
+            assertThat(mapper.toDTO(baseEntity).getLaterality()).isEqualTo("RIGHT");
         }
 
-        @Test
-        @DisplayName("Must map stature from entity to DTO correctly")
+        @Test @DisplayName("Must map stature from entity to DTO correctly")
         void mustMapStatureFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getStature()).isEqualTo("180cm");
+            assertThat(mapper.toDTO(baseEntity).getStature()).isEqualTo("180cm");
         }
 
-        @Test
-        @DisplayName("Must map state from entity to DTO correctly")
+        @Test @DisplayName("Must map state from entity to DTO correctly")
         void mustMapStateFromEntityToDTOCorrectly() {
-            AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getState()).isEqualTo("ACTIVE");
+            assertThat(mapper.toDTO(baseEntity).getState()).isEqualTo("ACTIVE");
         }
 
-        @Test
-        @DisplayName("Must map all fields correctly in a single conversion")
+        @Test @DisplayName("Must map nickName from entity to DTO correctly")
+        void mustMapNickNameFromEntityToDTOCorrectly() {
+            assertThat(mapper.toDTO(baseEntity).getNickName()).isEqualTo("El Pibe");
+        }
+
+        @Test @DisplayName("Must map all fields correctly in a single conversion")
         void mustMapAllFieldsCorrectlyInSingleConversion() {
             AthleticProfileDTO result = mapper.toDTO(baseEntity);
-
-            assertThat(result.getEmail()).isEqualTo(baseEntity.getEmail());
             assertThat(result.getDorsalNumber()).isEqualTo(baseEntity.getDorsalNumber());
             assertThat(result.getPosition()).isEqualTo(baseEntity.getPosition());
             assertThat(result.getLaterality()).isEqualTo(baseEntity.getLaterality());
             assertThat(result.getStature()).isEqualTo(baseEntity.getStature());
             assertThat(result.getState()).isEqualTo(baseEntity.getState());
+            assertThat(result.getNickName()).isEqualTo(baseEntity.getNickName());
         }
     }
 
-    // ----------------------------------------------------------------
-    // toEntity
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("toEntity - DTO to Entity conversion")
+    @Nested @DisplayName("toEntity - DTO to Entity conversion")
     class ToEntityTests {
 
-        @Test
-        @DisplayName("Must return a non-null entity when DTO is valid")
+        @Test @DisplayName("Must return a non-null entity when DTO is valid")
         void mustReturnNonNullEntityWhenDTOIsValid() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result).isNotNull();
+            assertThat(mapper.toEntity(baseDTO)).isNotNull();
         }
 
-        @Test
-        @DisplayName("Must map email from DTO to entity correctly")
-        void mustMapEmailFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getEmail()).isEqualTo("player@escuela.edu.co");
-        }
-
-        @Test
-        @DisplayName("Must map dorsalNumber from DTO to entity correctly")
+        @Test @DisplayName("Must map dorsalNumber from DTO to entity correctly")
         void mustMapDorsalNumberFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getDorsalNumber()).isEqualTo(10);
+            assertThat(mapper.toEntity(baseDTO).getDorsalNumber()).isEqualTo(10);
         }
 
-        @Test
-        @DisplayName("Must map position from DTO to entity correctly")
+        @Test @DisplayName("Must map position from DTO to entity correctly")
         void mustMapPositionFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getPosition()).isEqualTo("FORWARD");
+            assertThat(mapper.toEntity(baseDTO).getPosition()).isEqualTo("FORWARD");
         }
 
-        @Test
-        @DisplayName("Must map laterality from DTO to entity correctly")
+        @Test @DisplayName("Must map laterality from DTO to entity correctly")
         void mustMapLateralityFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getLaterality()).isEqualTo("RIGHT");
+            assertThat(mapper.toEntity(baseDTO).getLaterality()).isEqualTo("RIGHT");
         }
 
-        @Test
-        @DisplayName("Must map stature from DTO to entity correctly")
+        @Test @DisplayName("Must map stature from DTO to entity correctly")
         void mustMapStatureFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getStature()).isEqualTo("180cm");
+            assertThat(mapper.toEntity(baseDTO).getStature()).isEqualTo("180cm");
         }
 
-        @Test
-        @DisplayName("Must map state from DTO to entity correctly")
+        @Test @DisplayName("Must map state from DTO to entity correctly")
         void mustMapStateFromDTOToEntityCorrectly() {
-            AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getState()).isEqualTo("ACTIVE");
+            assertThat(mapper.toEntity(baseDTO).getState()).isEqualTo("ACTIVE");
         }
 
-        @Test
-        @DisplayName("Must map all fields correctly in a single conversion")
+        @Test @DisplayName("Must map all fields correctly in a single conversion")
         void mustMapAllFieldsCorrectlyInSingleConversion() {
             AthleticProfileEntity result = mapper.toEntity(baseDTO);
-
-            assertThat(result.getEmail()).isEqualTo(baseDTO.getEmail());
             assertThat(result.getDorsalNumber()).isEqualTo(baseDTO.getDorsalNumber());
             assertThat(result.getPosition()).isEqualTo(baseDTO.getPosition());
             assertThat(result.getLaterality()).isEqualTo(baseDTO.getLaterality());
@@ -197,21 +137,13 @@ class AthleticProfileMapperTest {
         }
     }
 
-    // ----------------------------------------------------------------
-    // Round-trip: entity -> DTO -> entity
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Round-trip conversion")
+    @Nested @DisplayName("Round-trip conversion")
     class RoundTripTests {
 
-        @Test
-        @DisplayName("Must preserve all values when converting entity to DTO and back to entity")
+        @Test @DisplayName("Must preserve all values when converting entity to DTO and back to entity")
         void mustPreserveAllValuesInRoundTripEntityToDTOToEntity() {
             AthleticProfileDTO dto = mapper.toDTO(baseEntity);
             AthleticProfileEntity result = mapper.toEntity(dto);
-
-            assertThat(result.getEmail()).isEqualTo(baseEntity.getEmail());
             assertThat(result.getDorsalNumber()).isEqualTo(baseEntity.getDorsalNumber());
             assertThat(result.getPosition()).isEqualTo(baseEntity.getPosition());
             assertThat(result.getLaterality()).isEqualTo(baseEntity.getLaterality());
@@ -219,13 +151,10 @@ class AthleticProfileMapperTest {
             assertThat(result.getState()).isEqualTo(baseEntity.getState());
         }
 
-        @Test
-        @DisplayName("Must preserve all values when converting DTO to entity and back to DTO")
+        @Test @DisplayName("Must preserve all values when converting DTO to entity and back to DTO")
         void mustPreserveAllValuesInRoundTripDTOToEntityToDTO() {
             AthleticProfileEntity entity = mapper.toEntity(baseDTO);
             AthleticProfileDTO result = mapper.toDTO(entity);
-
-            assertThat(result.getEmail()).isEqualTo(baseDTO.getEmail());
             assertThat(result.getDorsalNumber()).isEqualTo(baseDTO.getDorsalNumber());
             assertThat(result.getPosition()).isEqualTo(baseDTO.getPosition());
             assertThat(result.getLaterality()).isEqualTo(baseDTO.getLaterality());

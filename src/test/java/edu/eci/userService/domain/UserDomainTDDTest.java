@@ -1,8 +1,8 @@
-package com.techcup.users.domain;
+package edu.eci.userService.domain;
 
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.SchoolRelation;
-import com.techcup.users.model.enums.UserStatus;
+import edu.eci.userService.model.User;
+import edu.eci.userService.model.enums.SchoolRelation;
+import edu.eci.userService.model.enums.UserStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
