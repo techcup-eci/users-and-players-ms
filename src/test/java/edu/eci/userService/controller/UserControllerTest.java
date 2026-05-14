@@ -1,58 +1,38 @@
-package com.techcup.users.controller;
+package edu.eci.userService.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.techcup.users.dto.UpdateUserRequest;
-import com.techcup.users.exception.UserLinkedToActiveTournamentException;
-import com.techcup.users.exception.UserNotFoundException;
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.SchoolRelation;
-import com.techcup.users.model.enums.UserStatus;
-import com.techcup.users.service.UserService;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/*
- * REST layer tests for UserController.
+/**
+ * Tests de integración de la capa web para {@link UserController}.
  *
- * Architecture note:
- * This microservice runs behind the Orchestrator (API Gateway).
- * The gateway is responsible for blocking unauthenticated requests (401)
- * and performing basic JWT validation before routing the request here.
- * For that reason, @AutoConfigureMockMvc(addFilters = false) is used to
- * disable Spring Security filters locally. Token validation is not the
- * responsibility of this microservice.
- *
- * What is tested here:
- *   - Correct HTTP status codes for different business scenarios
- *   - Input data validation (400 for invalid or missing fields)
- *   - Correct exception-to-HTTP-status mapping
- *   - Password field is never exposed in any response
- *
- * Endpoints:
- *   GET   /api/users/{id}
- *   PUT   /api/users/{id}
- *   PATCH /api/users/{id}/deactivate
+ * Se usa @WebMvcTest para levantar sólo el contexto del controller,
+ * mockeando el servicio con @MockBean.
  */
 @WebMvcTest(UserController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@DisplayName("UserController - REST Tests")
 class UserControllerTest {
 
     @Autowired
@@ -61,202 +41,145 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @Autowired
     private ObjectMapper objectMapper;
-
-    private User baseUser;
-    private UpdateUserRequest validRequest;
+    private UserDTO sampleDTO;
 
     @BeforeEach
     void setUp() {
-        baseUser = new User();
-        baseUser.setId(1L);
-        baseUser.setFullName("Carlos Perez");
-        baseUser.setEmail("carlos.perez@escuela.edu.co");
-        baseUser.setSchoolRelation(SchoolRelation.STUDENT);
-        baseUser.setAcademicProgram("Systems Engineering");
-        baseUser.setSemester(5);
-        baseUser.setStatus(UserStatus.ACTIVE);
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
-        validRequest = new UpdateUserRequest();
-        validRequest.setFullName("Carlos Alberto Perez");
-        validRequest.setSchoolRelation(SchoolRelation.STUDENT);
-        validRequest.setAcademicProgram("Systems Engineering");
-        validRequest.setSemester(6);
+        sampleDTO = new UserDTO();
+        sampleDTO.setId(1L);
+        sampleDTO.setName("Juan Pérez");
+        sampleDTO.setEmail("juan.perez@eci.edu.co");
+        sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
+        sampleDTO.setRole(UserRoleEnum.STUDENT);
+        sampleDTO.setRelationShip("student");
+        sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
+        sampleDTO.setSemester(5);
+        sampleDTO.setIdentificationType("CC");
+        sampleDTO.setIdentificationNumber(1000123456);
+        sampleDTO.setPhone(3001234567);
     }
 
-    // ----------------------------------------------------------------
-    // GET /api/users/{id}
-    // ----------------------------------------------------------------
+    // ── GET /User ────────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("GET /api/users/{id} - Find user by ID")
-    class FindUserByIdTests {
+    @DisplayName("GET /User")
+    class GetAll {
 
         @Test
-        @DisplayName("Must return 200 with user data when user exists")
-        void mustReturn200WithUserDataWhenUserExists() throws Exception {
-            when(userService.findById(1L)).thenReturn(baseUser);
+        @DisplayName("Debe retornar 200 con lista de usuarios")
+        void shouldReturn200WithList() throws Exception {
+            when(userService.getAllUsers()).thenReturn(List.of(sampleDTO));
 
-            mockMvc.perform(get("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.fullName").value("Carlos Perez"))
-                .andExpect(jsonPath("$.email").value("carlos.perez@escuela.edu.co"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"));
+            mockMvc.perform(get("/User"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].name", is("Juan Pérez")))
+                    .andExpect(jsonPath("$[0].email", is("juan.perez@eci.edu.co")));
         }
 
         @Test
-        @DisplayName("Must return 404 when user does not exist")
-        void mustReturn404WhenUserDoesNotExist() throws Exception {
-            when(userService.findById(99L))
-                .thenThrow(new UserNotFoundException("User not found"));
+        @DisplayName("Debe retornar 200 con lista vacía cuando no hay usuarios")
+        void shouldReturn200WithEmptyList() throws Exception {
+            when(userService.getAllUsers()).thenReturn(List.of());
 
-            mockMvc.perform(get("/api/users/99"))
-                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Must never expose the password field in the response")
-        void mustNeverExposePasswordFieldInResponse() throws Exception {
-            when(userService.findById(1L)).thenReturn(baseUser);
-
-            mockMvc.perform(get("/api/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.password").doesNotExist())
-                .andExpect(jsonPath("$.passwordHash").doesNotExist());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when ID in URL is not a valid number")
-        void mustReturn400WhenIdIsNotAValidNumber() throws Exception {
-            mockMvc.perform(get("/api/users/abc"))
-                .andExpect(status().isBadRequest());
+            mockMvc.perform(get("/User"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(0)));
         }
     }
 
-    // ----------------------------------------------------------------
-    // PUT /api/users/{id}
-    // ----------------------------------------------------------------
+    // ── GET /User/{id} ───────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("PUT /api/users/{id} - Update user")
-    class UpdateUserTests {
+    @DisplayName("GET /User/{id}")
+    class GetById {
 
         @Test
-        @DisplayName("Must return 200 when update request contains valid data")
-        void mustReturn200WhenUpdateRequestContainsValidData() throws Exception {
-            baseUser.setFullName("Carlos Alberto Perez");
-            when(userService.updateUser(eq(1L), any(), any(), any(), any()))
-                .thenReturn(baseUser);
+        @DisplayName("Debe retornar 200 con el usuario cuando existe")
+        void shouldReturn200WhenFound() throws Exception {
+            when(userService.getUserById(1L)).thenReturn(sampleDTO);
 
-            mockMvc.perform(put("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Carlos Alberto Perez"));
-        }
-
-        @Test
-        @DisplayName("Must return 400 when full name is empty")
-        void mustReturn400WhenFullNameIsEmpty() throws Exception {
-            validRequest.setFullName("");
-
-            mockMvc.perform(put("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when full name is null")
-        void mustReturn400WhenFullNameIsNull() throws Exception {
-            validRequest.setFullName(null);
-
-            mockMvc.perform(put("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Must return 404 when user to update does not exist")
-        void mustReturn404WhenUserToUpdateDoesNotExist() throws Exception {
-            when(userService.updateUser(eq(99L), any(), any(), any(), any()))
-                .thenThrow(new UserNotFoundException("User not found"));
-
-            mockMvc.perform(put("/api/users/99")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when request body includes email field which is not updatable")
-        void mustReturn400WhenRequestBodyIncludesEmailField() throws Exception {
-            validRequest.setEmail("new@email.com");
-
-            mockMvc.perform(put("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(validRequest)))
-                .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when request body is empty")
-        void mustReturn400WhenRequestBodyIsEmpty() throws Exception {
-            mockMvc.perform(put("/api/users/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{}"))
-                .andExpect(status().isBadRequest());
+            mockMvc.perform(get("/User/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(1)))
+                    .andExpect(jsonPath("$.name", is("Juan Pérez")));
         }
     }
 
-    // ----------------------------------------------------------------
-    // PATCH /api/users/{id}/deactivate
-    // ----------------------------------------------------------------
+    // ── POST /User ───────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("PATCH /api/users/{id}/deactivate - Deactivate user")
-    class DeactivateUserTests {
+    @DisplayName("POST /User")
+    class CreateUser {
 
         @Test
-        @DisplayName("Must return 200 when user is successfully deactivated")
-        void mustReturn200WhenUserIsSuccessfullyDeactivated() throws Exception {
-            baseUser.setStatus(UserStatus.INACTIVE);
-            when(userService.deactivateUser(1L)).thenReturn(baseUser);
+        @DisplayName("Debe retornar 200 con el usuario creado")
+        void shouldReturn200WithCreatedUser() throws Exception {
+            when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
 
-            mockMvc.perform(patch("/api/users/1/deactivate"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("INACTIVE"));
+            mockMvc.perform(post("/User")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(sampleDTO)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name", is("Juan Pérez")))
+                    .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
+
+            verify(userService).createUser(any(UserDTO.class));
+        }
+    }
+
+    // ── PUT /User/{id} ───────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("PUT /User/{id}")
+    class UpdateUser {
+
+        @Test
+        @DisplayName("Debe retornar 200 con el usuario actualizado")
+        void shouldReturn200WithUpdatedUser() throws Exception {
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setId(1L);
+            updatedDTO.setName("Juan Actualizado");
+            updatedDTO.setEmail("juan.perez@eci.edu.co");
+
+            when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedDTO);
+
+            mockMvc.perform(put("/User/1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(updatedDTO)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name", is("Juan Actualizado")));
+        }
+    }
+
+    // ── DELETE /User/{id} ────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("DELETE /User/{id}")
+    class DeleteUser {
+
+        @Test
+        @DisplayName("Debe retornar 200 con mensaje de éxito")
+        void shouldReturn200WithSuccessMessage() throws Exception {
+            doNothing().when(userService).deleteUser(1L);
+
+            mockMvc.perform(delete("/User/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message", is("User deleted successfully")));
         }
 
         @Test
-        @DisplayName("Must return 409 when user is linked to an active or in-progress tournament")
-        void mustReturn409WhenUserIsLinkedToActiveTournament() throws Exception {
-            when(userService.deactivateUser(1L))
-                .thenThrow(new UserLinkedToActiveTournamentException("Linked to active tournament"));
+        @DisplayName("Debe propagar excepción cuando el usuario no existe")
+        void shouldPropagateExceptionWhenNotFound() throws Exception {
+            doThrow(new NoSuchElementException("No user found with ID: 99"))
+                    .when(userService).deleteUser(99L);
 
-            mockMvc.perform(patch("/api/users/1/deactivate"))
-                .andExpect(status().isConflict());
-        }
-
-        @Test
-        @DisplayName("Must return 404 when user to deactivate does not exist")
-        void mustReturn404WhenUserToDeactivateDoesNotExist() throws Exception {
-            when(userService.deactivateUser(99L))
-                .thenThrow(new UserNotFoundException("User not found"));
-
-            mockMvc.perform(patch("/api/users/99/deactivate"))
-                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when ID in URL is not numeric")
-        void mustReturn400WhenIdIsNotNumeric() throws Exception {
-            mockMvc.perform(patch("/api/users/xyz/deactivate"))
-                .andExpect(status().isBadRequest());
+            mockMvc.perform(delete("/User/99"))
+                    .andExpect(status().is5xxServerError());
         }
     }
 }

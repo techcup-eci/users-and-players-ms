@@ -2,6 +2,7 @@ package edu.eci.userService.service;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
+import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.mappers.AthleticProfileMapper;
 import edu.eci.userService.repository.AthleticProfileRepository;
 import edu.eci.userService.services.AthleticProfileService;
@@ -16,30 +17,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-/*
- * Unit tests for AthleticProfileService.
- *
- * All dependencies (repository and mapper) are mocked with Mockito.
- * Tests are written against the real production classes:
- *   - AthleticProfileService
- *   - AthleticProfileRepository
- *   - AthleticProfileMapper
- *   - AthleticProfileEntity
- *   - AthleticProfileDTO
- *
- * Pattern: AAA (Arrange - Act - Assert)
- * Framework: JUnit 5 + Mockito
+/**
+ * Tests unitarios para {@link AthleticProfileService}.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AthleticProfileService - Unit Tests")
 class AthleticProfileServiceTest {
 
     @Mock
@@ -51,459 +38,277 @@ class AthleticProfileServiceTest {
     @InjectMocks
     private AthleticProfileService athleticProfileService;
 
-    private AthleticProfileEntity baseEntity;
-    private AthleticProfileDTO baseDTO;
+    // ── Fixtures ─────────────────────────────────────────────────────────────
+
+    private AthleticProfileEntity sampleEntity;
+    private AthleticProfileDTO sampleDTO;
+    private UserEntity sampleUser;
 
     @BeforeEach
     void setUp() {
-        baseEntity = new AthleticProfileEntity();
-        baseEntity.setEmail("player@escuela.edu.co");
-        baseEntity.setDorsalNumber(10);
-        baseEntity.setPosition("FORWARD");
-        baseEntity.setLaterality("RIGHT");
-        baseEntity.setStature("180cm");
-        baseEntity.setState("ACTIVE");
+        sampleUser = new UserEntity();
+        sampleUser.setId(1L);
+        sampleUser.setName("Juan Pérez");
+        sampleUser.setEmail("juan.perez@eci.edu.co");
 
-        baseDTO = new AthleticProfileDTO();
-        baseDTO.setEmail("player@escuela.edu.co");
-        baseDTO.setDorsalNumber(10);
-        baseDTO.setPosition("FORWARD");
-        baseDTO.setLaterality("RIGHT");
-        baseDTO.setStature("180cm");
-        baseDTO.setState("ACTIVE");
+        sampleEntity = new AthleticProfileEntity();
+        sampleEntity.setId(1L);
+        sampleEntity.setDorsalNumber(10);
+        sampleEntity.setNickName("Juancho");
+        sampleEntity.setPosition("delantero");
+        sampleEntity.setLaterality("diestro");
+        sampleEntity.setStature("175cm");
+        sampleEntity.setState("activo");
+        sampleEntity.setUser(sampleUser);
+
+        sampleDTO = new AthleticProfileDTO();
+        sampleDTO.setId(1L);
+        sampleDTO.setDorsalNumber(10);
+        sampleDTO.setNickName("Juancho");
+        sampleDTO.setPosition("delantero");
+        sampleDTO.setLaterality("diestro");
+        sampleDTO.setStature("175cm");
+        sampleDTO.setState("activo");
+        sampleDTO.setUser(sampleUser);
     }
 
-    // ----------------------------------------------------------------
-    // getAllAthleticProfiles
-    // ----------------------------------------------------------------
+    // ── getAllAthleticProfiles ────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("getAllAthleticProfiles")
-    class GetAllAthleticProfilesTests {
+    @DisplayName("getAllAthleticProfiles()")
+    class GetAll {
 
         @Test
-        @DisplayName("Must return a list with all profiles when profiles exist")
-        void mustReturnListWithAllProfilesWhenProfilesExist() {
-            when(athleticProfileRepository.findAll()).thenReturn(List.of(baseEntity));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe retornar lista de DTOs cuando existen perfiles")
+        void shouldReturnDTOList() {
+            when(athleticProfileRepository.findAll()).thenReturn(List.of(sampleEntity));
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<AthleticProfileDTO> result = athleticProfileService.getAllAthleticProfiles();
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getEmail()).isEqualTo("player@escuela.edu.co");
+            assertThat(result.get(0).getNickName()).isEqualTo("Juancho");
             verify(athleticProfileRepository).findAll();
         }
 
         @Test
-        @DisplayName("Must return an empty list when no profiles exist")
-        void mustReturnEmptyListWhenNoProfilesExist() {
+        @DisplayName("Debe retornar lista vacía cuando no hay perfiles")
+        void shouldReturnEmptyList() {
             when(athleticProfileRepository.findAll()).thenReturn(List.of());
 
             List<AthleticProfileDTO> result = athleticProfileService.getAllAthleticProfiles();
 
             assertThat(result).isEmpty();
-            verify(athleticProfileRepository).findAll();
-        }
-
-        @Test
-        @DisplayName("Must call mapper toDTO for each entity returned by the repository")
-        void mustCallMapperToDTOForEachEntity() {
-            AthleticProfileEntity secondEntity = new AthleticProfileEntity();
-            secondEntity.setEmail("second@escuela.edu.co");
-            AthleticProfileDTO secondDTO = new AthleticProfileDTO();
-            secondDTO.setEmail("second@escuela.edu.co");
-
-            when(athleticProfileRepository.findAll()).thenReturn(List.of(baseEntity, secondEntity));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
-            when(athleticProfileMapper.toDTO(secondEntity)).thenReturn(secondDTO);
-
-            List<AthleticProfileDTO> result = athleticProfileService.getAllAthleticProfiles();
-
-            assertThat(result).hasSize(2);
-            verify(athleticProfileMapper).toDTO(baseEntity);
-            verify(athleticProfileMapper).toDTO(secondEntity);
         }
     }
 
-    // ----------------------------------------------------------------
-    // getAthleticProfilesByEmail
-    // ----------------------------------------------------------------
+    // ── getAthleticProfilesByUserId ──────────────────────────────────────────
 
     @Nested
-    @DisplayName("getAthleticProfilesByEmail")
-    class GetAthleticProfilesByEmailTests {
+    @DisplayName("getAthleticProfilesByUserId()")
+    class GetById {
 
         @Test
-        @DisplayName("Must return the DTO when a profile exists for the given email")
-        void mustReturnDTOWhenProfileExistsForEmail() {
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe retornar DTO cuando el perfil existe")
+        void shouldReturnDTOWhenFound() {
+            when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
-            AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByEmail("player@escuela.edu.co");
+            AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByUserId(1L);
 
             assertThat(result).isNotNull();
-            assertThat(result.getEmail()).isEqualTo("player@escuela.edu.co");
-            assertThat(result.getDorsalNumber()).isEqualTo(10);
-            assertThat(result.getPosition()).isEqualTo("FORWARD");
+            assertThat(result.getPosition()).isEqualTo("delantero");
         }
 
         @Test
-        @DisplayName("Must call repository findByEmail with the exact email provided")
-        void mustCallRepositoryFindByEmailWithExactEmail() {
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe retornar null cuando el perfil no existe")
+        void shouldReturnNullWhenNotFound() {
+            when(athleticProfileRepository.findById(99L)).thenReturn(Optional.empty());
+            when(athleticProfileMapper.toDTO(null)).thenReturn(null);
 
-            athleticProfileService.getAthleticProfilesByEmail("player@escuela.edu.co");
+            AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByUserId(99L);
 
-            verify(athleticProfileRepository).findByEmail("player@escuela.edu.co");
-        }
-
-        @Test
-        @DisplayName("Must call mapper toDTO with the entity returned by the repository")
-        void mustCallMapperToDTOWithEntityFromRepository() {
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
-
-            athleticProfileService.getAthleticProfilesByEmail("player@escuela.edu.co");
-
-            verify(athleticProfileMapper).toDTO(baseEntity);
+            assertThat(result).isNull();
         }
     }
 
-    // ----------------------------------------------------------------
-    // getAthleticProfileByPosition
-    // ----------------------------------------------------------------
+    // ── getAthleticProfileByPosition ─────────────────────────────────────────
 
     @Nested
-    @DisplayName("getAthleticProfileByPosition")
-    class GetAthleticProfileByPositionTests {
+    @DisplayName("getAthleticProfileByPosition()")
+    class GetByPosition {
 
         @Test
-        @DisplayName("Must return profiles matching the given position")
-        void mustReturnProfilesMatchingGivenPosition() {
-            when(athleticProfileRepository.findByPosition("FORWARD")).thenReturn(List.of(baseEntity));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe retornar lista de perfiles con la posición indicada")
+        void shouldReturnProfilesForPosition() {
+            when(athleticProfileRepository.findByPosition("delantero"))
+                    .thenReturn(List.of(sampleEntity));
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByPosition("FORWARD");
+            List<AthleticProfileDTO> result =
+                    athleticProfileService.getAthleticProfileByPosition("delantero");
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getPosition()).isEqualTo("FORWARD");
+            assertThat(result.get(0).getPosition()).isEqualTo("delantero");
         }
 
         @Test
-        @DisplayName("Must return empty list when no profiles match the given position")
-        void mustReturnEmptyListWhenNoProfilesMatchPosition() {
-            when(athleticProfileRepository.findByPosition("GOALKEEPER")).thenReturn(List.of());
+        @DisplayName("Debe retornar lista vacía si no hay perfiles para esa posición")
+        void shouldReturnEmptyListWhenNoMatch() {
+            when(athleticProfileRepository.findByPosition("portero")).thenReturn(List.of());
 
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByPosition("GOALKEEPER");
+            List<AthleticProfileDTO> result =
+                    athleticProfileService.getAthleticProfileByPosition("portero");
 
             assertThat(result).isEmpty();
         }
-
-        @Test
-        @DisplayName("Must call mapper toDTO for each entity returned by findByPosition")
-        void mustCallMapperToDTOForEachEntityByPosition() {
-            AthleticProfileEntity second = new AthleticProfileEntity();
-            second.setPosition("FORWARD");
-            AthleticProfileDTO secondDTO = new AthleticProfileDTO();
-            secondDTO.setPosition("FORWARD");
-
-            when(athleticProfileRepository.findByPosition("FORWARD")).thenReturn(List.of(baseEntity, second));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
-            when(athleticProfileMapper.toDTO(second)).thenReturn(secondDTO);
-
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByPosition("FORWARD");
-
-            assertThat(result).hasSize(2);
-            verify(athleticProfileMapper).toDTO(baseEntity);
-            verify(athleticProfileMapper).toDTO(second);
-        }
     }
 
-    // ----------------------------------------------------------------
-    // getAthleticProfileByLaterality
-    // ----------------------------------------------------------------
+    // ── getAthleticProfileByLaterality ───────────────────────────────────────
 
     @Nested
-    @DisplayName("getAthleticProfileByLaterality")
-    class GetAthleticProfileByLateralityTests {
+    @DisplayName("getAthleticProfileByLaterality()")
+    class GetByLaterality {
 
         @Test
-        @DisplayName("Must return profiles matching the given laterality")
-        void mustReturnProfilesMatchingGivenLaterality() {
-            when(athleticProfileRepository.findByLaterality("RIGHT")).thenReturn(List.of(baseEntity));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe retornar perfiles con la lateralidad indicada")
+        void shouldReturnProfilesForLaterality() {
+            when(athleticProfileRepository.findByLaterality("diestro"))
+                    .thenReturn(List.of(sampleEntity));
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByLaterality("RIGHT");
+            List<AthleticProfileDTO> result =
+                    athleticProfileService.getAthleticProfileByLaterality("diestro");
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getLaterality()).isEqualTo("RIGHT");
-        }
-
-        @Test
-        @DisplayName("Must return empty list when no profiles match the given laterality")
-        void mustReturnEmptyListWhenNoProfilesMatchLaterality() {
-            when(athleticProfileRepository.findByLaterality("LEFT")).thenReturn(List.of());
-
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByLaterality("LEFT");
-
-            assertThat(result).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Must call mapper toDTO for each entity returned by findByLaterality")
-        void mustCallMapperForEachEntityByLaterality() {
-            AthleticProfileEntity second = new AthleticProfileEntity();
-            second.setLaterality("RIGHT");
-            AthleticProfileDTO secondDTO = new AthleticProfileDTO();
-            secondDTO.setLaterality("RIGHT");
-
-            when(athleticProfileRepository.findByLaterality("RIGHT")).thenReturn(List.of(baseEntity, second));
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
-            when(athleticProfileMapper.toDTO(second)).thenReturn(secondDTO);
-
-            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByLaterality("RIGHT");
-
-            assertThat(result).hasSize(2);
         }
     }
 
-    // ----------------------------------------------------------------
-    // createAthleticProfile
-    // ----------------------------------------------------------------
+    // ── createAthleticProfile ────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("createAthleticProfile")
-    class CreateAthleticProfileTests {
+    @DisplayName("createAthleticProfile()")
+    class Create {
 
         @Test
-        @DisplayName("Must return the created DTO after saving the entity")
-        void mustReturnCreatedDTOAfterSaving() {
-            when(athleticProfileMapper.toEntity(baseDTO)).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(baseEntity)).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe persistir y retornar el DTO del perfil creado")
+        void shouldPersistAndReturnDTO() {
+            when(athleticProfileMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
+            when(athleticProfileRepository.save(sampleEntity)).thenReturn(sampleEntity);
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
-            AthleticProfileDTO result = athleticProfileService.createAthleticProfile(baseDTO);
+            AthleticProfileDTO result = athleticProfileService.createAthleticProfile(sampleDTO);
 
             assertThat(result).isNotNull();
-            assertThat(result.getEmail()).isEqualTo("player@escuela.edu.co");
             assertThat(result.getDorsalNumber()).isEqualTo(10);
+            verify(athleticProfileRepository).save(sampleEntity);
         }
 
         @Test
-        @DisplayName("Must call mapper toEntity with the received DTO")
-        void mustCallMapperToEntityWithReceivedDTO() {
-            when(athleticProfileMapper.toEntity(baseDTO)).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(baseEntity)).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe llamar al mapper antes de persistir")
+        void shouldCallMapperBeforeSave() {
+            when(athleticProfileMapper.toEntity(any())).thenReturn(sampleEntity);
+            when(athleticProfileRepository.save(any())).thenReturn(sampleEntity);
+            when(athleticProfileMapper.toDTO(any())).thenReturn(sampleDTO);
 
-            athleticProfileService.createAthleticProfile(baseDTO);
+            athleticProfileService.createAthleticProfile(sampleDTO);
 
-            verify(athleticProfileMapper).toEntity(baseDTO);
+            // El orden importa: primero toEntity, luego save, luego toDTO
+            var order = inOrder(athleticProfileMapper, athleticProfileRepository);
+            order.verify(athleticProfileMapper).toEntity(sampleDTO);
+            order.verify(athleticProfileRepository).save(sampleEntity);
+            order.verify(athleticProfileMapper).toDTO(sampleEntity);
         }
+    }
+
+    // ── updateAthleticProfile ────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("updateAthleticProfile()")
+    class Update {
 
         @Test
-        @DisplayName("Must call repository save with the entity produced by the mapper")
-        void mustCallRepositorySaveWithEntityFromMapper() {
-            when(athleticProfileMapper.toEntity(baseDTO)).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(baseEntity)).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
+        @DisplayName("Debe actualizar campos y retornar DTO")
+        void shouldUpdateAndReturnDTO() {
+            AthleticProfileDTO updatedDTO = new AthleticProfileDTO();
+            updatedDTO.setDorsalNumber(7);
+            updatedDTO.setPosition("volante");
+            updatedDTO.setLaterality("zurdo");
+            updatedDTO.setStature("180cm");
+            updatedDTO.setState("activo");
 
-            athleticProfileService.createAthleticProfile(baseDTO);
+            when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(athleticProfileRepository.save(sampleEntity)).thenReturn(sampleEntity);
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(updatedDTO);
 
-            verify(athleticProfileRepository).save(baseEntity);
-        }
-
-        @Test
-        @DisplayName("Must call mapper toDTO with the entity returned by repository save")
-        void mustCallMapperToDTOWithSavedEntity() {
-            when(athleticProfileMapper.toEntity(baseDTO)).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(baseEntity)).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(baseEntity)).thenReturn(baseDTO);
-
-            athleticProfileService.createAthleticProfile(baseDTO);
-
-            verify(athleticProfileMapper).toDTO(baseEntity);
-        }
-
-        @Test
-        @DisplayName("Must persist all fields from the DTO through entity and back to DTO")
-        void mustPersistAllFieldsFromDTOToEntity() {
-            AthleticProfileDTO fullDTO = new AthleticProfileDTO(7, "new@escuela.edu.co", "DEFENDER", "LEFT", "175cm", "ACTIVE");
-            AthleticProfileEntity fullEntity = new AthleticProfileEntity();
-            fullEntity.setEmail("new@escuela.edu.co");
-            fullEntity.setDorsalNumber(7);
-            fullEntity.setPosition("DEFENDER");
-            fullEntity.setLaterality("LEFT");
-            fullEntity.setStature("175cm");
-            fullEntity.setState("ACTIVE");
-
-            when(athleticProfileMapper.toEntity(fullDTO)).thenReturn(fullEntity);
-            when(athleticProfileRepository.save(fullEntity)).thenReturn(fullEntity);
-            when(athleticProfileMapper.toDTO(fullEntity)).thenReturn(fullDTO);
-
-            AthleticProfileDTO result = athleticProfileService.createAthleticProfile(fullDTO);
+            AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(1L, updatedDTO);
 
             assertThat(result.getDorsalNumber()).isEqualTo(7);
-            assertThat(result.getPosition()).isEqualTo("DEFENDER");
-            assertThat(result.getLaterality()).isEqualTo("LEFT");
-            assertThat(result.getStature()).isEqualTo("175cm");
-            assertThat(result.getState()).isEqualTo("ACTIVE");
+            assertThat(result.getPosition()).isEqualTo("volante");
+            verify(athleticProfileRepository).save(sampleEntity);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar NoSuchElementException cuando el perfil no existe")
+        void shouldThrowWhenNotFound() {
+            when(athleticProfileRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> athleticProfileService.updateAthleticProfile(99L, sampleDTO))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
+        }
+
+        @Test
+        @DisplayName("Debe actualizar todos los campos mutables del perfil")
+        void shouldUpdateAllMutableFields() {
+            AthleticProfileDTO updatedDTO = new AthleticProfileDTO();
+            updatedDTO.setDorsalNumber(5);
+            updatedDTO.setPosition("defensa");
+            updatedDTO.setLaterality("diestro");
+            updatedDTO.setStature("170cm");
+            updatedDTO.setState("inactivo");
+
+            when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(athleticProfileRepository.save(any())).thenReturn(sampleEntity);
+            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(updatedDTO);
+
+            AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(1L, updatedDTO);
+
+            // Verificar que la entidad recibió los nuevos valores
+            assertThat(sampleEntity.getDorsalNumber()).isEqualTo(5);
+            assertThat(sampleEntity.getPosition()).isEqualTo("defensa");
+            assertThat(sampleEntity.getLaterality()).isEqualTo("diestro");
+            assertThat(sampleEntity.getStature()).isEqualTo("170cm");
+            assertThat(sampleEntity.getState()).isEqualTo("inactivo");
         }
     }
 
-    // ----------------------------------------------------------------
-    // updateAthleticProfile
-    // ----------------------------------------------------------------
+    // ── deleteAthleticProfile ────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("updateAthleticProfile")
-    class UpdateAthleticProfileTests {
+    @DisplayName("deleteAthleticProfile()")
+    class Delete {
 
         @Test
-        @DisplayName("Must update all fields and return the updated DTO")
-        void mustUpdateAllFieldsAndReturnUpdatedDTO() {
-            AthleticProfileDTO updatedDTO = new AthleticProfileDTO();
-            updatedDTO.setDorsalNumber(11);
-            updatedDTO.setPosition("MIDFIELDER");
-            updatedDTO.setLaterality("LEFT");
-            updatedDTO.setStature("175cm");
-            updatedDTO.setState("INACTIVE");
+        @DisplayName("Debe eliminar el perfil cuando existe")
+        void shouldDeleteWhenExists() {
+            when(athleticProfileRepository.existsById(1L)).thenReturn(true);
 
-            AthleticProfileEntity updatedEntity = new AthleticProfileEntity();
-            updatedEntity.setEmail("player@escuela.edu.co");
-            updatedEntity.setDorsalNumber(11);
-            updatedEntity.setPosition("MIDFIELDER");
-            updatedEntity.setLaterality("LEFT");
-            updatedEntity.setStature("175cm");
-            updatedEntity.setState("INACTIVE");
+            athleticProfileService.deleteAthleticProfile(1L);
 
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(updatedEntity);
-            when(athleticProfileMapper.toDTO(updatedEntity)).thenReturn(updatedDTO);
-
-            AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(
-                "player@escuela.edu.co", updatedDTO
-            );
-
-            assertThat(result.getDorsalNumber()).isEqualTo(11);
-            assertThat(result.getPosition()).isEqualTo("MIDFIELDER");
-            assertThat(result.getLaterality()).isEqualTo("LEFT");
-            assertThat(result.getStature()).isEqualTo("175cm");
-            assertThat(result.getState()).isEqualTo("INACTIVE");
+            verify(athleticProfileRepository).deleteById(1L);
         }
 
         @Test
-        @DisplayName("Must call repository save after updating the entity fields")
-        void mustCallRepositorySaveAfterUpdatingFields() {
-            AthleticProfileDTO updatedDTO = new AthleticProfileDTO();
-            updatedDTO.setDorsalNumber(11);
-            updatedDTO.setPosition("MIDFIELDER");
-            updatedDTO.setLaterality("LEFT");
-            updatedDTO.setStature("175cm");
-            updatedDTO.setState("INACTIVE");
+        @DisplayName("Debe lanzar IllegalArgumentException cuando el perfil no existe")
+        void shouldThrowWhenNotFound() {
+            when(athleticProfileRepository.existsById(99L)).thenReturn(false);
 
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(baseEntity);
-            when(athleticProfileMapper.toDTO(any())).thenReturn(updatedDTO);
+            assertThatThrownBy(() -> athleticProfileService.deleteAthleticProfile(99L))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Athletic profile not found");
 
-            athleticProfileService.updateAthleticProfile("player@escuela.edu.co", updatedDTO);
-
-            verify(athleticProfileRepository).save(baseEntity);
-        }
-
-        @Test
-        @DisplayName("Must throw NoSuchElementException when no profile exists for the given email")
-        void mustThrowNoSuchElementExceptionWhenProfileNotFound() {
-            when(athleticProfileRepository.findByEmail("unknown@escuela.edu.co")).thenReturn(null);
-
-            assertThatThrownBy(() ->
-                athleticProfileService.updateAthleticProfile("unknown@escuela.edu.co", baseDTO)
-            ).isInstanceOf(NoSuchElementException.class)
-             .hasMessageContaining("unknown@escuela.edu.co");
-        }
-
-        @Test
-        @DisplayName("Must not call repository save when profile is not found")
-        void mustNotCallRepositorySaveWhenProfileNotFound() {
-            when(athleticProfileRepository.findByEmail("unknown@escuela.edu.co")).thenReturn(null);
-
-            assertThatThrownBy(() ->
-                athleticProfileService.updateAthleticProfile("unknown@escuela.edu.co", baseDTO)
-            ).isInstanceOf(NoSuchElementException.class);
-
-            verify(athleticProfileRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("Must update dorsalNumber on the existing entity before saving")
-        void mustUpdateDorsalNumberOnExistingEntityBeforeSaving() {
-            AthleticProfileDTO updatedDTO = new AthleticProfileDTO();
-            updatedDTO.setDorsalNumber(99);
-            updatedDTO.setPosition("FORWARD");
-            updatedDTO.setLaterality("RIGHT");
-            updatedDTO.setStature("180cm");
-            updatedDTO.setState("ACTIVE");
-
-            when(athleticProfileRepository.findByEmail("player@escuela.edu.co")).thenReturn(baseEntity);
-            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenAnswer(inv -> inv.getArgument(0));
-            when(athleticProfileMapper.toDTO(any())).thenReturn(updatedDTO);
-
-            athleticProfileService.updateAthleticProfile("player@escuela.edu.co", updatedDTO);
-
-            assertThat(baseEntity.getDorsalNumber()).isEqualTo(99);
-        }
-    }
-
-    // ----------------------------------------------------------------
-    // deleteAthleticProfile
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("deleteAthleticProfile")
-    class DeleteAthleticProfileTests {
-
-        @Test
-        @DisplayName("Must call deleteByEmail when profile exists")
-        void mustCallDeleteByEmailWhenProfileExists() {
-            when(athleticProfileRepository.existsByEmail("player@escuela.edu.co")).thenReturn(true);
-
-            athleticProfileService.deleteAthleticProfile("player@escuela.edu.co");
-
-            verify(athleticProfileRepository).deleteByEmail("player@escuela.edu.co");
-        }
-
-        @Test
-        @DisplayName("Must throw IllegalArgumentException when profile does not exist")
-        void mustThrowIllegalArgumentExceptionWhenProfileDoesNotExist() {
-            when(athleticProfileRepository.existsByEmail("unknown@escuela.edu.co")).thenReturn(false);
-
-            assertThatThrownBy(() ->
-                athleticProfileService.deleteAthleticProfile("unknown@escuela.edu.co")
-            ).isInstanceOf(IllegalArgumentException.class)
-             .hasMessageContaining("Athletic profile not found");
-        }
-
-        @Test
-        @DisplayName("Must not call deleteByEmail when profile does not exist")
-        void mustNotCallDeleteByEmailWhenProfileDoesNotExist() {
-            when(athleticProfileRepository.existsByEmail("unknown@escuela.edu.co")).thenReturn(false);
-
-            assertThatThrownBy(() ->
-                athleticProfileService.deleteAthleticProfile("unknown@escuela.edu.co")
-            ).isInstanceOf(IllegalArgumentException.class);
-
-            verify(athleticProfileRepository, never()).deleteByEmail(any());
-        }
-
-        @Test
-        @DisplayName("Must call existsByEmail before attempting deletion")
-        void mustCallExistsByEmailBeforeDeletion() {
-            when(athleticProfileRepository.existsByEmail("player@escuela.edu.co")).thenReturn(true);
-
-            athleticProfileService.deleteAthleticProfile("player@escuela.edu.co");
-
-            verify(athleticProfileRepository).existsByEmail("player@escuela.edu.co");
+            verify(athleticProfileRepository, never()).deleteById(any());
         }
     }
 }
