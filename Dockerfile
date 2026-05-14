@@ -1,9 +1,19 @@
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline -B
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
 
-EXPOSE 8080
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/target/userService-0.0.1-SNAPSHOT.jar app.jar
+
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

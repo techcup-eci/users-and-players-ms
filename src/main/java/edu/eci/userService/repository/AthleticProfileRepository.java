@@ -12,13 +12,7 @@ public interface AthleticProfileRepository extends JpaRepository<AthleticProfile
 
     public List<AthleticProfileEntity> findAll();
 
-    public AthleticProfileEntity findByEmail(String email);
-
     public List<AthleticProfileEntity> findByPosition(String position);
 
     public List<AthleticProfileEntity> findByLaterality(String laterality);
-
-    public boolean existsByEmail(String email);
-
-    public void deleteByEmail(String email);
 }

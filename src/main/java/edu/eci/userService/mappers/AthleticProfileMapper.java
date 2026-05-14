@@ -1,6 +1,7 @@
 package edu.eci.userService.mappers;
 
 import org.springframework.stereotype.Component;
+
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
 
@@ -24,6 +25,7 @@ public class AthleticProfileMapper {
         AthleticProfileEntity entity = new AthleticProfileEntity();
         entity.setDorsalNumber(dto.getDorsalNumber());
         entity.setId(dto.getId());
+        entity.setUser(dto.getUser());
         entity.setNickName(dto.getNickName());
         entity.setPosition(dto.getPosition());
         entity.setLaterality(dto.getLaterality());

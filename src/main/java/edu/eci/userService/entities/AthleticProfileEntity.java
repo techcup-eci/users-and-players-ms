@@ -21,9 +21,6 @@ public class AthleticProfileEntity {
     @Column(nullable = false)
     private String nickName;
 
-    @OneToOne
-    @Column(nullable = false)
-    private Long userId;
 
     @Column(nullable = false)
     private String position;
@@ -37,9 +34,9 @@ public class AthleticProfileEntity {
     @Column(nullable = false)
     private String state;
 
-    @OneToOne
+    @OneToOne(optional = false)
     @MapsId // Link the ID of this entity to the ID of the UserEntity
-    @JoinColumn(name = "user_id") // Database column name
+    @JoinColumn(name = "user_id", nullable = false) // Database column name
     private UserEntity user; // We're replacing Long with the Entity class
 
     public void setDorsalNumber(Integer dorsalNumber) {
