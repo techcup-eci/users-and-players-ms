@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.services.AthleticProfileService;
 import io.swagger.v3.oas.annotations.Operation;
+
+import edu.eci.userService.entities.UserEntity;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/AthleticProfile")
@@ -33,10 +36,10 @@ public class AthleticProfileController {
         return athleticProfileService.getAllAthleticProfiles();
     }
 
-    @GetMapping("/{email}")
-    @Operation(summary = "Get athletic profiles by email", description = "Get a list of athletic profiles that match the specified email")
-    public AthleticProfileDTO getProfileAthleticByEmail(@PathVariable String email) {
-        return athleticProfileService.getAthleticProfilesByEmail(email);
+    @GetMapping("/{UserId}")
+    @Operation(summary = "Get athletic profiles by user ID", description = "Get a list of athletic profiles that match the specified user ID")
+    public AthleticProfileDTO getProfileAthleticByUserId(@PathVariable long UserId) {
+        return athleticProfileService.getAthleticProfilesByUserId(UserId);
     }
 
     @PostMapping
@@ -45,24 +48,26 @@ public class AthleticProfileController {
         return athleticProfileService.createAthleticProfile(toDTO(requestBody));
     }
 
-    @PutMapping("/{email}")
+    @PutMapping("/{UserId}")
     @Operation(summary = "Update an existing athletic profile", description = "Update the athletic profile")
-    public AthleticProfileDTO updateAthleticProfile(@PathVariable String email,
+    public AthleticProfileDTO updateAthleticProfile(@PathVariable long UserId,
             @RequestBody AthleticProfileRequestBody requestBody) {
-        return athleticProfileService.updateAthleticProfile(email, toDTO(requestBody));
+        return athleticProfileService.updateAthleticProfile(UserId, toDTO(requestBody));
     }
 
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/{UserId}")
     @Operation(summary = "Delete an athletic profile", description = "Delete the athletic profile")
-    public Map<String, String> deleteAthleticProfile(@PathVariable String email) {
-        athleticProfileService.deleteAthleticProfile(email);
+    public Map<String, String> deleteAthleticProfile(@PathVariable long UserId) {
+        athleticProfileService.deleteAthleticProfile(UserId);
         return Map.of("message", "User deleted successfully");
     }
 
     private AthleticProfileDTO toDTO(AthleticProfileRequestBody requestBody) {
         AthleticProfileDTO dto = new AthleticProfileDTO();
         dto.setDorsalNumber(requestBody.dorsalNumber());
-        dto.setEmail(requestBody.email());
+        dto.setId(requestBody.id());
+        dto.setUser(requestBody.user());
+        dto.setNickName(requestBody.nickName());
         dto.setPosition(requestBody.position());
         dto.setLaterality(requestBody.laterality());
         dto.setStature(requestBody.stature());
@@ -72,7 +77,9 @@ public class AthleticProfileController {
 
     public record AthleticProfileRequestBody(
             int dorsalNumber,
-            String email,
+            long id,
+            UserEntity user,
+            String nickName,
             String position,
             String laterality,
             String stature,

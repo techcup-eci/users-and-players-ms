@@ -27,9 +27,9 @@ public class AthleticProfileService {
         return athleticProfileDTO;
     }
 
-    public AthleticProfileDTO getAthleticProfilesByEmail(String email) {
+    public AthleticProfileDTO getAthleticProfilesByUserId(Long userId) {
         AthleticProfileDTO dto = new AthleticProfileDTO();
-        dto = athleticProfileMapper.toDTO(athleticProfileRepository.findByEmail(email));
+        dto = athleticProfileMapper.toDTO(athleticProfileRepository.findById(userId).orElse(null));
         return dto;
     }
 
@@ -54,10 +54,10 @@ public class AthleticProfileService {
         return athleticProfileMapper.toDTO(athleticProfileRepository.save(entity));
     }
 
-    public AthleticProfileDTO updateAthleticProfile(String email, AthleticProfileDTO athleticProfileDTO) {
-        AthleticProfileEntity entitie = athleticProfileRepository.findByEmail(email);
+    public AthleticProfileDTO updateAthleticProfile(Long userId, AthleticProfileDTO athleticProfileDTO) {
+        AthleticProfileEntity entitie = athleticProfileRepository.findById(userId).orElse(null);
         if (entitie == null) {
-            throw new NoSuchElementException("No athletic profile found with email: " + email);
+            throw new NoSuchElementException("No athletic profile found with user ID: " + userId);
         }
         entitie.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
         entitie.setPosition(athleticProfileDTO.getPosition());
@@ -67,11 +67,11 @@ public class AthleticProfileService {
         return athleticProfileMapper.toDTO(athleticProfileRepository.save(entitie));
     }
 
-    public void deleteAthleticProfile(String email) {
-        if (!athleticProfileRepository.existsByEmail(email)) {
+    public void deleteAthleticProfile(Long userId) {
+        if (!athleticProfileRepository.existsById(userId)) {
             throw new IllegalArgumentException("Athletic profile not found");
         }
-        athleticProfileRepository.deleteByEmail(email);
+        athleticProfileRepository.deleteById(userId);
     }
 
 }

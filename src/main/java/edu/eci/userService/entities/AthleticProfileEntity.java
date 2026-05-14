@@ -2,9 +2,10 @@ package edu.eci.userService.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -12,14 +13,17 @@ import jakarta.persistence.Table;
 public class AthleticProfileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private int dorsalNumber;
+    private Integer dorsalNumber;
 
     @Column(nullable = false)
-    private String email;
+    private String nickName;
+
+    @OneToOne
+    @Column(nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
     private String position;
@@ -33,12 +37,29 @@ public class AthleticProfileEntity {
     @Column(nullable = false)
     private String state;
 
-    public void setDorsalNumber(int dorsalNumber) {
+    @OneToOne
+    @MapsId // Link the ID of this entity to the ID of the UserEntity
+    @JoinColumn(name = "user_id") // Database column name
+    private UserEntity user; // We're replacing Long with the Entity class
+
+    public void setDorsalNumber(Integer dorsalNumber) {
         this.dorsalNumber = dorsalNumber;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setPosition(String position) {
@@ -57,12 +78,16 @@ public class AthleticProfileEntity {
         this.state = state;
     }
 
-    public int getDorsalNumber() {
+    public Integer getDorsalNumber() {
         return dorsalNumber;
     }
 
-    public String getEmail() {
-        return email;
+    public String getNickName() {
+        return nickName;
+    }
+
+    public UserEntity getUser() {
+        return user;
     }
 
     public String getPosition() {
