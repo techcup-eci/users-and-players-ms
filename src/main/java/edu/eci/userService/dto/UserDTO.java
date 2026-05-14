@@ -15,15 +15,15 @@ public class UserDTO {
     private String academicProgram;
     private int semester;
     private String identificationType;
-    private int identificationNumber;
-    private int phone;
+    private Long identificationNumber;
+    private Long phone;
     private String password;
 
     public UserDTO() {
     }
 
     public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationShip,
-            String academicProgram, int semester, String identificationType, int identificationNumber, int phone,
+            String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone,
             String password) {
         this.id = id;
         this.name = name;
@@ -75,11 +75,11 @@ public class UserDTO {
         return identificationType;
     }
 
-    public int getIdentificationNumber() {
+    public Long getIdentificationNumber() {
         return identificationNumber;
     }
 
-    public int getPhone() {
+    public Long getPhone() {
         return phone;
     }
 
@@ -123,11 +123,11 @@ public class UserDTO {
         this.identificationType = identificationType;
     }
 
-    public void setIdentificationNumber(int identificationNumber) {
+    public void setIdentificationNumber(Long identificationNumber) {
         this.identificationNumber = identificationNumber;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(Long phone) {
         this.phone = phone;
     }
 

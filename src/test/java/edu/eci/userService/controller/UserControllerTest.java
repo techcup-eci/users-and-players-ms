@@ -59,8 +59,8 @@ class UserControllerTest {
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
-        sampleDTO.setIdentificationNumber(1000123456);
-        sampleDTO.setPhone(3001234567);
+        sampleDTO.setIdentificationNumber(1000123456L);
+        sampleDTO.setPhone(3001234567L);
     }
 
     // ── GET /User ────────────────────────────────────────────────────────────

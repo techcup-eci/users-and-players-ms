@@ -21,7 +21,7 @@ public class UserMapper {
         dto.setIdentificationNumber(entity.getIdentificationNumber());
         dto.setPhone(entity.getPhone());
         return dto;
-    }w
+    }
 
     public UserEntity toEntity(UserDTO dto) {
         UserEntity entity = new UserEntity();

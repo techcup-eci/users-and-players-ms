@@ -50,8 +50,8 @@ class MapperTest {
             assertThat(dto.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(dto.getSemester()).isEqualTo(5);
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
-            assertThat(dto.getIdentificationNumber()).isEqualTo(1000123456);
-            assertThat(dto.getPhone()).isEqualTo(3001234567);
+            assertThat(dto.getIdentificationNumber()).isEqualTo(1000123456L);
+            assertThat(dto.getPhone()).isEqualTo(3001234567L);
         }
 
         @Test
@@ -70,8 +70,8 @@ class MapperTest {
             assertThat(entity.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(entity.getSemester()).isEqualTo(5);
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
-            assertThat(entity.getIdentificationNumber()).isEqualTo(1000123456);
-            assertThat(entity.getPhone()).isEqualTo(3001234567);
+            assertThat(entity.getIdentificationNumber()).isEqualTo(1000123456L);
+            assertThat(entity.getPhone()).isEqualTo(3001234567L);
         }
 
         @Test
@@ -111,8 +111,8 @@ class MapperTest {
             e.setAcademicProgram("Ingeniería de Sistemas");
             e.setSemester(5);
             e.setIdentificationType("CC");
-            e.setIdentificationNumber(1000123456);
-            e.setPhone(3001234567);
+            e.setIdentificationNumber(1000123456L);
+            e.setPhone(3001234567L);
             e.setPassword("secret_hash");
             return e;
         }
@@ -128,17 +128,15 @@ class MapperTest {
             dto.setAcademicProgram("Ingeniería de Sistemas");
             dto.setSemester(5);
             dto.setIdentificationType("CC");
-            dto.setIdentificationNumber(1000123456);
-            dto.setPhone(3001234567);
+            dto.setIdentificationNumber(1000123456L);
+            dto.setPhone(3001234567L);
             return dto;
         }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
     // AthleticProfileMapper
-    // ══════════════════════════════════════════════════════════════════════════
-
-    @Nested
+    // ════════════════════════════════════
     @DisplayName("AthleticProfileMapper")
     class AthleticProfileMapperTests {
 

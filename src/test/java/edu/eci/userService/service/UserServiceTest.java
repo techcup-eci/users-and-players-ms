@@ -61,8 +61,8 @@ class UserServiceTest {
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
-        sampleEntity.setIdentificationNumber(1000123456);
-        sampleEntity.setPhone(3001234567);
+        sampleEntity.setIdentificationNumber(1000123456L);
+        sampleEntity.setPhone(3001234567L);
         sampleEntity.setPassword("hashed_password");
 
         sampleDTO = new UserDTO();
@@ -75,8 +75,8 @@ class UserServiceTest {
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
-        sampleDTO.setIdentificationNumber(1000123456);
-        sampleDTO.setPhone(3001234567);
+        sampleDTO.setIdentificationNumber(1000123456L);
+        sampleDTO.setPhone(3001234567L);
         sampleDTO.setPassword("hashed_password");
     }
 
@@ -194,8 +194,8 @@ class UserServiceTest {
             updatedDTO.setAcademicProgram("Ingeniería de IA");
             updatedDTO.setSemester(6);
             updatedDTO.setIdentificationType("CC");
-            updatedDTO.setIdentificationNumber(1000123456);
-            updatedDTO.setPhone(3009999999);
+            updatedDTO.setIdentificationNumber(1000123456L);
+            updatedDTO.setPhone(3009999999L);
 
             UserEntity updatedEntity = new UserEntity();
             updatedEntity.setId(1L);

@@ -46,10 +46,10 @@ public class UserEntity {
     private String identificationType;
 
     @Column(nullable = false)
-    private Integer identificationNumber;
+    private Long identificationNumber;
 
     @Column(nullable = false)
-    private Integer phone;
+    private Long phone;
 
     @Column(nullable = false)
     private String password;
@@ -93,11 +93,11 @@ public class UserEntity {
         return identificationType;
     }
 
-    public Integer getIdentificationNumber() {
+    public Long getIdentificationNumber() {
         return identificationNumber;
     }
 
-    public Integer getPhone() {
+    public Long getPhone() {
         return phone;
     }
 
@@ -124,7 +124,6 @@ public class UserEntity {
     public void setRole(UserRoleEnum role) {
         this.role = role;
     }
-w
     public void setRelationShip(String relationship) {
         this.relationship = relationship;
     }
@@ -141,11 +140,11 @@ w
         this.identificationType = identificationType;
     }
 
-    public void setIdentificationNumber(Integer identificationNumber) {
+    public void setIdentificationNumber(Long identificationNumber) {
         this.identificationNumber = identificationNumber;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(Long phone) {
         this.phone = phone;
     }
 
