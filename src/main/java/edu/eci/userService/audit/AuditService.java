@@ -31,11 +31,17 @@ public class AuditService {
      * @param status      "SUCCESS" o "ERROR"
      * @param detail      detalle adicional
      */
-    public AuditLog log(String action, String httpMethod, String endpoint,
-                        String entityType, String entityId,
-                        String performedBy, String status, String detail) {
-        AuditLog entry = new AuditLog(action, httpMethod, endpoint,
-                entityType, entityId, performedBy, status, detail);
+    public AuditLog log(AuditLogRequest request) {
+        AuditLog entry = new AuditLog(
+                request.getAction(),
+                request.getHttpMethod(),
+                request.getEndpoint(),
+                request.getEntityType(),
+                request.getEntityId(),
+                request.getPerformedBy(),
+                request.getStatus(),
+                request.getDetail()
+        );
         return auditLogRepository.save(entry);
     }
 
