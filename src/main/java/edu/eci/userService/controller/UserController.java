@@ -3,7 +3,6 @@ package edu.eci.userService.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/User")
 public class UserController {
