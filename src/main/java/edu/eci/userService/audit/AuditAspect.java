@@ -80,12 +80,27 @@ public class AuditAspect {
         Object result;
         try {
             result = pjp.proceed();
-            auditService.log(action, httpMethod, endpoint, entityType,
-                    entityId, performedBy, "SUCCESS", null);
+            AuditLogRequest auditRequest = new AuditLogRequest();
+            auditRequest.setAction(action);
+            auditRequest.setHttpMethod(httpMethod);
+            auditRequest.setEndpoint(endpoint);
+            auditRequest.setEntityType(entityType);
+            auditRequest.setEntityId(entityId);
+            auditRequest.setPerformedBy(performedBy);
+            auditRequest.setStatus("SUCCESS");
+            auditRequest.setDetail(null);
+            auditService.log(auditRequest);
         } catch (Exception ex) {
-            auditService.log(action, httpMethod, endpoint, entityType,
-                    entityId, performedBy, "ERROR",
-                    ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            AuditLogRequest auditRequest = new AuditLogRequest();
+            auditRequest.setAction(action);
+            auditRequest.setHttpMethod(httpMethod);
+            auditRequest.setEndpoint(endpoint);
+            auditRequest.setEntityType(entityType);
+            auditRequest.setEntityId(entityId);
+            auditRequest.setPerformedBy(performedBy);
+            auditRequest.setStatus("ERROR");
+            auditRequest.setDetail(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            auditService.log(auditRequest);
             throw ex;
         }
         return result;
