@@ -173,13 +173,15 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción cuando el usuario no existe")
-        void shouldPropagateExceptionWhenNotFound() throws Exception {
+        @DisplayName("Debe retornar 404 cuando el usuario no existe")
+        void shouldReturn404WhenUserNotFound() throws Exception {
+
             doThrow(new NoSuchElementException("No user found with ID: 99"))
                     .when(userService).deleteUser(99L);
 
             mockMvc.perform(delete("/User/99"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().string("No user found with ID: 99"));
         }
     }
 }
