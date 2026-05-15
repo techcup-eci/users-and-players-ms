@@ -32,13 +32,9 @@ class AthleticProfileServiceTest {
     @Mock
     private AthleticProfileRepository athleticProfileRepository;
 
-    @Mock
-    private AthleticProfileMapper athleticProfileMapper;
+    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
 
-    @InjectMocks
     private AthleticProfileService athleticProfileService;
-
-    // ── Fixtures ─────────────────────────────────────────────────────────────
 
     private AthleticProfileEntity sampleEntity;
     private AthleticProfileDTO sampleDTO;
@@ -46,6 +42,7 @@ class AthleticProfileServiceTest {
 
     @BeforeEach
     void setUp() {
+        athleticProfileService = new AthleticProfileService(athleticProfileRepository, athleticProfileMapper);
         sampleUser = new UserEntity();
         sampleUser.setId(1L);
         sampleUser.setName("Juan Pérez");
@@ -82,7 +79,6 @@ class AthleticProfileServiceTest {
         @DisplayName("Debe retornar lista de DTOs cuando existen perfiles")
         void shouldReturnDTOList() {
             when(athleticProfileRepository.findAll()).thenReturn(List.of(sampleEntity));
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<AthleticProfileDTO> result = athleticProfileService.getAllAthleticProfiles();
 
@@ -112,7 +108,6 @@ class AthleticProfileServiceTest {
         @DisplayName("Debe retornar DTO cuando el perfil existe")
         void shouldReturnDTOWhenFound() {
             when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByUserId(1L);
 
@@ -124,7 +119,6 @@ class AthleticProfileServiceTest {
         @DisplayName("Debe retornar null cuando el perfil no existe")
         void shouldReturnNullWhenNotFound() {
             when(athleticProfileRepository.findById(99L)).thenReturn(Optional.empty());
-            when(athleticProfileMapper.toDTO(null)).thenReturn(null);
 
             AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByUserId(99L);
 
@@ -143,7 +137,6 @@ class AthleticProfileServiceTest {
         void shouldReturnProfilesForPosition() {
             when(athleticProfileRepository.findByPosition("delantero"))
                     .thenReturn(List.of(sampleEntity));
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<AthleticProfileDTO> result =
                     athleticProfileService.getAthleticProfileByPosition("delantero");
@@ -175,7 +168,6 @@ class AthleticProfileServiceTest {
         void shouldReturnProfilesForLaterality() {
             when(athleticProfileRepository.findByLaterality("diestro"))
                     .thenReturn(List.of(sampleEntity));
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<AthleticProfileDTO> result =
                     athleticProfileService.getAthleticProfileByLaterality("diestro");
@@ -193,31 +185,23 @@ class AthleticProfileServiceTest {
         @Test
         @DisplayName("Debe persistir y retornar el DTO del perfil creado")
         void shouldPersistAndReturnDTO() {
-            when(athleticProfileMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
-            when(athleticProfileRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
+            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
 
             AthleticProfileDTO result = athleticProfileService.createAthleticProfile(sampleDTO);
 
             assertThat(result).isNotNull();
             assertThat(result.getDorsalNumber()).isEqualTo(10);
-            verify(athleticProfileRepository).save(sampleEntity);
+            verify(athleticProfileRepository).save(any(AthleticProfileEntity.class));
         }
 
         @Test
-        @DisplayName("Debe llamar al mapper antes de persistir")
-        void shouldCallMapperBeforeSave() {
-            when(athleticProfileMapper.toEntity(any())).thenReturn(sampleEntity);
-            when(athleticProfileRepository.save(any())).thenReturn(sampleEntity);
-            when(athleticProfileMapper.toDTO(any())).thenReturn(sampleDTO);
+        @DisplayName("Debe llamar al repositorio para guardar")
+        void shouldSaveToRepository() {
+            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
 
             athleticProfileService.createAthleticProfile(sampleDTO);
 
-            // El orden importa: primero toEntity, luego save, luego toDTO
-            var order = inOrder(athleticProfileMapper, athleticProfileRepository);
-            order.verify(athleticProfileMapper).toEntity(sampleDTO);
-            order.verify(athleticProfileRepository).save(sampleEntity);
-            order.verify(athleticProfileMapper).toDTO(sampleEntity);
+            verify(athleticProfileRepository).save(any(AthleticProfileEntity.class));
         }
     }
 
@@ -239,7 +223,6 @@ class AthleticProfileServiceTest {
 
             when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
             when(athleticProfileRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(updatedDTO);
 
             AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(1L, updatedDTO);
 
@@ -269,8 +252,7 @@ class AthleticProfileServiceTest {
             updatedDTO.setState("inactivo");
 
             when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
-            when(athleticProfileRepository.save(any())).thenReturn(sampleEntity);
-            when(athleticProfileMapper.toDTO(sampleEntity)).thenReturn(updatedDTO);
+            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
 
             AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(1L, updatedDTO);
 

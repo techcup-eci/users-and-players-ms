@@ -9,6 +9,8 @@ import edu.eci.userService.entities.AthleticProfileEntity;
 public class AthleticProfileMapper {
 
     public AthleticProfileDTO toDTO(AthleticProfileEntity entity) {
+        if (entity == null) { return null;}
+
         AthleticProfileDTO dto = new AthleticProfileDTO();
         dto.setDorsalNumber(entity.getDorsalNumber());
         dto.setId(entity.getId());
@@ -22,6 +24,8 @@ public class AthleticProfileMapper {
     }
 
     public AthleticProfileEntity toEntity(AthleticProfileDTO dto) {
+        if (dto == null) { return null; }
+
         AthleticProfileEntity entity = new AthleticProfileEntity();
         entity.setDorsalNumber(dto.getDorsalNumber());
         entity.setId(dto.getId());

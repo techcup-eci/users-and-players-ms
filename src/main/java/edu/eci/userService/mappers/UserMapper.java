@@ -8,6 +8,8 @@ import edu.eci.userService.entities.UserEntity;
 public class UserMapper {
 
     public UserDTO toDTO(UserEntity entity) {
+        if (entity == null) { return null; }
+
         UserDTO dto = new UserDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
@@ -24,6 +26,8 @@ public class UserMapper {
     }
 
     public UserEntity toEntity(UserDTO dto) {
+        if (dto == null) { return null; }
+
         UserEntity entity = new UserEntity();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
