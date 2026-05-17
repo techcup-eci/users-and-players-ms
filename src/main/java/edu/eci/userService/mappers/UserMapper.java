@@ -1,6 +1,7 @@
 package edu.eci.userService.mappers;
 
 import org.springframework.stereotype.Component;
+
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.UserEntity;
 
@@ -29,7 +30,9 @@ public class UserMapper {
         if (dto == null) { return null; }
 
         UserEntity entity = new UserEntity();
-        entity.setId(dto.getId());
+        if (dto.getId() > 0) {
+            entity.setId(dto.getId());
+        }
         entity.setName(dto.getName());
         entity.setEmail(dto.getEmail());
         entity.setBirthDate(dto.getBirthDate());
@@ -40,6 +43,7 @@ public class UserMapper {
         entity.setIdentificationType(dto.getIdentificationType());
         entity.setIdentificationNumber(dto.getIdentificationNumber());
         entity.setPhone(dto.getPhone());
+        entity.setPassword(dto.getPassword());
         return entity;
     }
 }
