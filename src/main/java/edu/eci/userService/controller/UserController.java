@@ -16,7 +16,7 @@ import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 @RestController
-@RequestMapping("/User")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -37,7 +37,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping
+    @PostMapping("/register")
     @Operation(summary = "Create a new user", description = "Create a new user with the provided information")
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);

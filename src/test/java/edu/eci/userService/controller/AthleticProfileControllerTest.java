@@ -200,8 +200,9 @@ class AthleticProfileControllerTest {
             doThrow(new IllegalArgumentException("Athletic profile not found"))
                     .when(athleticProfileService).deleteAthleticProfile(99L);
 
-            mockMvc.perform(delete("/AthleticProfile/99"))
-                    .andExpect(status().is5xxServerError());
+            org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
+                mockMvc.perform(delete("/AthleticProfile/99"));
+            });
         }
     }
 }

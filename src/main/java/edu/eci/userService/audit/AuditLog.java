@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Campos registrados:
  *  - action      : nombre lógico de la operación (CREATE_USER, UPDATE_PROFILE…)
  *  - httpMethod  : GET | POST | PUT | DELETE
- *  - endpoint    : ruta real invocada (/User/3, /AthleticProfile…)
+ *  - endpoint    : ruta real invocada (/api/users/3, /AthleticProfile…)
  *  - entityType  : "User" o "AthleticProfile"
  *  - entityId    : ID del recurso afectado (puede ser null en listados)
  *  - performedBy : IP del cliente que realizó la petición

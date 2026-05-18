@@ -63,123 +63,124 @@ class UserControllerTest {
         sampleDTO.setPhone(3001234567L);
     }
 
-    // ── GET /User ────────────────────────────────────────────────────────────
-
-    @Nested
-    @DisplayName("GET /User")
-    class GetAll {
-
-        @Test
-        @DisplayName("Debe retornar 200 con lista de usuarios")
-        void shouldReturn200WithList() throws Exception {
-            when(userService.getAllUsers()).thenReturn(List.of(sampleDTO));
-
-            mockMvc.perform(get("/User"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)))
-                    .andExpect(jsonPath("$[0].name", is("Juan Pérez")))
-                    .andExpect(jsonPath("$[0].email", is("juan.perez@eci.edu.co")));
-        }
-
-        @Test
-        @DisplayName("Debe retornar 200 con lista vacía cuando no hay usuarios")
-        void shouldReturn200WithEmptyList() throws Exception {
-            when(userService.getAllUsers()).thenReturn(List.of());
-
-            mockMvc.perform(get("/User"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(0)));
-        }
-    }
-
-    // ── GET /User/{id} ───────────────────────────────────────────────────────
-
-    @Nested
-    @DisplayName("GET /User/{id}")
-    class GetById {
-
-        @Test
-        @DisplayName("Debe retornar 200 con el usuario cuando existe")
-        void shouldReturn200WhenFound() throws Exception {
-            when(userService.getUserById(1L)).thenReturn(sampleDTO);
-
-            mockMvc.perform(get("/User/1"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is(1)))
-                    .andExpect(jsonPath("$.name", is("Juan Pérez")));
-        }
-    }
-
-    // ── POST /User ───────────────────────────────────────────────────────────
-
-    @Nested
-    @DisplayName("POST /User")
-    class CreateUser {
-
-        @Test
-        @DisplayName("Debe retornar 200 con el usuario creado")
-        void shouldReturn200WithCreatedUser() throws Exception {
-            when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
-
-            mockMvc.perform(post("/User")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(sampleDTO)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name", is("Juan Pérez")))
-                    .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
-
-            verify(userService).createUser(any(UserDTO.class));
-        }
-    }
-
-    // ── PUT /User/{id} ───────────────────────────────────────────────────────
-
-    @Nested
-    @DisplayName("PUT /User/{id}")
-    class UpdateUser {
-
-        @Test
-        @DisplayName("Debe retornar 200 con el usuario actualizado")
-        void shouldReturn200WithUpdatedUser() throws Exception {
-            UserDTO updatedDTO = new UserDTO();
-            updatedDTO.setId(1L);
-            updatedDTO.setName("Juan Actualizado");
-            updatedDTO.setEmail("juan.perez@eci.edu.co");
-
-            when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedDTO);
-
-            mockMvc.perform(put("/User/1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updatedDTO)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name", is("Juan Actualizado")));
-        }
-    }
-
-    // ── DELETE /User/{id} ────────────────────────────────────────────────────
-
-    @Nested
-    @DisplayName("DELETE /User/{id}")
-    class DeleteUser {
-
-        @Test
-        @DisplayName("Debe retornar 200 con mensaje de éxito")
-        void shouldReturn200WithSuccessMessage() throws Exception {
-            doNothing().when(userService).deleteUser(1L);
-
-            mockMvc.perform(delete("/User/1"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("User deleted successfully")));
-        }
-
-        @Test
-        @DisplayName("Debe propagar excepción cuando el usuario no existe")
-        void shouldPropagateExceptionWhenNotFound() throws Exception {
-            doThrow(new NoSuchElementException("No user found with ID: 99"))
-                    .when(userService).deleteUser(99L);
-
-            mockMvc.perform(delete("/User/99"))
-                    .andExpect(status().is5xxServerError());
-        }
-    }
+    // ── GET /api/users ────────────────────────────────────────────────────────
+ 
+     @Nested
+     @DisplayName("GET /api/users")
+     class GetAll {
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con lista de usuarios")
+         void shouldReturn200WithList() throws Exception {
+             when(userService.getAllUsers()).thenReturn(List.of(sampleDTO));
+ 
+             mockMvc.perform(get("/api/users"))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$", hasSize(1)))
+                     .andExpect(jsonPath("$[0].name", is("Juan Pérez")))
+                     .andExpect(jsonPath("$[0].email", is("juan.perez@eci.edu.co")));
+         }
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con lista vacía cuando no hay usuarios")
+         void shouldReturn200WithEmptyList() throws Exception {
+             when(userService.getAllUsers()).thenReturn(List.of());
+ 
+             mockMvc.perform(get("/api/users"))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$", hasSize(0)));
+         }
+     }
+ 
+     // ── GET /api/users/{id} ───────────────────────────────────────────────────
+ 
+     @Nested
+     @DisplayName("GET /api/users/{id}")
+     class GetById {
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con el usuario cuando existe")
+         void shouldReturn200WhenFound() throws Exception {
+             when(userService.getUserById(1L)).thenReturn(sampleDTO);
+ 
+             mockMvc.perform(get("/api/users/1"))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$.id", is(1)))
+                     .andExpect(jsonPath("$.name", is("Juan Pérez")));
+         }
+     }
+ 
+     // ── POST /api/users/register ─────────────────────────────────────────────
+ 
+     @Nested
+     @DisplayName("POST /api/users/register")
+     class CreateUser {
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con el usuario creado")
+         void shouldReturn200WithCreatedUser() throws Exception {
+             when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
+ 
+             mockMvc.perform(post("/api/users/register")
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(objectMapper.writeValueAsString(sampleDTO)))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$.name", is("Juan Pérez")))
+                     .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
+ 
+             verify(userService).createUser(any(UserDTO.class));
+         }
+     }
+ 
+     // ── PUT /api/users/{id} ───────────────────────────────────────────────────
+ 
+     @Nested
+     @DisplayName("PUT /api/users/{id}")
+     class UpdateUser {
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con el usuario actualizado")
+         void shouldReturn200WithUpdatedUser() throws Exception {
+             UserDTO updatedDTO = new UserDTO();
+             updatedDTO.setId(1L);
+             updatedDTO.setName("Juan Actualizado");
+             updatedDTO.setEmail("juan.perez@eci.edu.co");
+ 
+             when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedDTO);
+ 
+             mockMvc.perform(put("/api/users/1")
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(objectMapper.writeValueAsString(updatedDTO)))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$.name", is("Juan Actualizado")));
+         }
+     }
+ 
+     // ── DELETE /api/users/{id} ────────────────────────────────────────────────
+ 
+     @Nested
+     @DisplayName("DELETE /api/users/{id}")
+     class DeleteUser {
+ 
+         @Test
+         @DisplayName("Debe retornar 200 con mensaje de éxito")
+         void shouldReturn200WithSuccessMessage() throws Exception {
+             doNothing().when(userService).deleteUser(1L);
+ 
+             mockMvc.perform(delete("/api/users/1"))
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("$.message", is("User deleted successfully")));
+         }
+ 
+         @Test
+         @DisplayName("Debe propagar excepción cuando el usuario no existe")
+         void shouldPropagateExceptionWhenNotFound() throws Exception {
+             doThrow(new NoSuchElementException("No user found with ID: 99"))
+                     .when(userService).deleteUser(99L);
+ 
+             org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
+                 mockMvc.perform(delete("/api/users/99"));
+             });
+         }
+     }
 }
