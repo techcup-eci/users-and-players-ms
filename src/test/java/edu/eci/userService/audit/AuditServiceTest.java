@@ -43,6 +43,7 @@ class AuditServiceTest {
         request.setEntityId("1");
         request.setPerformedBy("IP");
         request.setStatus("SUCCESS");
+        request.setDetail(null);
 
         AuditLog result = auditService.log(request);
 
