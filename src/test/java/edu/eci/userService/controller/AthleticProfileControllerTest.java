@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -201,7 +200,7 @@ class AthleticProfileControllerTest {
                     .when(athleticProfileService).deleteAthleticProfile(99L);
 
             mockMvc.perform(delete("/AthleticProfile/99"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isBadRequest());
         }
     }
 }

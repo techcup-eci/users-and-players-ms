@@ -179,7 +179,7 @@ class UserControllerTest {
                     .when(userService).deleteUser(99L);
 
             mockMvc.perform(delete("/User/99"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isNotFound());
         }
     }
 }
