@@ -22,26 +22,26 @@ class DTOTest {
         dto.setEmail("email@test.com");
         dto.setBirthDate(birthDate);
         dto.setRole(UserRoleEnum.STUDENT);
-        dto.setRelationShip("staff");
+        dto.setRelationship("staff");
         dto.setAcademicProgram("Program");
         dto.setSemester(1);
         dto.setIdentificationType("CC");
         dto.setIdentificationNumber(123L);
         dto.setPhone(456L);
-        dto.setPassword("pass");
+        dto.setSystemRole("PLAYER");
 
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getName()).isEqualTo("Name");
         assertThat(dto.getEmail()).isEqualTo("email@test.com");
         assertThat(dto.getBirthDate()).isEqualTo(birthDate);
         assertThat(dto.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-        assertThat(dto.getRelationShip()).isEqualTo("staff");
+        assertThat(dto.getRelationship()).isEqualTo("staff");
         assertThat(dto.getAcademicProgram()).isEqualTo("Program");
         assertThat(dto.getSemester()).isEqualTo(1);
         assertThat(dto.getIdentificationType()).isEqualTo("CC");
         assertThat(dto.getIdentificationNumber()).isEqualTo(123L);
         assertThat(dto.getPhone()).isEqualTo(456L);
-        assertThat(dto.getPassword()).isEqualTo("pass");
+        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
     }
 
     @Test

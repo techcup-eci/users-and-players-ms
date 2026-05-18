@@ -5,6 +5,7 @@ import edu.eci.userService.entities.AthleticProfileEntity;
 import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.mappers.AthleticProfileMapper;
 import edu.eci.userService.repository.AthleticProfileRepository;
+import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.AthleticProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,9 @@ class AthleticProfileServiceTest {
     @Mock
     private AthleticProfileRepository athleticProfileRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
 
     private AthleticProfileService athleticProfileService;
@@ -42,7 +46,7 @@ class AthleticProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        athleticProfileService = new AthleticProfileService(athleticProfileRepository, athleticProfileMapper);
+        athleticProfileService = new AthleticProfileService(athleticProfileRepository, athleticProfileMapper, userRepository);
         sampleUser = new UserEntity();
         sampleUser.setId(1L);
         sampleUser.setName("Juan Pérez");
@@ -60,6 +64,7 @@ class AthleticProfileServiceTest {
 
         sampleDTO = new AthleticProfileDTO();
         sampleDTO.setId(1L);
+        sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setDorsalNumber(10);
         sampleDTO.setNickName("Juancho");
         sampleDTO.setPosition("delantero");
@@ -185,23 +190,35 @@ class AthleticProfileServiceTest {
         @Test
         @DisplayName("Debe persistir y retornar el DTO del perfil creado")
         void shouldPersistAndReturnDTO() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleUser);
             when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
 
             AthleticProfileDTO result = athleticProfileService.createAthleticProfile(sampleDTO);
 
             assertThat(result).isNotNull();
             assertThat(result.getDorsalNumber()).isEqualTo(10);
+            verify(userRepository).findByEmail("juan.perez@eci.edu.co");
             verify(athleticProfileRepository).save(any(AthleticProfileEntity.class));
         }
 
         @Test
-        @DisplayName("Debe llamar al repositorio para guardar")
-        void shouldSaveToRepository() {
-            when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
+        @DisplayName("Debe lanzar NoSuchElementException cuando el usuario no existe")
+        void shouldThrowWhenUserNotFound() {
+            when(userRepository.findByEmail("unknown@eci.edu.co")).thenReturn(null);
 
-            athleticProfileService.createAthleticProfile(sampleDTO);
+            AthleticProfileDTO dtoWithoutUser = new AthleticProfileDTO();
+            dtoWithoutUser.setEmail("unknown@eci.edu.co");
+            dtoWithoutUser.setDorsalNumber(10);
+            dtoWithoutUser.setPosition("delantero");
+            dtoWithoutUser.setLaterality("diestro");
+            dtoWithoutUser.setStature("175cm");
+            dtoWithoutUser.setState("activo");
 
-            verify(athleticProfileRepository).save(any(AthleticProfileEntity.class));
+            assertThatThrownBy(() -> athleticProfileService.createAthleticProfile(dtoWithoutUser))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("unknown@eci.edu.co");
+
+            verify(athleticProfileRepository, never()).save(any());
         }
     }
 

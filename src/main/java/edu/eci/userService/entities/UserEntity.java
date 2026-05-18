@@ -49,10 +49,10 @@ public class UserEntity {
     private Long identificationNumber;
 
     @Column(nullable = false)
-    private Long phone;
+    private Long phone = 0L;
 
-    @Column(nullable = false)
-    private String password;
+    @Column
+    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private AthleticProfileEntity athleticProfile;
@@ -77,7 +77,7 @@ public class UserEntity {
         return role;
     }
 
-    public String getRelationShip() {
+    public String getRelationship() {
         return relationship;
     }
 
@@ -101,8 +101,8 @@ public class UserEntity {
         return phone;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSystemRole() {
+        return systemRole;
     }
 
     public void setId(Long id) {
@@ -124,7 +124,7 @@ public class UserEntity {
     public void setRole(UserRoleEnum role) {
         this.role = role;
     }
-    public void setRelationShip(String relationship) {
+    public void setRelationship(String relationship) {
         this.relationship = relationship;
     }
 
@@ -148,7 +148,15 @@ public class UserEntity {
         this.phone = phone;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSystemRole(String systemRole) {
+        this.systemRole = systemRole;
+    }
+
+    public AthleticProfileEntity getAthleticProfile() {
+        return athleticProfile;
+    }
+
+    public void setAthleticProfile(AthleticProfileEntity athleticProfile) {
+        this.athleticProfile = athleticProfile;
     }
 }

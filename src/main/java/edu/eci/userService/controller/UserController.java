@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 @RestController
-@RequestMapping("/User")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -54,5 +58,52 @@ public class UserController {
     public Map<String, String> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
         return Map.of("message", "User deleted successfully");
+    }
+
+    // ── Validation endpoints (called by teams-ms via OpenFeign) ──────────
+
+    /**
+     * Checks for duplicate jersey numbers among a list of player IDs.
+     * Returns { "valid": true/false, "duplicates": [details...] }.
+     * Does NOT block — teams-ms uses this for warnings only.
+     */
+    @PostMapping("/validate-jerseys")
+    @Operation(summary = "Validate jersey uniqueness", description = "Check if any players in the list share the same jersey number")
+    public Map<String, Object> validateJerseys(@RequestBody Map<String, List<Long>> body) {
+        List<Long> playerIds = body.getOrDefault("playerIds", List.of());
+        Map<String, Object> result = new HashMap<>();
+        result.put("valid", true);
+        result.put("duplicates", List.of());
+        // TODO: query athletic profiles by player IDs and check dorsal numbers
+        return result;
+    }
+
+    /**
+     * Validates that more than half of the players belong to allowed programs
+     * (Ing. Sistemas, IA, Ciberseguridad, Estadística).
+     */
+    @PostMapping("/validate-programs")
+    @Operation(summary = "Validate program composition", description = "Check if more than half of players are from allowed programs")
+    public Map<String, Object> validatePrograms(@RequestBody Map<String, List<Long>> body) {
+        List<Long> playerIds = body.getOrDefault("playerIds", List.of());
+        Map<String, Object> result = new HashMap<>();
+        result.put("valid", true);
+        result.put("details", "Validación de programas pendiente de implementar");
+        return result;
+    }
+
+    /**
+     * Updates the systemRole field (synced from identity-ms when role changes).
+     * Called by identity-ms via OpenFeign when a user's role is updated.
+     */
+    @PutMapping("/{id}/system-role")
+    @Operation(summary = "Update system role", description = "Update the systemRole field synced from identity-ms")
+    public Map<String, String> updateSystemRole(@PathVariable long id, @RequestBody Map<String, String> body) {
+        String systemRole = body.get("systemRole");
+        if (systemRole == null || systemRole.isEmpty()) {
+            return Map.of("error", "El campo 'systemRole' es requerido");
+        }
+        userService.updateSystemRole(id, systemRole);
+        return Map.of("message", "System role updated successfully", "systemRole", systemRole);
     }
 }

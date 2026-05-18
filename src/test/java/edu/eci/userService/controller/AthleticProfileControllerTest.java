@@ -60,10 +60,10 @@ class AthleticProfileControllerTest {
         sampleDTO.setUser(user);
     }
 
-    // ── GET /AthleticProfile ─────────────────────────────────────────────────
+    // ── GET /api/athletic-profiles ─────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("GET /AthleticProfile")
+    @DisplayName("GET /api/athletic-profiles")
     class GetAll {
 
         @Test
@@ -71,7 +71,7 @@ class AthleticProfileControllerTest {
         void shouldReturn200WithList() throws Exception {
             when(athleticProfileService.getAllAthleticProfiles()).thenReturn(List.of(sampleDTO));
 
-            mockMvc.perform(get("/AthleticProfile"))
+            mockMvc.perform(get("/api/athletic-profiles"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))
                     .andExpect(jsonPath("$[0].nickName", is("Juancho")))
@@ -83,16 +83,16 @@ class AthleticProfileControllerTest {
         void shouldReturn200WithEmptyList() throws Exception {
             when(athleticProfileService.getAllAthleticProfiles()).thenReturn(List.of());
 
-            mockMvc.perform(get("/AthleticProfile"))
+            mockMvc.perform(get("/api/athletic-profiles"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(0)));
         }
     }
 
-    // ── GET /AthleticProfile/{UserId} ────────────────────────────────────────
+    // ── GET /api/athletic-profiles/{UserId} ────────────────────────────────────────
 
     @Nested
-    @DisplayName("GET /AthleticProfile/{UserId}")
+    @DisplayName("GET /api/athletic-profiles/{UserId}")
     class GetByUserId {
 
         @Test
@@ -100,17 +100,17 @@ class AthleticProfileControllerTest {
         void shouldReturn200WhenFound() throws Exception {
             when(athleticProfileService.getAthleticProfilesByUserId(1L)).thenReturn(sampleDTO);
 
-            mockMvc.perform(get("/AthleticProfile/1"))
+            mockMvc.perform(get("/api/athletic-profiles/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(1)))
                     .andExpect(jsonPath("$.nickName", is("Juancho")));
         }
     }
 
-    // ── POST /AthleticProfile ────────────────────────────────────────────────
+    // ── POST /api/athletic-profiles ────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("POST /AthleticProfile")
+    @DisplayName("POST /api/athletic-profiles")
     class CreateProfile {
 
         @Test
@@ -119,21 +119,18 @@ class AthleticProfileControllerTest {
             when(athleticProfileService.createAthleticProfile(any(AthleticProfileDTO.class)))
                     .thenReturn(sampleDTO);
 
-            // Construimos el request body usando el record del controller
             String body = """
                     {
                         "dorsalNumber": 10,
-                        "id": 1,
-                        "nickName": "Juancho",
+                        "email": "juan.perez@eci.edu.co",
                         "position": "delantero",
                         "laterality": "diestro",
                         "stature": "175cm",
-                        "state": "activo",
-                        "user": { "id": 1, "name": "Juan Pérez" }
+                        "state": "activo"
                     }
                     """;
 
-            mockMvc.perform(post("/AthleticProfile")
+            mockMvc.perform(post("/api/athletic-profiles")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
                     .andExpect(status().isOk())
@@ -143,10 +140,10 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── PUT /AthleticProfile/{UserId} ────────────────────────────────────────
+    // ── PUT /api/athletic-profiles/{UserId} ────────────────────────────────────────
 
     @Nested
-    @DisplayName("PUT /AthleticProfile/{UserId}")
+    @DisplayName("PUT /api/athletic-profiles/{UserId}")
     class UpdateProfile {
 
         @Test
@@ -163,8 +160,7 @@ class AthleticProfileControllerTest {
             String body = """
                     {
                         "dorsalNumber": 7,
-                        "id": 1,
-                        "nickName": "Juancho2",
+                        "email": "juan.perez@eci.edu.co",
                         "position": "volante",
                         "laterality": "zurdo",
                         "stature": "180cm",
@@ -172,7 +168,7 @@ class AthleticProfileControllerTest {
                     }
                     """;
 
-            mockMvc.perform(put("/AthleticProfile/1")
+            mockMvc.perform(put("/api/athletic-profiles/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(body))
                     .andExpect(status().isOk())
@@ -180,10 +176,10 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── DELETE /AthleticProfile/{UserId} ─────────────────────────────────────
+    // ── DELETE /api/athletic-profiles/{UserId} ─────────────────────────────────────
 
     @Nested
-    @DisplayName("DELETE /AthleticProfile/{UserId}")
+    @DisplayName("DELETE /api/athletic-profiles/{UserId}")
     class DeleteProfile {
 
         @Test
@@ -191,7 +187,7 @@ class AthleticProfileControllerTest {
         void shouldReturn200WithSuccessMessage() throws Exception {
             doNothing().when(athleticProfileService).deleteAthleticProfile(1L);
 
-            mockMvc.perform(delete("/AthleticProfile/1"))
+            mockMvc.perform(delete("/api/athletic-profiles/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("User deleted successfully")));
         }
@@ -203,7 +199,7 @@ class AthleticProfileControllerTest {
                     .when(athleticProfileService)
                     .deleteAthleticProfile(99L);
 
-            mockMvc.perform(delete("/AthleticProfile/99"))
+            mockMvc.perform(delete("/api/athletic-profiles/99"))
                     .andExpect(status().isNotFound());
         }
     }

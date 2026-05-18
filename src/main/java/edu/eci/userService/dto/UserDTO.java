@@ -11,32 +11,32 @@ public class UserDTO {
     private String email;
     private LocalDate birthDate;
     private UserRoleEnum role;
-    private String relationShip;
+    private String relationship;
     private String academicProgram;
     private int semester;
     private String identificationType;
     private Long identificationNumber;
     private Long phone;
-    private String password;
+    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
 
     public UserDTO() {
     }
 
-    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationShip,
+    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationship,
             String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone,
-            String password) {
+            String systemRole) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.birthDate = birthDate;
         this.role = role;
-        this.relationShip = relationShip;
+        this.relationship = relationship;
         this.academicProgram = academicProgram;
         this.semester = semester;
         this.identificationType = identificationType;
         this.identificationNumber = identificationNumber;
         this.phone = phone;
-        this.password = password;
+        this.systemRole = systemRole;
     }
 
     public long getId() {
@@ -59,8 +59,8 @@ public class UserDTO {
         return role;
     }
 
-    public String getRelationShip() {
-        return relationShip;
+    public String getRelationship() {
+        return relationship;
     }
 
     public String getAcademicProgram() {
@@ -83,8 +83,8 @@ public class UserDTO {
         return phone;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSystemRole() {
+        return systemRole;
     }
 
     public void setId(long id) {
@@ -107,8 +107,8 @@ public class UserDTO {
         this.role = role;
     }
 
-    public void setRelationShip(String relationShip) {
-        this.relationShip = relationShip;
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
     }
 
     public void setAcademicProgram(String academicProgram) {
@@ -131,8 +131,8 @@ public class UserDTO {
         this.phone = phone;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSystemRole(String systemRole) {
+        this.systemRole = systemRole;
     }
 
 }

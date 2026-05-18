@@ -55,18 +55,19 @@ class UserControllerTest {
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationShip("student");
+        sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
+        sampleDTO.setSystemRole("PLAYER");
     }
 
-    // ── GET /User ────────────────────────────────────────────────────────────
+    // ── GET /api/users ────────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("GET /User")
+    @DisplayName("GET /api/users")
     class GetAll {
 
         @Test
@@ -74,7 +75,7 @@ class UserControllerTest {
         void shouldReturn200WithList() throws Exception {
             when(userService.getAllUsers()).thenReturn(List.of(sampleDTO));
 
-            mockMvc.perform(get("/User"))
+            mockMvc.perform(get("/api/users"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))
                     .andExpect(jsonPath("$[0].name", is("Juan Pérez")))
@@ -86,16 +87,16 @@ class UserControllerTest {
         void shouldReturn200WithEmptyList() throws Exception {
             when(userService.getAllUsers()).thenReturn(List.of());
 
-            mockMvc.perform(get("/User"))
+            mockMvc.perform(get("/api/users"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(0)));
         }
     }
 
-    // ── GET /User/{id} ───────────────────────────────────────────────────────
+    // ── GET /api/users/{id} ───────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("GET /User/{id}")
+    @DisplayName("GET /api/users/{id}")
     class GetById {
 
         @Test
@@ -103,17 +104,17 @@ class UserControllerTest {
         void shouldReturn200WhenFound() throws Exception {
             when(userService.getUserById(1L)).thenReturn(sampleDTO);
 
-            mockMvc.perform(get("/User/1"))
+            mockMvc.perform(get("/api/users/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(1)))
                     .andExpect(jsonPath("$.name", is("Juan Pérez")));
         }
     }
 
-    // ── POST /User ───────────────────────────────────────────────────────────
+    // ── POST /api/users ───────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("POST /User")
+    @DisplayName("POST /api/users")
     class CreateUser {
 
         @Test
@@ -121,7 +122,7 @@ class UserControllerTest {
         void shouldReturn200WithCreatedUser() throws Exception {
             when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
 
-            mockMvc.perform(post("/User")
+            mockMvc.perform(post("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(sampleDTO)))
                     .andExpect(status().isOk())
@@ -132,10 +133,10 @@ class UserControllerTest {
         }
     }
 
-    // ── PUT /User/{id} ───────────────────────────────────────────────────────
+    // ── PUT /api/users/{id} ───────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("PUT /User/{id}")
+    @DisplayName("PUT /api/users/{id}")
     class UpdateUser {
 
         @Test
@@ -148,7 +149,7 @@ class UserControllerTest {
 
             when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedDTO);
 
-            mockMvc.perform(put("/User/1")
+            mockMvc.perform(put("/api/users/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(updatedDTO)))
                     .andExpect(status().isOk())
@@ -156,10 +157,10 @@ class UserControllerTest {
         }
     }
 
-    // ── DELETE /User/{id} ────────────────────────────────────────────────────
+    // ── DELETE /api/users/{id} ────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("DELETE /User/{id}")
+    @DisplayName("DELETE /api/users/{id}")
     class DeleteUser {
 
         @Test
@@ -167,7 +168,7 @@ class UserControllerTest {
         void shouldReturn200WithSuccessMessage() throws Exception {
             doNothing().when(userService).deleteUser(1L);
 
-            mockMvc.perform(delete("/User/1"))
+            mockMvc.perform(delete("/api/users/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message", is("User deleted successfully")));
         }
@@ -179,9 +180,9 @@ class UserControllerTest {
             doThrow(new NoSuchElementException("No user found with ID: 99"))
                     .when(userService).deleteUser(99L);
 
-            mockMvc.perform(delete("/User/99"))
+            mockMvc.perform(delete("/api/users/99"))
                     .andExpect(status().isNotFound())
-                    .andExpect(content().string("No user found with ID: 99"));
+                    .andExpect(jsonPath("$.error", containsString("No user found")));
         }
     }
 }

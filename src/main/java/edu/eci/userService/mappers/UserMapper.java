@@ -17,12 +17,13 @@ public class UserMapper {
         dto.setEmail(entity.getEmail());
         dto.setBirthDate(entity.getBirthDate());
         dto.setRole(entity.getRole());
-        dto.setRelationShip(entity.getRelationShip());
+        dto.setRelationship(entity.getRelationship());
         dto.setAcademicProgram(entity.getAcademicProgram());
         dto.setSemester(entity.getSemester());
         dto.setIdentificationType(entity.getIdentificationType());
         dto.setIdentificationNumber(entity.getIdentificationNumber());
         dto.setPhone(entity.getPhone());
+        dto.setSystemRole(entity.getSystemRole());
         return dto;
     }
 
@@ -37,13 +38,13 @@ public class UserMapper {
         entity.setEmail(dto.getEmail());
         entity.setBirthDate(dto.getBirthDate());
         entity.setRole(dto.getRole());
-        entity.setRelationShip(dto.getRelationShip());
+        entity.setRelationship(dto.getRelationship());
         entity.setAcademicProgram(dto.getAcademicProgram());
         entity.setSemester(dto.getSemester());
         entity.setIdentificationType(dto.getIdentificationType());
         entity.setIdentificationNumber(dto.getIdentificationNumber());
-        entity.setPhone(dto.getPhone());
-        entity.setPassword(dto.getPassword());
+        entity.setPhone(dto.getPhone() != null ? dto.getPhone() : 0L);
+        entity.setSystemRole(dto.getSystemRole());
         return entity;
     }
 }

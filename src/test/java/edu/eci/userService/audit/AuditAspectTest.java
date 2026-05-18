@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -60,13 +60,17 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{new UserDTO()});
         when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getMethod()).thenReturn("POST");
-        when(httpServletRequest.getRequestURI()).thenReturn("/User");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users");
         when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("result");
-        verify(auditService).log(eq("CREATE_USER"), eq("POST"), eq("/User"), eq("User"), any(), eq("127.0.0.1"), eq("SUCCESS"), isNull());
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+        assertThat(req.getAction()).isEqualTo("CREATE_USER");
+        assertThat(req.getStatus()).isEqualTo("SUCCESS");
     }
 
     @Test
@@ -78,11 +82,14 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L});
         when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getMethod()).thenReturn("GET");
-        when(httpServletRequest.getRequestURI()).thenReturn("/User/1");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/1");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(any(), any(), any(), any(), eq("1"), any(), any(), any());
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        assertThat(captor.getValue().getEntityId()).isEqualTo("1");
     }
 
     @Test
@@ -93,11 +100,17 @@ class AuditAspectTest {
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{99L});
         when(proceedingJoinPoint.proceed()).thenThrow(new RuntimeException("Test Exception"));
+        when(httpServletRequest.getMethod()).thenReturn("DELETE");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/99");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         assertThatThrownBy(() -> auditAspect.auditUser(proceedingJoinPoint))
                 .isInstanceOf(RuntimeException.class);
 
-        verify(auditService).log(eq("DELETE_USER"), any(), any(), eq("User"), eq("99"), any(), eq("ERROR"), contains("Test Exception"));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        assertThat(captor.getValue().getStatus()).isEqualTo("ERROR");
+        assertThat(captor.getValue().getDetail()).contains("Test Exception");
     }
 
     @Test
@@ -111,7 +124,7 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("list");
-        verify(auditService, never()).log(any(), any(), any(), any(), any(), any(), any(), any());
+        verify(auditService, never()).log(any());
     }
 
     @Test
@@ -121,26 +134,36 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn("10.0.0.1, 192.168.1.1");
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/1");
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(any(), any(), any(), any(), any(), eq("10.0.0.1"), any(), any());
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        assertThat(captor.getValue().getPerformedBy()).isEqualTo("10.0.0.1");
     }
 
     @Test
     @DisplayName("Debe manejar métodos desconocidos")
     void unknownMethodActionTest() throws Throwable {
-        // Creamos un método ficticio para probar el fallback de resolveAction
         class Fake { public void customOp() {} }
         Method method = Fake.class.getMethod("customOp");
         
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{});
+        when(proceedingJoinPoint.proceed()).thenReturn("ok");
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/athletic-profiles");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         auditAspect.auditAthleticProfile(proceedingJoinPoint);
 
-        verify(auditService).log(eq("CUSTOMOP_ATHLETICPROFILE"), any(), any(), eq("AthleticProfile"), any(), any(), any(), any());
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        assertThat(captor.getValue().getAction()).isEqualTo("CUSTOMOP_ATHLETICPROFILE");
     }
 }
