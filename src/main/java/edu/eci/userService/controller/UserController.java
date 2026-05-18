@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.eci.userService.dto.LoginRequest;
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +42,12 @@ public class UserController {
     @Operation(summary = "Create a new user", description = "Create a new user with the provided information")
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "Authenticate user", description = "Validate user credentials")
+    public UserDTO login(@RequestBody LoginRequest request) {
+        return userService.authenticate(request.getEmail(), request.getPassword());
     }
 
     @PutMapping("/{id}")

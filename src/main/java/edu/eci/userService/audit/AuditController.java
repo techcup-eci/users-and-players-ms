@@ -18,7 +18,7 @@ import java.util.List;
  *   GET /audit/status/{status}        → por estado (SUCCESS/ERROR)
  *   GET /audit/range?from=…&to=…     → por rango de fechas (ISO 8601)
  */
-@CrossOrigin(origins = "http://localhost:5173")
+
 @RestController
 @RequestMapping("/audit")
 public class AuditController {

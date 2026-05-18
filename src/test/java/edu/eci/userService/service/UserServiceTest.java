@@ -6,6 +6,8 @@ import edu.eci.userService.enums.UserRoleEnum;
 import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.UserService;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,19 +40,19 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    private final UserMapper userMapper = new UserMapper();
+
     @Mock
-    private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
     private UserService userService;
-
-    // ── Fixtures ─────────────────────────────────────────────────────────────
 
     private UserEntity sampleEntity;
     private UserDTO sampleDTO;
 
     @BeforeEach
     void setUp() {
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
@@ -77,7 +79,9 @@ class UserServiceTest {
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
-        sampleDTO.setPassword("hashed_password");
+        sampleDTO.setPassword("plain_password");
+
+        lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
 
     // ── getAllUsers ──────────────────────────────────────────────────────────
@@ -90,7 +94,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar lista de DTOs cuando existen usuarios")
         void shouldReturnDTOList() {
             when(userRepository.findAll()).thenReturn(List.of(sampleEntity));
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<UserDTO> result = userService.getAllUsers();
 
@@ -120,7 +123,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar DTO cuando el usuario existe")
         void shouldReturnDTOWhenFound() {
             when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             UserDTO result = userService.getUserById(1L);
 
@@ -133,7 +135,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar null cuando el usuario no existe")
         void shouldReturnNullWhenNotFound() {
             when(userRepository.findById(99L)).thenReturn(Optional.empty());
-            when(userMapper.toDTO(null)).thenReturn(null);
 
             UserDTO result = userService.getUserById(99L);
 
@@ -150,23 +151,19 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe persistir y retornar el DTO del usuario creado")
         void shouldPersistAndReturnDTO() {
-            when(userMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
-            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
             UserDTO result = userService.createUser(sampleDTO);
 
             assertThat(result).isNotNull();
             assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
-            verify(userRepository).save(sampleEntity);
+            verify(userRepository).save(any(UserEntity.class));
         }
 
         @Test
         @DisplayName("Debe mapear correctamente todos los campos al crear")
         void shouldMapAllFieldsOnCreate() {
-            when(userMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
-            when(userRepository.save(any())).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
             UserDTO result = userService.createUser(sampleDTO);
 
@@ -197,17 +194,8 @@ class UserServiceTest {
             updatedDTO.setIdentificationNumber(1000123456L);
             updatedDTO.setPhone(3009999999L);
 
-            UserEntity updatedEntity = new UserEntity();
-            updatedEntity.setId(1L);
-            updatedEntity.setName("Juan Actualizado");
-
-            UserDTO updatedResultDTO = new UserDTO();
-            updatedResultDTO.setId(1L);
-            updatedResultDTO.setName("Juan Actualizado");
-
             when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
             when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(updatedResultDTO);
 
             UserDTO result = userService.updateUser(1L, updatedDTO);
 
@@ -252,6 +240,54 @@ class UserServiceTest {
                     .hasMessageContaining("99");
 
             verify(userRepository, never()).deleteById(any());
+        }
+    }
+
+    // ── authenticate ────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("authenticate()")
+    class Authenticate {
+
+        @Test
+        @DisplayName("Debe autenticar cuando las credenciales son correctas")
+        void shouldAuthenticateWhenCredentialsAreValid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("plain_password", "hashed_password")).thenReturn(true);
+
+            UserDTO result = userService.authenticate("juan.perez@eci.edu.co", "plain_password");
+
+            assertThat(result).isNotNull();
+            assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando la clave es incorrecta")
+        void shouldThrowWhenPasswordIsInvalid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("wrong_password", "hashed_password")).thenReturn(false);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", "wrong_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando el usuario no existe")
+        void shouldThrowWhenUserNotFound() {
+            when(userRepository.findByEmail("missing@eci.edu.co")).thenReturn(null);
+
+            assertThatThrownBy(() -> userService.authenticate("missing@eci.edu.co", "plain_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando faltan datos")
+        void shouldThrowWhenMissingData() {
+            assertThatThrownBy(() -> userService.authenticate("", "plain_password"))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", ""))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

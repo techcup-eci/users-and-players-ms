@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests de integración de la capa web para {@link AthleticProfileController}.
  */
 @WebMvcTest(AthleticProfileController.class)
+@Import(GlobalExceptionHandler.class)
 class AthleticProfileControllerTest {
 
     @Autowired
@@ -195,14 +196,15 @@ class AthleticProfileControllerTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción cuando el perfil no existe")
-        void shouldPropagateExceptionWhenNotFound() throws Exception {
+        @DisplayName("Debe retornar 400 cuando el perfil no existe")
+        void shouldReturn400WhenProfileNotFound() throws Exception {
             doThrow(new IllegalArgumentException("Athletic profile not found"))
-                    .when(athleticProfileService).deleteAthleticProfile(99L);
+                    .when(athleticProfileService)
+                    .deleteAthleticProfile(99L);
 
-            org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
-                mockMvc.perform(delete("/AthleticProfile/99"));
-            });
+            mockMvc.perform(delete("/AthleticProfile/99"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error", is("Athletic profile not found")));
         }
     }
 }
