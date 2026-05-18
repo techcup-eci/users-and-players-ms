@@ -19,6 +19,7 @@ public class UserDTO {
     private String identificationType;
     private Long identificationNumber;
     private Long phone;
+    private String systemRole;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -90,6 +91,10 @@ public class UserDTO {
         return systemRole;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -111,6 +116,10 @@ public class UserDTO {
     }
 
     public void setRelationship(String relationship) {
+        this.relationship = relationship;
+    }
+
+    public void setRelationShip(String relationship) {
         this.relationship = relationship;
     }
 
@@ -136,6 +145,10 @@ public class UserDTO {
 
     public void setSystemRole(String systemRole) {
         this.systemRole = systemRole;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }
