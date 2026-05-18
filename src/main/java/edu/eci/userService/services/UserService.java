@@ -56,7 +56,7 @@ public class UserService {
         entitie.setEmail(userDTO.getEmail());
         entitie.setBirthDate(userDTO.getBirthDate());
         entitie.setRole(userDTO.getRole());
-        entitie.setRelationShip(userDTO.getRelationShip());
+        entitie.setRelationship(userDTO.getRelationship());
         entitie.setAcademicProgram(userDTO.getAcademicProgram());
         entitie.setSemester(userDTO.getSemester());
         entitie.setIdentificationType(userDTO.getIdentificationType());
@@ -84,5 +84,15 @@ public class UserService {
             throw new NoSuchElementException("No user found with ID: " + id);
         }
         userRepository.deleteById(id);
+    }
+
+    /**
+     * Updates only the systemRole field (synced from identity-ms).
+     */
+    public void updateSystemRole(Long id, String systemRole) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + id));
+        entity.setSystemRole(systemRole);
+        userRepository.save(entity);
     }
 }

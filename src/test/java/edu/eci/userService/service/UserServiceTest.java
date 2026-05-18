@@ -59,13 +59,13 @@ class UserServiceTest {
         sampleEntity.setEmail("juan.perez@eci.edu.co");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleEntity.setRole(UserRoleEnum.STUDENT);
-        sampleEntity.setRelationShip("student");
+        sampleEntity.setRelationship("student");
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
         sampleEntity.setIdentificationNumber(1000123456L);
         sampleEntity.setPhone(3001234567L);
-        sampleEntity.setPassword("hashed_password");
+        sampleEntity.setSystemRole("PLAYER");
 
         sampleDTO = new UserDTO();
         sampleDTO.setId(1L);
@@ -73,7 +73,7 @@ class UserServiceTest {
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationShip("student");
+        sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
@@ -187,7 +187,7 @@ class UserServiceTest {
             updatedDTO.setEmail("juan.perez@eci.edu.co");
             updatedDTO.setBirthDate(LocalDate.of(2000, 5, 15));
             updatedDTO.setRole(UserRoleEnum.STUDENT);
-            updatedDTO.setRelationShip("student");
+            updatedDTO.setRelationship("student");
             updatedDTO.setAcademicProgram("Ingeniería de IA");
             updatedDTO.setSemester(6);
             updatedDTO.setIdentificationType("CC");

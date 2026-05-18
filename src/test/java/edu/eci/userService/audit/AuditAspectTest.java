@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -60,7 +60,7 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{new UserDTO()});
         when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getMethod()).thenReturn("POST");
-        when(httpServletRequest.getRequestURI()).thenReturn("/User");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users");
         when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         Object result = auditAspect.auditUser(proceedingJoinPoint);
@@ -86,7 +86,8 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L});
         when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getMethod()).thenReturn("GET");
-        when(httpServletRequest.getRequestURI()).thenReturn("/User/1");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/1");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         auditAspect.auditUser(proceedingJoinPoint);
 
@@ -103,6 +104,9 @@ class AuditAspectTest {
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{99L});
         when(proceedingJoinPoint.proceed()).thenThrow(new RuntimeException("Test Exception"));
+        when(httpServletRequest.getMethod()).thenReturn("DELETE");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/99");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         assertThatThrownBy(() -> auditAspect.auditUser(proceedingJoinPoint))
                 .isInstanceOf(RuntimeException.class);
@@ -137,7 +141,10 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn("10.0.0.1, 192.168.1.1");
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/1");
 
         auditAspect.auditUser(proceedingJoinPoint);
 
@@ -156,6 +163,10 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{});
+        when(proceedingJoinPoint.proceed()).thenReturn("ok");
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/athletic-profiles");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
         auditAspect.auditAthleticProfile(proceedingJoinPoint);
 

@@ -60,6 +60,7 @@ class UserControllerTest {
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
+        sampleDTO.setSystemRole("PLAYER");
     }
 
     // --- GET /api/users ---

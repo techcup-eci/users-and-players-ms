@@ -46,12 +46,13 @@ class MapperTest {
             assertThat(dto.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(dto.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
             assertThat(dto.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-            assertThat(dto.getRelationShip()).isEqualTo("student");
+            assertThat(dto.getRelationship()).isEqualTo("student");
             assertThat(dto.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(dto.getSemester()).isEqualTo(5);
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
             assertThat(dto.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(dto.getPhone()).isEqualTo(3001234567L);
+            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -66,24 +67,23 @@ class MapperTest {
             assertThat(entity.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(entity.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
             assertThat(entity.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-            assertThat(entity.getRelationShip()).isEqualTo("student");
+            assertThat(entity.getRelationship()).isEqualTo("student");
             assertThat(entity.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(entity.getSemester()).isEqualTo(5);
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
             assertThat(entity.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(entity.getPhone()).isEqualTo(3001234567L);
+            assertThat(entity.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
-        @DisplayName("toDTO no debe incluir la contraseña (campo excluido del DTO de respuesta)")
-        void toDTOShouldNotExposePassword() {
+        @DisplayName("toDTO debe mapear el systemRole (campo de identidad del sistema)")
+        void toDTOShouldMapSystemRole() {
             UserEntity entity = buildUserEntity();
-            entity.setPassword("secret_hash");
 
             UserDTO dto = userMapper.toDTO(entity);
 
-            // La contraseña no se mapea en la respuesta para no exponerla
-            assertThat(dto.getPassword()).isNull();
+            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -96,24 +96,25 @@ class MapperTest {
             assertThat(reconstructed.getName()).isEqualTo(original.getName());
             assertThat(reconstructed.getEmail()).isEqualTo(original.getEmail());
             assertThat(reconstructed.getRole()).isEqualTo(original.getRole());
+            assertThat(reconstructed.getSystemRole()).isEqualTo(original.getSystemRole());
         }
 
         // ── Builders ─────────────────────────────────────────────────────────
 
-        private UserEntity buildUserEntity() {
+            private UserEntity buildUserEntity() {
             UserEntity e = new UserEntity();
             e.setId(1L);
             e.setName("Juan Pérez");
             e.setEmail("juan@eci.edu.co");
             e.setBirthDate(LocalDate.of(2000, 5, 15));
             e.setRole(UserRoleEnum.STUDENT);
-            e.setRelationShip("student");
+            e.setRelationship("student");
             e.setAcademicProgram("Ingeniería de Sistemas");
             e.setSemester(5);
             e.setIdentificationType("CC");
             e.setIdentificationNumber(1000123456L);
             e.setPhone(3001234567L);
-            e.setPassword("secret_hash");
+            e.setSystemRole("PLAYER");
             return e;
         }
 
@@ -124,12 +125,13 @@ class MapperTest {
             dto.setEmail("juan@eci.edu.co");
             dto.setBirthDate(LocalDate.of(2000, 5, 15));
             dto.setRole(UserRoleEnum.STUDENT);
-            dto.setRelationShip("student");
+            dto.setRelationship("student");
             dto.setAcademicProgram("Ingeniería de Sistemas");
             dto.setSemester(5);
             dto.setIdentificationType("CC");
             dto.setIdentificationNumber(1000123456L);
             dto.setPhone(3001234567L);
+            dto.setSystemRole("PLAYER");
             return dto;
         }
 
