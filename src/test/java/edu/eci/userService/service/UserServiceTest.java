@@ -40,22 +40,19 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private UserMapper userMapper;
+    private final UserMapper userMapper = new UserMapper();
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @InjectMocks
     private UserService userService;
-
-    // ── Fixtures ─────────────────────────────────────────────────────────────
 
     private UserEntity sampleEntity;
     private UserDTO sampleDTO;
 
     @BeforeEach
     void setUp() {
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
@@ -97,7 +94,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar lista de DTOs cuando existen usuarios")
         void shouldReturnDTOList() {
             when(userRepository.findAll()).thenReturn(List.of(sampleEntity));
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             List<UserDTO> result = userService.getAllUsers();
 
@@ -127,7 +123,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar DTO cuando el usuario existe")
         void shouldReturnDTOWhenFound() {
             when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             UserDTO result = userService.getUserById(1L);
 
@@ -140,7 +135,6 @@ class UserServiceTest {
         @DisplayName("Debe retornar null cuando el usuario no existe")
         void shouldReturnNullWhenNotFound() {
             when(userRepository.findById(99L)).thenReturn(Optional.empty());
-            when(userMapper.toDTO(null)).thenReturn(null);
 
             UserDTO result = userService.getUserById(99L);
 
@@ -157,23 +151,19 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe persistir y retornar el DTO del usuario creado")
         void shouldPersistAndReturnDTO() {
-            when(userMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
-            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
             UserDTO result = userService.createUser(sampleDTO);
 
             assertThat(result).isNotNull();
             assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
-            verify(userRepository).save(sampleEntity);
+            verify(userRepository).save(any(UserEntity.class));
         }
 
         @Test
         @DisplayName("Debe mapear correctamente todos los campos al crear")
         void shouldMapAllFieldsOnCreate() {
-            when(userMapper.toEntity(sampleDTO)).thenReturn(sampleEntity);
-            when(userRepository.save(any())).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
             UserDTO result = userService.createUser(sampleDTO);
 
@@ -204,17 +194,8 @@ class UserServiceTest {
             updatedDTO.setIdentificationNumber(1000123456L);
             updatedDTO.setPhone(3009999999L);
 
-            UserEntity updatedEntity = new UserEntity();
-            updatedEntity.setId(1L);
-            updatedEntity.setName("Juan Actualizado");
-
-            UserDTO updatedResultDTO = new UserDTO();
-            updatedResultDTO.setId(1L);
-            updatedResultDTO.setName("Juan Actualizado");
-
             when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
             when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(updatedResultDTO);
 
             UserDTO result = userService.updateUser(1L, updatedDTO);
 

@@ -132,6 +132,18 @@ class MapperTest {
             dto.setPhone(3001234567L);
             return dto;
         }
+
+        @Test
+        @DisplayName("toDTO debe retornar null cuando el entity es null")
+        void toDTOShouldReturnNullWhenEntityIsNull() {
+            assertThat(userMapper.toDTO(null)).isNull();
+        }
+
+        @Test
+        @DisplayName("toEntity debe retornar null cuando el DTO es null")
+        void toEntityShouldReturnNullWhenDTOIsNull() {
+            assertThat(userMapper.toEntity(null)).isNull();
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -218,6 +230,18 @@ class MapperTest {
             dto.setState("activo");
             dto.setUser(user);
             return dto;
+        }
+
+        @Test
+        @DisplayName("toDTO debe retornar null cuando el entity es null")
+        void toDTOShouldReturnNullWhenEntityIsNull() {
+            assertThat(athleticProfileMapper.toDTO(null)).isNull();
+        }
+
+        @Test
+        @DisplayName("toEntity debe retornar null cuando el DTO es null")
+        void toEntityShouldReturnNullWhenDTOIsNull() {
+            assertThat(athleticProfileMapper.toEntity(null)).isNull();
         }
     }
 }
