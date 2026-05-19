@@ -1,8 +1,8 @@
-package com.techcup.users.domain;
+package edu.eci.userService.domain;
 
-import com.techcup.users.model.JoinRequest;
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.JoinRequestStatus;
+import edu.eci.userService.entities.JoinRequestEntity;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.JoinRequestStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,16 +32,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("JoinRequest - Domain TDD Tests")
 class JoinRequestDomainTDDTest {
 
-    private User player;
-    private JoinRequest joinRequest;
+    private UserEntity player;
+    private JoinRequestEntity joinRequest;
 
     @BeforeEach
     void setUp() {
-        player = new User();
+        player = new UserEntity();
         player.setId(1L);
         player.setFullName("Luis Martinez");
 
-        joinRequest = new JoinRequest();
+        joinRequest = new JoinRequestEntity();
         joinRequest.setId(100L);
         joinRequest.setPlayer(player);
         joinRequest.setTeamId(5L);
@@ -59,7 +59,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - a new join request must have PENDING status by default")
         void newJoinRequestMustHavePendingStatusByDefault() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThat(request.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
         }
@@ -67,7 +67,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - a new join request must have null player by default")
         void newJoinRequestMustHaveNullPlayerByDefault() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThat(request.getPlayer()).isNull();
         }
@@ -75,7 +75,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - a new join request must have null teamId by default")
         void newJoinRequestMustHaveNullTeamIdByDefault() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThat(request.getTeamId()).isNull();
         }
@@ -92,7 +92,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - must reject null player when setting")
         void mustRejectNullPlayer() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThatThrownBy(() -> request.setPlayer(null))
                 .isInstanceOf(IllegalArgumentException.class)

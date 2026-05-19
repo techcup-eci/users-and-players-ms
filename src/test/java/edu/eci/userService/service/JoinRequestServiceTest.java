@@ -1,13 +1,14 @@
-package com.techcup.users.service;
+package edu.eci.userService.service;
 
-import com.techcup.users.exception.PendingJoinRequestException;
-import com.techcup.users.exception.TeamNotAvailableException;
-import com.techcup.users.exception.UserNotFoundException;
-import com.techcup.users.model.JoinRequest;
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.JoinRequestStatus;
-import com.techcup.users.repository.JoinRequestRepository;
-import com.techcup.users.repository.UserRepository;
+import edu.eci.userService.dto.JoinRequestDTO;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.exception.PendingJoinRequestException;
+import edu.eci.userService.exception.TeamNotAvailableException;
+import edu.eci.userService.exception.UserNotFoundException;
+import edu.eci.userService.enums.JoinRequestStatus;
+import edu.eci.userService.repository.JoinRequestRepository;
+import edu.eci.userService.repository.UserRepository;
+import edu.eci.userService.services.JoinRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,24 +54,28 @@ class JoinRequestServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
+    @Mock
+    private edu.eci.userService.mappers.JoinRequestMapper joinRequestMapper;
+
     private JoinRequestService joinRequestService;
 
-    private User player;
-    private User captain;
-    private JoinRequest pendingRequest;
+    private UserDTO player;
+    private UserDTO captain;
+    private JoinRequestDTO pendingRequest;
 
     @BeforeEach
     void setUp() {
-        player = new User();
+        joinRequestService = new JoinRequestService(joinRequestRepository, userRepository, joinRequestMapper);
+        
+        player = new UserDTO();
         player.setId(1L);
         player.setFullName("Luis Martinez");
 
-        captain = new User();
+        captain = new UserDTO();
         captain.setId(2L);
         captain.setFullName("Pedro Gomez");
 
-        pendingRequest = new JoinRequest();
+        pendingRequest = new JoinRequestDTO();
         pendingRequest.setId(100L);
         pendingRequest.setPlayer(player);
         pendingRequest.setTeamId(5L);
@@ -88,11 +93,24 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must create a PENDING request when player has no existing pending request")
         void mustCreatePendingRequestWhenPlayerHasNoExistingPendingRequest() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
+            UserEntity playerEntity = new UserEntity();
+            playerEntity.setId(1L);
+            playerEntity.setFullName("Luis Martinez");
+            
+            when(userRepository.findById(1L)).thenReturn(Optional.of(playerEntity));
             when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
                 .thenReturn(false);
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
+            
+            JoinRequestEntity entity = new JoinRequestEntity();
+            entity.setId(100L);
+            entity.setPlayer(playerEntity);
+            entity.setTeamId(5L);
+            entity.setStatus(JoinRequestStatus.PENDING);
+            
+            when(joinRequestRepository.save(any(JoinRequestEntity.class)))
+                .thenReturn(entity);
+            when(joinRequestMapper.toDTO(entity))
+                .thenReturn(pendingRequest);
 
             JoinRequest result = joinRequestService.sendRequest(1L, 5L);
 
