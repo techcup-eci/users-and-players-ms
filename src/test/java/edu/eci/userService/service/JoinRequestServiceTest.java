@@ -69,11 +69,11 @@ class JoinRequestServiceTest {
         
         player = new UserDTO();
         player.setId(1L);
-        player.setFullName("Luis Martinez");
+        player.setName("Luis Martinez");
 
         captain = new UserDTO();
         captain.setId(2L);
-        captain.setFullName("Pedro Gomez");
+        captain.setName("Pedro Gomez");
 
         pendingRequest = new JoinRequestDTO();
         pendingRequest.setId(100L);
@@ -95,7 +95,7 @@ class JoinRequestServiceTest {
         void mustCreatePendingRequestWhenPlayerHasNoExistingPendingRequest() {
             UserEntity playerEntity = new UserEntity();
             playerEntity.setId(1L);
-            playerEntity.setFullName("Luis Martinez");
+            playerEntity.setName("Luis Martinez");
             
             when(userRepository.findById(1L)).thenReturn(Optional.of(playerEntity));
             when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))

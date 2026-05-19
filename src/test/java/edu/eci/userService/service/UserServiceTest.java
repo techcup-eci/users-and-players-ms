@@ -1,11 +1,13 @@
-package com.techcup.users.service;
+package edu.eci.userService.service;
 
-import com.techcup.users.exception.UserLinkedToActiveTournamentException;
-import com.techcup.users.exception.UserNotFoundException;
-import com.techcup.users.model.User;
-import com.techcup.users.model.enums.SchoolRelation;
-import com.techcup.users.model.enums.UserStatus;
-import com.techcup.users.repository.UserRepository;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.mappers.UserMapper;
+import edu.eci.userService.repository.UserRepository;
+import edu.eci.userService.services.UserService;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,250 +18,276 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-/*
- * Unit tests for UserService.
+/**
+ * Tests unitarios para {@link UserService}.
  *
- * Covers the functionalities defined in the TECHCUP FOOTBALL document (section 7.2):
- *   - Update user basic information
- *   - Deactivate user
- *   - Query user by ID and by email
- *
- * Pattern: AAA (Arrange - Act - Assert)
- * Framework: JUnit 5 + Mockito
+ * Estrategia TDD:
+ *  - Cada método del servicio tiene un grupo @Nested con escenarios happy-path y de error.
+ *  - Se usa Mockito para aislar el repositorio y el mapper.
+ *  - AssertJ para aserciones expresivas.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UserService - Unit Tests")
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
+    private final UserMapper userMapper = new UserMapper();
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private UserService userService;
 
-    private User baseUser;
+    private UserEntity sampleEntity;
+    private UserDTO sampleDTO;
 
     @BeforeEach
     void setUp() {
-        baseUser = new User();
-        baseUser.setId(1L);
-        baseUser.setFullName("Carlos Perez");
-        baseUser.setEmail("carlos.perez@escuela.edu.co");
-        baseUser.setSchoolRelation(SchoolRelation.STUDENT);
-        baseUser.setAcademicProgram("Systems Engineering");
-        baseUser.setSemester(5);
-        baseUser.setStatus(UserStatus.ACTIVE);
-        baseUser.setDateOfBirth(LocalDate.of(2000, 3, 15));
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
+        sampleEntity = new UserEntity();
+        sampleEntity.setId(1L);
+        sampleEntity.setName("Juan Pérez");
+        sampleEntity.setEmail("juan.perez@eci.edu.co");
+        sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
+        sampleEntity.setRole(UserRoleEnum.STUDENT);
+        sampleEntity.setRelationship("student");
+        sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
+        sampleEntity.setSemester(5);
+        sampleEntity.setIdentificationType("CC");
+        sampleEntity.setIdentificationNumber(1000123456L);
+        sampleEntity.setPhone(3001234567L);
+        sampleEntity.setSystemRole("PLAYER");
+
+        sampleDTO = new UserDTO();
+        sampleDTO.setId(1L);
+        sampleDTO.setName("Juan Pérez");
+        sampleDTO.setEmail("juan.perez@eci.edu.co");
+        sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
+        sampleDTO.setRole(UserRoleEnum.STUDENT);
+        sampleDTO.setRelationship("student");
+        sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
+        sampleDTO.setSemester(5);
+        sampleDTO.setIdentificationType("CC");
+        sampleDTO.setIdentificationNumber(1000123456L);
+        sampleDTO.setPhone(3001234567L);
+        sampleDTO.setPassword("plain_password");
+
+        lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
 
-    // ----------------------------------------------------------------
-    // Update user
-    // ----------------------------------------------------------------
+    // ── getAllUsers ──────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("Update User")
-    class UpdateUserTests {
+    @DisplayName("getAllUsers()")
+    class GetAllUsers {
 
         @Test
-        @DisplayName("Must update full name successfully")
-        void mustUpdateFullNameSuccessfully() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        @DisplayName("Debe retornar lista de DTOs cuando existen usuarios")
+        void shouldReturnDTOList() {
+            when(userRepository.findAll()).thenReturn(List.of(sampleEntity));
 
-            User result = userService.updateUser(1L, "Juan Lopez", null, null, null);
+            List<UserDTO> result = userService.getAllUsers();
 
-            assertThat(result.getFullName()).isEqualTo("Juan Lopez");
-            verify(userRepository).save(any(User.class));
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getEmail()).isEqualTo("juan.perez@eci.edu.co");
+            verify(userRepository).findAll();
         }
 
         @Test
-        @DisplayName("Must update school relation successfully")
-        void mustUpdateSchoolRelationSuccessfully() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        @DisplayName("Debe retornar lista vacía cuando no hay usuarios")
+        void shouldReturnEmptyListWhenNoUsers() {
+            when(userRepository.findAll()).thenReturn(List.of());
 
-            User result = userService.updateUser(1L, null, SchoolRelation.GRADUATE, null, null);
+            List<UserDTO> result = userService.getAllUsers();
 
-            assertThat(result.getSchoolRelation()).isEqualTo(SchoolRelation.GRADUATE);
-        }
-
-        @Test
-        @DisplayName("Must update academic program successfully")
-        void mustUpdateAcademicProgramSuccessfully() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-
-            User result = userService.updateUser(1L, null, null, "AI Engineering", null);
-
-            assertThat(result.getAcademicProgram()).isEqualTo("AI Engineering");
-        }
-
-        @Test
-        @DisplayName("Must update semester when user is a student")
-        void mustUpdateSemesterWhenUserIsStudent() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-
-            User result = userService.updateUser(1L, null, null, null, 7);
-
-            assertThat(result.getSemester()).isEqualTo(7);
-        }
-
-        @Test
-        @DisplayName("Must fail - must not allow updating the email address")
-        void mustNotAllowUpdatingEmail() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-
-            assertThatThrownBy(() -> userService.updateEmail(1L, "new@email.com"))
-                .isInstanceOf(UnsupportedOperationException.class)
-                .hasMessageContaining("email");
-        }
-
-        @Test
-        @DisplayName("Must fail - must not allow updating the password from this service")
-        void mustNotAllowUpdatingPassword() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-
-            assertThatThrownBy(() -> userService.updatePassword(1L, "newPassword123"))
-                .isInstanceOf(UnsupportedOperationException.class)
-                .hasMessageContaining("password");
-        }
-
-        @Test
-        @DisplayName("Must fail - must throw exception when user does not exist")
-        void mustThrowExceptionWhenUserDoesNotExistOnUpdate() {
-            when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> userService.updateUser(99L, "Name", null, null, null))
-                .isInstanceOf(UserNotFoundException.class);
+            assertThat(result).isEmpty();
         }
     }
 
-    // ----------------------------------------------------------------
-    // Deactivate user
-    // ----------------------------------------------------------------
+    // ── getUserById ──────────────────────────────────────────────────────────
 
     @Nested
-    @DisplayName("Deactivate User")
-    class DeactivateUserTests {
+    @DisplayName("getUserById()")
+    class GetUserById {
 
         @Test
-        @DisplayName("Must deactivate a user who is not linked to an active tournament")
-        void mustDeactivateUserNotLinkedToActiveTournament() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.isLinkedToActiveTournament(1L)).thenReturn(false);
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        @DisplayName("Debe retornar DTO cuando el usuario existe")
+        void shouldReturnDTOWhenFound() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
 
-            User result = userService.deactivateUser(1L);
-
-            assertThat(result.getStatus()).isEqualTo(UserStatus.INACTIVE);
-            verify(userRepository).save(any(User.class));
-        }
-
-        @Test
-        @DisplayName("Must fail - must not deactivate user linked to an active tournament")
-        void mustNotDeactivateUserLinkedToActiveTournament() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.isLinkedToActiveTournament(1L)).thenReturn(true);
-
-            assertThatThrownBy(() -> userService.deactivateUser(1L))
-                .isInstanceOf(UserLinkedToActiveTournamentException.class)
-                .hasMessageContaining("active tournament");
-
-            verify(userRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("Must fail - must not deactivate user linked to an in-progress tournament")
-        void mustNotDeactivateUserLinkedToInProgressTournament() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.isLinkedToActiveTournament(1L)).thenReturn(true);
-
-            assertThatThrownBy(() -> userService.deactivateUser(1L))
-                .isInstanceOf(UserLinkedToActiveTournamentException.class);
-        }
-
-        @Test
-        @DisplayName("Must fail - must throw exception when user to deactivate does not exist")
-        void mustThrowExceptionWhenUserDoesNotExistOnDeactivate() {
-            when(userRepository.findById(55L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> userService.deactivateUser(55L))
-                .isInstanceOf(UserNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("Must set status to INACTIVE even when user is already inactive")
-        void mustSetStatusToInactiveWhenAlreadyInactive() {
-            baseUser.setStatus(UserStatus.INACTIVE);
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-            when(userRepository.isLinkedToActiveTournament(1L)).thenReturn(false);
-            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-
-            User result = userService.deactivateUser(1L);
-
-            assertThat(result.getStatus()).isEqualTo(UserStatus.INACTIVE);
-        }
-    }
-
-    // ----------------------------------------------------------------
-    // Query user
-    // ----------------------------------------------------------------
-
-    @Nested
-    @DisplayName("Query User")
-    class QueryUserTests {
-
-        @Test
-        @DisplayName("Must return user by ID when it exists")
-        void mustReturnUserByIdWhenExists() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(baseUser));
-
-            User result = userService.findById(1L);
+            UserDTO result = userService.getUserById(1L);
 
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(1L);
-            assertThat(result.getFullName()).isEqualTo("Carlos Perez");
+            assertThat(result.getName()).isEqualTo("Juan Pérez");
         }
 
         @Test
-        @DisplayName("Must fail - must throw exception when ID does not exist")
-        void mustThrowExceptionWhenIdDoesNotExist() {
-            when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        @DisplayName("Debe retornar null cuando el usuario no existe")
+        void shouldReturnNullWhenNotFound() {
+            when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> userService.findById(999L))
-                .isInstanceOf(UserNotFoundException.class);
+            UserDTO result = userService.getUserById(99L);
+
+            assertThat(result).isNull();
         }
+    }
+
+    // ── createUser ───────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("createUser()")
+    class CreateUser {
 
         @Test
-        @DisplayName("Must return user by email when it exists")
-        void mustReturnUserByEmailWhenExists() {
-            when(userRepository.findByEmail("carlos.perez@escuela.edu.co"))
-                .thenReturn(Optional.of(baseUser));
+        @DisplayName("Debe persistir y retornar el DTO del usuario creado")
+        void shouldPersistAndReturnDTO() {
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            User result = userService.findByEmail("carlos.perez@escuela.edu.co");
+            UserDTO result = userService.createUser(sampleDTO);
 
             assertThat(result).isNotNull();
-            assertThat(result.getEmail()).isEqualTo("carlos.perez@escuela.edu.co");
+            assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
+            verify(userRepository).save(any(UserEntity.class));
         }
 
         @Test
-        @DisplayName("Must fail - must throw exception when email does not exist")
-        void mustThrowExceptionWhenEmailDoesNotExist() {
-            when(userRepository.findByEmail("unknown@escuela.edu.co"))
-                .thenReturn(Optional.empty());
+        @DisplayName("Debe mapear correctamente todos los campos al crear")
+        void shouldMapAllFieldsOnCreate() {
+            when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            assertThatThrownBy(() -> userService.findByEmail("unknown@escuela.edu.co"))
-                .isInstanceOf(UserNotFoundException.class);
+            UserDTO result = userService.createUser(sampleDTO);
+
+            assertThat(result.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+            assertThat(result.getSemester()).isEqualTo(5);
+            assertThat(result.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
+        }
+    }
+
+    // ── updateUser ───────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("updateUser()")
+    class UpdateUser {
+
+        @Test
+        @DisplayName("Debe actualizar y retornar DTO cuando el usuario existe")
+        void shouldUpdateAndReturnDTO() {
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setName("Juan Actualizado");
+            updatedDTO.setEmail("juan.perez@eci.edu.co");
+            updatedDTO.setBirthDate(LocalDate.of(2000, 5, 15));
+            updatedDTO.setRole(UserRoleEnum.STUDENT);
+            updatedDTO.setRelationship("student");
+            updatedDTO.setAcademicProgram("Ingeniería de IA");
+            updatedDTO.setSemester(6);
+            updatedDTO.setIdentificationType("CC");
+            updatedDTO.setIdentificationNumber(1000123456L);
+            updatedDTO.setPhone(3009999999L);
+
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
+
+            UserDTO result = userService.updateUser(1L, updatedDTO);
+
+            assertThat(result.getName()).isEqualTo("Juan Actualizado");
+            verify(userRepository).save(sampleEntity);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar NoSuchElementException cuando el usuario no existe")
+        void shouldThrowWhenUserNotFound() {
+            when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userService.updateUser(99L, sampleDTO))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
+        }
+    }
+
+    // ── deleteUser ───────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("deleteUser()")
+    class DeleteUser {
+
+        @Test
+        @DisplayName("Debe eliminar el usuario cuando existe")
+        void shouldDeleteWhenExists() {
+            when(userRepository.existsById(1L)).thenReturn(true);
+
+            userService.deleteUser(1L);
+
+            verify(userRepository).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar NoSuchElementException cuando el usuario no existe")
+        void shouldThrowWhenNotFound() {
+            when(userRepository.existsById(99L)).thenReturn(false);
+
+            assertThatThrownBy(() -> userService.deleteUser(99L))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
+
+            verify(userRepository, never()).deleteById(any());
+        }
+    }
+
+    // ── authenticate ────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("authenticate()")
+    class Authenticate {
+
+        @Test
+        @DisplayName("Debe autenticar cuando las credenciales son correctas")
+        void shouldAuthenticateWhenCredentialsAreValid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("plain_password", "hashed_password")).thenReturn(true);
+
+            UserDTO result = userService.authenticate("juan.perez@eci.edu.co", "plain_password");
+
+            assertThat(result).isNotNull();
+            assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando la clave es incorrecta")
+        void shouldThrowWhenPasswordIsInvalid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("wrong_password", "hashed_password")).thenReturn(false);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", "wrong_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando el usuario no existe")
+        void shouldThrowWhenUserNotFound() {
+            when(userRepository.findByEmail("missing@eci.edu.co")).thenReturn(null);
+
+            assertThatThrownBy(() -> userService.authenticate("missing@eci.edu.co", "plain_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando faltan datos")
+        void shouldThrowWhenMissingData() {
+            assertThatThrownBy(() -> userService.authenticate("", "plain_password"))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", ""))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

@@ -1,13 +1,18 @@
 package edu.eci.userService.entities;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.enums.UserStatus;
-import edu.eci.userService.enums.SchoolRelation;
-import edu.eci.userService.enums.IdentificationType;
-import edu.eci.userService.enums.AcademicLevel;
+
+import edu.eci.userService.enums.UserRoleEnum;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -18,207 +23,152 @@ public class UserEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String fullName;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private String password;
+
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Column(nullable = true)
-    private String phone;
+    @Enumerated(EnumType.STRING) // Enum relationes in the dir: enums.UserRoleEnum
+    private UserRoleEnum role;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IdentificationType identificationType;
+    private String relationship; // Relationship with the university (student, teacher, etc)
 
-    @Column(nullable = false, unique = true)
-    private String identificationNumber;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SchoolRelation schoolRelation;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
-    private AcademicLevel academicLevel;
-
-    @Column(nullable = true)
-    private Integer semester;
-
-    @Column(nullable = true)
+    @Column
     private String academicProgram;
 
-    @Column(nullable = true)
-    private String professionalChair;
-
-    @Column(nullable = true)
-    private String plantType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole role;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserStatus status;
+    @Column
+    private Integer semester;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private String identificationType;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private Long identificationNumber;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
+    @Column(nullable = false)
+    private Long phone = 0L;
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Column
+    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
 
-    // Getters and Setters
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private AthleticProfileEntity athleticProfile;
+
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getPassword() {
+        return password;
     }
 
     public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public UserRoleEnum getRole() {
+        return role;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public IdentificationType getIdentificationType() {
-        return identificationType;
-    }
-
-    public void setIdentificationType(IdentificationType identificationType) {
-        this.identificationType = identificationType;
-    }
-
-    public String getIdentificationNumber() {
-        return identificationNumber;
-    }
-
-    public void setIdentificationNumber(String identificationNumber) {
-        this.identificationNumber = identificationNumber;
-    }
-
-    public SchoolRelation getSchoolRelation() {
-        return schoolRelation;
-    }
-
-    public void setSchoolRelation(SchoolRelation schoolRelation) {
-        this.schoolRelation = schoolRelation;
-    }
-
-    public AcademicLevel getAcademicLevel() {
-        return academicLevel;
-    }
-
-    public void setAcademicLevel(AcademicLevel academicLevel) {
-        this.academicLevel = academicLevel;
-    }
-
-    public Integer getSemester() {
-        return semester;
-    }
-
-    public void setSemester(Integer semester) {
-        this.semester = semester;
+    public String getRelationship() {
+        return relationship;
     }
 
     public String getAcademicProgram() {
         return academicProgram;
     }
 
+    public Integer getSemester() {
+        return semester;
+    }
+
+    public String getIdentificationType() {
+        return identificationType;
+    }
+
+    public Long getIdentificationNumber() {
+        return identificationNumber;
+    }
+
+    public Long getPhone() {
+        return phone;
+    }
+
+    public String getSystemRole() {
+        return systemRole;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
+    }
+
     public void setAcademicProgram(String academicProgram) {
         this.academicProgram = academicProgram;
     }
 
-    public String getProfessionalChair() {
-        return professionalChair;
+    public void setSemester(Integer semester) {
+        this.semester = semester;
     }
 
-    public void setProfessionalChair(String professionalChair) {
-        this.professionalChair = professionalChair;
+    public void setIdentificationType(String identificationType) {
+        this.identificationType = identificationType;
     }
 
-    public String getPlantType() {
-        return plantType;
+    public void setIdentificationNumber(Long identificationNumber) {
+        this.identificationNumber = identificationNumber;
     }
 
-    public void setPlantType(String plantType) {
-        this.plantType = plantType;
+    public void setPhone(Long phone) {
+        this.phone = phone;
     }
 
-    public UserRole getRole() {
-        return role;
+    public void setSystemRole(String systemRole) {
+        this.systemRole = systemRole;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public AthleticProfileEntity getAthleticProfile() {
+        return athleticProfile;
     }
 
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public boolean canSendJoinRequest(int pendingRequestCount) {
-        return pendingRequestCount == 0;
+    public void setAthleticProfile(AthleticProfileEntity athleticProfile) {
+        this.athleticProfile = athleticProfile;
     }
 }

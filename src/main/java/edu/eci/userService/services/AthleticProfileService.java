@@ -8,100 +8,101 @@ import edu.eci.userService.mappers.AthleticProfileMapper;
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.validation.ValidationUtils;
-import edu.eci.userService.exception.UserNotFoundException;
 
 @Service
 public class AthleticProfileService {
 
     private final AthleticProfileRepository athleticProfileRepository;
-    private final UserRepository userRepository;
     private final AthleticProfileMapper athleticProfileMapper;
+    private final UserRepository userRepository;
 
     public AthleticProfileService(AthleticProfileRepository athleticProfileRepository,
-            UserRepository userRepository,
-            AthleticProfileMapper athleticProfileMapper) {
+            AthleticProfileMapper athleticProfileMapper,
+            UserRepository userRepository) {
         this.athleticProfileRepository = athleticProfileRepository;
-        this.userRepository = userRepository;
         this.athleticProfileMapper = athleticProfileMapper;
+        this.userRepository = userRepository;
     }
 
     public List<AthleticProfileDTO> getAllAthleticProfiles() {
-        List<AthleticProfileDTO> athleticProfileDTOs = new ArrayList<>();
+        List<AthleticProfileDTO> athleticProfileDTO = new ArrayList<>();
         for (AthleticProfileEntity entity : athleticProfileRepository.findAll()) {
-            athleticProfileDTOs.add(athleticProfileMapper.toDTO(entity));
+            athleticProfileDTO.add(athleticProfileMapper.toDTO(entity));
         }
-        return athleticProfileDTOs;
+        return athleticProfileDTO;
     }
 
-    public AthleticProfileDTO getAthleticProfileByUserId(Long userId) {
-        return athleticProfileRepository.findByUserId(userId)
-                .map(athleticProfileMapper::toDTO)
-                .orElseThrow(() -> new UserNotFoundException("Athletic profile not found for user: " + userId));
+    public AthleticProfileDTO getAthleticProfilesByUserId(Long userId) {
+        AthleticProfileDTO dto = new AthleticProfileDTO();
+        dto = athleticProfileMapper.toDTO(athleticProfileRepository.findById(userId).orElse(null));
+        return dto;
     }
 
     public List<AthleticProfileDTO> getAthleticProfileByPosition(String position) {
-        List<AthleticProfileDTO> dtos = new ArrayList<>();
+        List<AthleticProfileDTO> dto = new ArrayList<>();
         for (AthleticProfileEntity entity : athleticProfileRepository.findByPosition(position)) {
-            dtos.add(athleticProfileMapper.toDTO(entity));
+            dto.add(athleticProfileMapper.toDTO(entity));
         }
-        return dtos;
+        return dto;
     }
 
     public List<AthleticProfileDTO> getAthleticProfileByLaterality(String laterality) {
-        List<AthleticProfileDTO> dtos = new ArrayList<>();
+        List<AthleticProfileDTO> dto = new ArrayList<>();
         for (AthleticProfileEntity entity : athleticProfileRepository.findByLaterality(laterality)) {
-            dtos.add(athleticProfileMapper.toDTO(entity));
+            dto.add(athleticProfileMapper.toDTO(entity));
         }
-        return dtos;
+        return dto;
     }
 
-    public AthleticProfileDTO createAthleticProfile(Long userId, AthleticProfileDTO athleticProfileDTO) {
-        // Validaciones
-        if (!ValidationUtils.isValidDorsal(athleticProfileDTO.getDorsalNumber())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("dorsal", ""));
-        }
-        if (!ValidationUtils.isValidPosition(athleticProfileDTO.getPosition())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("position", ""));
-        }
-        if (!ValidationUtils.isValidStature(athleticProfileDTO.getStature())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("stature", ""));
+    public AthleticProfileDTO createAthleticProfile(AthleticProfileDTO athleticProfileDTO) {
+        UserEntity user = userRepository.findByEmail(athleticProfileDTO.getEmail());
+        if (user == null) {
+            throw new NoSuchElementException("User not found with email: " + athleticProfileDTO.getEmail());
         }
 
-        // Verificar que el usuario existe
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
-
-        // Verificar que no exista un profile previo
-        if (athleticProfileRepository.existsByUserId(userId)) {
-            throw new IllegalArgumentException("User already has an athletic profile");
+        // If profile already exists, update it instead of creating a duplicate
+        if (user.getAthleticProfile() != null) {
+            AthleticProfileEntity existing = user.getAthleticProfile();
+            existing.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
+            existing.setPosition(athleticProfileDTO.getPosition());
+            existing.setLaterality(athleticProfileDTO.getLaterality());
+            existing.setStature(athleticProfileDTO.getStature());
+            existing.setState(athleticProfileDTO.getState());
+            if (existing.getNickName() == null || existing.getNickName().isBlank()) {
+                existing.setNickName(user.getName() != null ? user.getName().split("@")[0] : user.getEmail().split("@")[0]);
+            }
+            return athleticProfileMapper.toDTO(athleticProfileRepository.save(existing));
         }
 
-        AthleticProfileEntity entity = athleticProfileMapper.toEntity(athleticProfileDTO);
+        // Create new profile — build manually to avoid mapper setting ID (conflicts with @MapsId)
+        AthleticProfileEntity entity = new AthleticProfileEntity();
+        entity.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
+        entity.setPosition(athleticProfileDTO.getPosition());
+        entity.setLaterality(athleticProfileDTO.getLaterality());
+        entity.setStature(athleticProfileDTO.getStature());
+        entity.setState(athleticProfileDTO.getState());
+
+        // Generate nickName if not provided
+        String nickName = athleticProfileDTO.getNickName();
+        if (nickName == null || nickName.isBlank()) {
+            String base = user.getName() != null ? user.getName() : user.getEmail();
+            nickName = base.split("@")[0].replaceAll("[^a-zA-Z0-9]", "");
+        }
+        entity.setNickName(nickName);
+
+        // Maintain BOTH sides of the bidirectional @OneToOne relationship
         entity.setUser(user);
+        user.setAthleticProfile(entity);
+
         return athleticProfileMapper.toDTO(athleticProfileRepository.save(entity));
     }
 
     public AthleticProfileDTO updateAthleticProfile(Long userId, AthleticProfileDTO athleticProfileDTO) {
-        AthleticProfileEntity entity = athleticProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new UserNotFoundException("Athletic profile not found for user: " + userId));
+        AthleticProfileEntity entity = athleticProfileRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("No athletic profile found with user ID: " + userId));
 
-        // Validaciones
-        if (athleticProfileDTO.getDorsalNumber() != null &&
-                !ValidationUtils.isValidDorsal(athleticProfileDTO.getDorsalNumber())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("dorsal", ""));
-        }
-        if (athleticProfileDTO.getPosition() != null &&
-                !ValidationUtils.isValidPosition(athleticProfileDTO.getPosition())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("position", ""));
-        }
-        if (athleticProfileDTO.getStature() != null &&
-                !ValidationUtils.isValidStature(athleticProfileDTO.getStature())) {
-            throw new IllegalArgumentException(ValidationUtils.getValidationErrorMessage("stature", ""));
-        }
-
-        // Actualizar solo los campos permitidos
-        if (athleticProfileDTO.getDorsalNumber() != null) {
+        // Update only the fields provided — preserve existing nickName
+        if (athleticProfileDTO.getDorsalNumber() != 0) {
             entity.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
         }
         if (athleticProfileDTO.getPosition() != null) {
@@ -113,24 +114,17 @@ public class AthleticProfileService {
         if (athleticProfileDTO.getStature() != null) {
             entity.setStature(athleticProfileDTO.getStature());
         }
-        if (athleticProfileDTO.getPhotoUrl() != null) {
-            entity.setPhotoUrl(athleticProfileDTO.getPhotoUrl());
+        if (athleticProfileDTO.getState() != null) {
+            entity.setState(athleticProfileDTO.getState());
         }
-        if (athleticProfileDTO.getStatus() != null) {
-            entity.setStatus(athleticProfileDTO.getStatus());
-        }
-
         return athleticProfileMapper.toDTO(athleticProfileRepository.save(entity));
     }
 
     public void deleteAthleticProfile(Long userId) {
-        if (!athleticProfileRepository.existsByUserId(userId)) {
-            throw new IllegalArgumentException("Athletic profile not found for user: " + userId);
+        if (!athleticProfileRepository.existsById(userId)) {
+            throw new IllegalArgumentException("Athletic profile not found");
         }
-        // Bloquear la eliminación de perfiles deportivos para preservar integridad
-        // histórica
-        throw new IllegalArgumentException(
-                "Athletic profile deletion is not permitted to preserve tournament historical integrity");
+        athleticProfileRepository.deleteById(userId);
     }
 
 }

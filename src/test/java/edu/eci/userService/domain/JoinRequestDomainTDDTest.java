@@ -39,7 +39,7 @@ class JoinRequestDomainTDDTest {
     void setUp() {
         player = new UserEntity();
         player.setId(1L);
-        player.setFullName("Luis Martinez");
+        player.setName("Luis Martinez");
 
         joinRequest = new JoinRequestEntity();
         joinRequest.setId(100L);

@@ -73,7 +73,7 @@ class JoinRequestControllerTest {
     void setUp() {
         player = new UserDTO();
         player.setId(1L);
-        player.setFullName("Luis Martinez");
+        player.setName("Luis Martinez");
 
         pendingRequest = new JoinRequestDTO();
         pendingRequest.setId(100L);
