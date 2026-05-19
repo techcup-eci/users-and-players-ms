@@ -102,7 +102,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - must reject null teamId when setting")
         void mustRejectNullTeamId() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThatThrownBy(() -> request.setTeamId(null))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -112,7 +112,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - must reject negative teamId")
         void mustRejectNegativeTeamId() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThatThrownBy(() -> request.setTeamId(-1L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -122,7 +122,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must accept valid player and teamId")
         void mustAcceptValidPlayerAndTeamId() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
             request.setPlayer(player);
             request.setTeamId(5L);
 
@@ -349,7 +349,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - JoinRequest entity must expose createdAt field")
         void joinRequestEntityMustExposeCreatedAtField() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThatCode(request::getCreatedAt).doesNotThrowAnyException();
         }
@@ -357,7 +357,7 @@ class JoinRequestDomainTDDTest {
         @Test
         @DisplayName("Must fail - JoinRequest entity must expose updatedAt field")
         void joinRequestEntityMustExposeUpdatedAtField() {
-            JoinRequest request = new JoinRequest();
+            JoinRequestEntity request = new JoinRequestEntity();
 
             assertThatCode(request::getUpdatedAt).doesNotThrowAnyException();
         }

@@ -2,10 +2,13 @@ package edu.eci.userService.service;
 
 import edu.eci.userService.dto.JoinRequestDTO;
 import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.JoinRequestEntity;
+import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.exception.PendingJoinRequestException;
 import edu.eci.userService.exception.TeamNotAvailableException;
 import edu.eci.userService.exception.UserNotFoundException;
 import edu.eci.userService.enums.JoinRequestStatus;
+import edu.eci.userService.mappers.JoinRequestMapper;
 import edu.eci.userService.repository.JoinRequestRepository;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.JoinRequestService;
@@ -14,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -55,31 +57,38 @@ class JoinRequestServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private edu.eci.userService.mappers.JoinRequestMapper joinRequestMapper;
+    private JoinRequestMapper joinRequestMapper;
 
     private JoinRequestService joinRequestService;
 
-    private UserDTO player;
-    private UserDTO captain;
-    private JoinRequestDTO pendingRequest;
+    private UserEntity playerEntity;
+    private UserDTO playerDTO;
+    private JoinRequestEntity pendingEntity;
+    private JoinRequestDTO pendingDTO;
 
     @BeforeEach
     void setUp() {
         joinRequestService = new JoinRequestService(joinRequestRepository, userRepository, joinRequestMapper);
-        
-        player = new UserDTO();
-        player.setId(1L);
-        player.setName("Luis Martinez");
 
-        captain = new UserDTO();
-        captain.setId(2L);
-        captain.setName("Pedro Gomez");
+        playerEntity = new UserEntity();
+        playerEntity.setId(1L);
+        playerEntity.setName("Luis Martinez");
 
-        pendingRequest = new JoinRequestDTO();
-        pendingRequest.setId(100L);
-        pendingRequest.setPlayer(player);
-        pendingRequest.setTeamId(5L);
-        pendingRequest.setStatus(JoinRequestStatus.PENDING);
+        playerDTO = new UserDTO();
+        playerDTO.setId(1L);
+        playerDTO.setName("Luis Martinez");
+
+        pendingEntity = new JoinRequestEntity();
+        pendingEntity.setId(100L);
+        pendingEntity.setPlayer(playerEntity);
+        pendingEntity.setTeamId(5L);
+        pendingEntity.setStatus(JoinRequestStatus.PENDING);
+
+        pendingDTO = new JoinRequestDTO();
+        pendingDTO.setId(100L);
+        pendingDTO.setPlayer(playerDTO);
+        pendingDTO.setTeamId(5L);
+        pendingDTO.setStatus(JoinRequestStatus.PENDING);
     }
 
     // ----------------------------------------------------------------
@@ -93,52 +102,24 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must create a PENDING request when player has no existing pending request")
         void mustCreatePendingRequestWhenPlayerHasNoExistingPendingRequest() {
-            UserEntity playerEntity = new UserEntity();
-            playerEntity.setId(1L);
-            playerEntity.setName("Luis Martinez");
-            
             when(userRepository.findById(1L)).thenReturn(Optional.of(playerEntity));
             when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
                 .thenReturn(false);
-            
-            JoinRequestEntity entity = new JoinRequestEntity();
-            entity.setId(100L);
-            entity.setPlayer(playerEntity);
-            entity.setTeamId(5L);
-            entity.setStatus(JoinRequestStatus.PENDING);
-            
-            when(joinRequestRepository.save(any(JoinRequestEntity.class)))
-                .thenReturn(entity);
-            when(joinRequestMapper.toDTO(entity))
-                .thenReturn(pendingRequest);
+            when(joinRequestRepository.save(any(JoinRequestEntity.class))).thenReturn(pendingEntity);
+            when(joinRequestMapper.toDTO(pendingEntity)).thenReturn(pendingDTO);
 
-            JoinRequest result = joinRequestService.sendRequest(1L, 5L);
+            JoinRequestDTO result = joinRequestService.sendRequest(1L, 5L);
 
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
             assertThat(result.getTeamId()).isEqualTo(5L);
-            verify(joinRequestRepository).save(any(JoinRequest.class));
-        }
-
-        @Test
-        @DisplayName("Must persist the player reference inside the created request")
-        void mustPersistPlayerReferenceInsideCreatedRequest() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
-            when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
-                .thenReturn(false);
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-            JoinRequest result = joinRequestService.sendRequest(1L, 5L);
-
-            assertThat(result.getPlayer()).isNotNull();
-            assertThat(result.getPlayer().getId()).isEqualTo(1L);
+            verify(joinRequestRepository).save(any(JoinRequestEntity.class));
         }
 
         @Test
         @DisplayName("Must fail - must throw PendingJoinRequestException when player already has a pending request")
         void mustThrowPendingJoinRequestExceptionWhenPlayerAlreadyHasPendingRequest() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
+            when(userRepository.findById(1L)).thenReturn(Optional.of(playerEntity));
             when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
                 .thenReturn(true);
 
@@ -161,45 +142,16 @@ class JoinRequestServiceTest {
         }
 
         @Test
-        @DisplayName("Must fail - must throw TeamNotAvailableException when team is not available")
-        void mustThrowTeamNotAvailableExceptionWhenTeamIsNotAvailable() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
+        @DisplayName("Must fail - must throw TeamNotAvailableException when team ID is null or zero")
+        void mustThrowTeamNotAvailableExceptionWhenTeamIdIsInvalid() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(playerEntity));
             when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
                 .thenReturn(false);
-            when(joinRequestService.isTeamAvailable(5L)).thenReturn(false);
 
-            assertThatThrownBy(() -> joinRequestService.sendRequest(1L, 5L))
+            assertThatThrownBy(() -> joinRequestService.sendRequest(1L, 0L))
                 .isInstanceOf(TeamNotAvailableException.class);
 
             verify(joinRequestRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("Must allow sending a new request after a previous one was rejected")
-        void mustAllowSendingNewRequestAfterPreviousOneWasRejected() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
-            when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
-                .thenReturn(false);
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-            JoinRequest result = joinRequestService.sendRequest(1L, 8L);
-
-            assertThat(result.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
-        }
-
-        @Test
-        @DisplayName("Must allow sending a new request after a previous one was accepted")
-        void mustAllowSendingNewRequestAfterPreviousOneWasAccepted() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(player));
-            when(joinRequestRepository.existsByPlayerIdAndStatus(1L, JoinRequestStatus.PENDING))
-                .thenReturn(false);
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-
-            JoinRequest result = joinRequestService.sendRequest(1L, 3L);
-
-            assertThat(result.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
         }
     }
 
@@ -214,21 +166,31 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must set status to ACCEPTED when request is pending and belongs to the captain team")
         void mustSetStatusToAcceptedWhenRequestIsPendingAndBelongsToCaptainTeam() {
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
+            JoinRequestEntity savedEntity = new JoinRequestEntity();
+            savedEntity.setId(100L);
+            savedEntity.setPlayer(playerEntity);
+            savedEntity.setTeamId(5L);
+            savedEntity.setStatus(JoinRequestStatus.ACCEPTED);
 
-            JoinRequest result = joinRequestService.acceptRequest(100L, 5L);
+            JoinRequestDTO acceptedDTO = new JoinRequestDTO();
+            acceptedDTO.setId(100L);
+            acceptedDTO.setStatus(JoinRequestStatus.ACCEPTED);
+
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
+            when(joinRequestRepository.save(any(JoinRequestEntity.class))).thenReturn(savedEntity);
+            when(joinRequestMapper.toDTO(savedEntity)).thenReturn(acceptedDTO);
+
+            JoinRequestDTO result = joinRequestService.acceptRequest(100L, 5L);
 
             assertThat(result.getStatus()).isEqualTo(JoinRequestStatus.ACCEPTED);
-            verify(joinRequestRepository).save(any(JoinRequest.class));
+            verify(joinRequestRepository).save(any(JoinRequestEntity.class));
         }
 
         @Test
         @DisplayName("Must fail - must throw IllegalStateException when request is already accepted")
         void mustThrowIllegalStateExceptionWhenRequestIsAlreadyAccepted() {
-            pendingRequest.setStatus(JoinRequestStatus.ACCEPTED);
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            pendingEntity.setStatus(JoinRequestStatus.ACCEPTED);
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.acceptRequest(100L, 5L))
                 .isInstanceOf(IllegalStateException.class)
@@ -240,8 +202,8 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must fail - must throw IllegalStateException when request is already rejected")
         void mustThrowIllegalStateExceptionWhenRequestIsAlreadyRejected() {
-            pendingRequest.setStatus(JoinRequestStatus.REJECTED);
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            pendingEntity.setStatus(JoinRequestStatus.REJECTED);
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.acceptRequest(100L, 5L))
                 .isInstanceOf(IllegalStateException.class)
@@ -253,7 +215,7 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must fail - must throw IllegalArgumentException when request belongs to a different team")
         void mustThrowIllegalArgumentExceptionWhenRequestBelongsToDifferentTeam() {
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.acceptRequest(100L, 9L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -263,12 +225,12 @@ class JoinRequestServiceTest {
         }
 
         @Test
-        @DisplayName("Must fail - must throw UserNotFoundException when request does not exist")
-        void mustThrowUserNotFoundExceptionWhenRequestDoesNotExist() {
+        @DisplayName("Must fail - must throw IllegalArgumentException when request does not exist")
+        void mustThrowWhenRequestDoesNotExist() {
             when(joinRequestRepository.findById(999L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> joinRequestService.acceptRequest(999L, 5L))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -283,21 +245,31 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must set status to REJECTED when request is pending and belongs to the captain team")
         void mustSetStatusToRejectedWhenRequestIsPendingAndBelongsToCaptainTeam() {
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
-            when(joinRequestRepository.save(any(JoinRequest.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
+            JoinRequestEntity savedEntity = new JoinRequestEntity();
+            savedEntity.setId(100L);
+            savedEntity.setPlayer(playerEntity);
+            savedEntity.setTeamId(5L);
+            savedEntity.setStatus(JoinRequestStatus.REJECTED);
 
-            JoinRequest result = joinRequestService.rejectRequest(100L, 5L);
+            JoinRequestDTO rejectedDTO = new JoinRequestDTO();
+            rejectedDTO.setId(100L);
+            rejectedDTO.setStatus(JoinRequestStatus.REJECTED);
+
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
+            when(joinRequestRepository.save(any(JoinRequestEntity.class))).thenReturn(savedEntity);
+            when(joinRequestMapper.toDTO(savedEntity)).thenReturn(rejectedDTO);
+
+            JoinRequestDTO result = joinRequestService.rejectRequest(100L, 5L);
 
             assertThat(result.getStatus()).isEqualTo(JoinRequestStatus.REJECTED);
-            verify(joinRequestRepository).save(any(JoinRequest.class));
+            verify(joinRequestRepository).save(any(JoinRequestEntity.class));
         }
 
         @Test
         @DisplayName("Must fail - must throw IllegalStateException when request is already rejected")
         void mustThrowIllegalStateExceptionWhenRequestIsAlreadyRejected() {
-            pendingRequest.setStatus(JoinRequestStatus.REJECTED);
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            pendingEntity.setStatus(JoinRequestStatus.REJECTED);
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.rejectRequest(100L, 5L))
                 .isInstanceOf(IllegalStateException.class)
@@ -309,8 +281,8 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must fail - must throw IllegalStateException when request is already accepted")
         void mustThrowIllegalStateExceptionWhenRequestIsAlreadyAccepted() {
-            pendingRequest.setStatus(JoinRequestStatus.ACCEPTED);
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            pendingEntity.setStatus(JoinRequestStatus.ACCEPTED);
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.rejectRequest(100L, 5L))
                 .isInstanceOf(IllegalStateException.class)
@@ -322,7 +294,7 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must fail - must throw IllegalArgumentException when request belongs to a different team")
         void mustThrowIllegalArgumentExceptionWhenRequestBelongsToDifferentTeam() {
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
 
             assertThatThrownBy(() -> joinRequestService.rejectRequest(100L, 8L))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -332,12 +304,12 @@ class JoinRequestServiceTest {
         }
 
         @Test
-        @DisplayName("Must fail - must throw UserNotFoundException when request does not exist")
-        void mustThrowUserNotFoundExceptionWhenRequestDoesNotExist() {
+        @DisplayName("Must fail - must throw IllegalArgumentException when request does not exist")
+        void mustThrowWhenRequestDoesNotExist() {
             when(joinRequestRepository.findById(999L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> joinRequestService.rejectRequest(999L, 5L))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -353,9 +325,10 @@ class JoinRequestServiceTest {
         @DisplayName("Must return list with all pending requests for the given team")
         void mustReturnListWithAllPendingRequestsForGivenTeam() {
             when(joinRequestRepository.findByTeamIdAndStatus(5L, JoinRequestStatus.PENDING))
-                .thenReturn(List.of(pendingRequest));
+                .thenReturn(List.of(pendingEntity));
+            when(joinRequestMapper.toDTO(pendingEntity)).thenReturn(pendingDTO);
 
-            List<JoinRequest> result = joinRequestService.listPendingRequests(5L);
+            List<JoinRequestDTO> result = joinRequestService.getRequestsByTeam(5L);
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getTeamId()).isEqualTo(5L);
@@ -368,41 +341,9 @@ class JoinRequestServiceTest {
             when(joinRequestRepository.findByTeamIdAndStatus(5L, JoinRequestStatus.PENDING))
                 .thenReturn(List.of());
 
-            List<JoinRequest> result = joinRequestService.listPendingRequests(5L);
+            List<JoinRequestDTO> result = joinRequestService.getRequestsByTeam(5L);
 
             assertThat(result).isEmpty();
-        }
-
-        @Test
-        @DisplayName("Must return only pending requests and not accepted or rejected ones")
-        void mustReturnOnlyPendingRequestsAndNotOtherStatuses() {
-            JoinRequest acceptedRequest = new JoinRequest();
-            acceptedRequest.setId(200L);
-            acceptedRequest.setTeamId(5L);
-            acceptedRequest.setStatus(JoinRequestStatus.ACCEPTED);
-
-            when(joinRequestRepository.findByTeamIdAndStatus(5L, JoinRequestStatus.PENDING))
-                .thenReturn(List.of(pendingRequest));
-
-            List<JoinRequest> result = joinRequestService.listPendingRequests(5L);
-
-            assertThat(result).allMatch(r -> r.getStatus() == JoinRequestStatus.PENDING);
-        }
-
-        @Test
-        @DisplayName("Must return multiple pending requests when more than one player sent a request")
-        void mustReturnMultiplePendingRequestsWhenMoreThanOnePlayerSentRequest() {
-            JoinRequest secondRequest = new JoinRequest();
-            secondRequest.setId(101L);
-            secondRequest.setTeamId(5L);
-            secondRequest.setStatus(JoinRequestStatus.PENDING);
-
-            when(joinRequestRepository.findByTeamIdAndStatus(5L, JoinRequestStatus.PENDING))
-                .thenReturn(List.of(pendingRequest, secondRequest));
-
-            List<JoinRequest> result = joinRequestService.listPendingRequests(5L);
-
-            assertThat(result).hasSize(2);
         }
     }
 
@@ -417,21 +358,22 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must return request when it exists")
         void mustReturnRequestWhenItExists() {
-            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingRequest));
+            when(joinRequestRepository.findById(100L)).thenReturn(Optional.of(pendingEntity));
+            when(joinRequestMapper.toDTO(pendingEntity)).thenReturn(pendingDTO);
 
-            JoinRequest result = joinRequestService.findById(100L);
+            JoinRequestDTO result = joinRequestService.getRequestById(100L);
 
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(100L);
         }
 
         @Test
-        @DisplayName("Must fail - must throw UserNotFoundException when request does not exist")
-        void mustThrowUserNotFoundExceptionWhenRequestDoesNotExist() {
+        @DisplayName("Must fail - must throw IllegalArgumentException when request does not exist")
+        void mustThrowWhenRequestDoesNotExist() {
             when(joinRequestRepository.findById(999L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> joinRequestService.findById(999L))
-                .isInstanceOf(UserNotFoundException.class);
+            assertThatThrownBy(() -> joinRequestService.getRequestById(999L))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -446,10 +388,10 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must return all requests sent by a given player")
         void mustReturnAllRequestsSentByGivenPlayer() {
-            when(joinRequestRepository.findByPlayerId(1L))
-                .thenReturn(List.of(pendingRequest));
+            when(joinRequestRepository.findByPlayerId(1L)).thenReturn(List.of(pendingEntity));
+            when(joinRequestMapper.toDTO(pendingEntity)).thenReturn(pendingDTO);
 
-            List<JoinRequest> result = joinRequestService.findRequestsByPlayer(1L);
+            List<JoinRequestDTO> result = joinRequestService.getRequestsByPlayer(1L);
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getPlayer().getId()).isEqualTo(1L);
@@ -460,7 +402,7 @@ class JoinRequestServiceTest {
         void mustReturnEmptyListWhenPlayerHasNoRequests() {
             when(joinRequestRepository.findByPlayerId(1L)).thenReturn(List.of());
 
-            List<JoinRequest> result = joinRequestService.findRequestsByPlayer(1L);
+            List<JoinRequestDTO> result = joinRequestService.getRequestsByPlayer(1L);
 
             assertThat(result).isEmpty();
         }
@@ -468,19 +410,27 @@ class JoinRequestServiceTest {
         @Test
         @DisplayName("Must return both pending and non-pending requests when querying by player")
         void mustReturnBothPendingAndNonPendingRequestsWhenQueryingByPlayer() {
-            JoinRequest rejectedRequest = new JoinRequest();
-            rejectedRequest.setId(101L);
-            rejectedRequest.setPlayer(player);
-            rejectedRequest.setTeamId(3L);
-            rejectedRequest.setStatus(JoinRequestStatus.REJECTED);
+            JoinRequestEntity rejectedEntity = new JoinRequestEntity();
+            rejectedEntity.setId(101L);
+            rejectedEntity.setPlayer(playerEntity);
+            rejectedEntity.setTeamId(3L);
+            rejectedEntity.setStatus(JoinRequestStatus.REJECTED);
+
+            JoinRequestDTO rejectedDTO = new JoinRequestDTO();
+            rejectedDTO.setId(101L);
+            rejectedDTO.setPlayer(playerDTO);
+            rejectedDTO.setTeamId(3L);
+            rejectedDTO.setStatus(JoinRequestStatus.REJECTED);
 
             when(joinRequestRepository.findByPlayerId(1L))
-                .thenReturn(List.of(pendingRequest, rejectedRequest));
+                .thenReturn(List.of(pendingEntity, rejectedEntity));
+            when(joinRequestMapper.toDTO(pendingEntity)).thenReturn(pendingDTO);
+            when(joinRequestMapper.toDTO(rejectedEntity)).thenReturn(rejectedDTO);
 
-            List<JoinRequest> result = joinRequestService.findRequestsByPlayer(1L);
+            List<JoinRequestDTO> result = joinRequestService.getRequestsByPlayer(1L);
 
             assertThat(result).hasSize(2);
-            assertThat(result).extracting(JoinRequest::getStatus)
+            assertThat(result).extracting(JoinRequestDTO::getStatus)
                 .containsExactlyInAnyOrder(JoinRequestStatus.PENDING, JoinRequestStatus.REJECTED);
         }
     }

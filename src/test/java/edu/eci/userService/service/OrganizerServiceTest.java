@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
+
 import edu.eci.userService.exception.UserNotFoundException;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.OrganizerService;
@@ -35,13 +35,13 @@ public class OrganizerServiceTest {
     public void setUp() {
         adminUser = new UserEntity();
         adminUser.setId(1L);
-        adminUser.setFullName("Admin User");
-        adminUser.setRole(UserRole.ADMINISTRATOR);
+        adminUser.setName("Admin User");
+        adminUser.setSystemRole("ADMIN");
 
         playerUser = new UserEntity();
         playerUser.setId(2L);
-        playerUser.setFullName("Player User");
-        playerUser.setRole(UserRole.STUDENT);
+        playerUser.setName("Player User");
+        playerUser.setSystemRole("PLAYER");
     }
 
     @Test
@@ -52,7 +52,7 @@ public class OrganizerServiceTest {
 
         organizerService.convertPlayerToOrganizer(2L, 1L);
 
-        verify(userRepository).save(argThat(user -> user.getRole() == UserRole.ORGANIZER));
+        verify(userRepository).save(argThat(user -> "ORGANIZER".equals(user.getSystemRole())));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class OrganizerServiceTest {
     public void testConvertPlayerToOrganizer_OnlyAdminCanConvert() {
         UserEntity nonAdmin = new UserEntity();
         nonAdmin.setId(3L);
-        nonAdmin.setRole(UserRole.STUDENT);
+        nonAdmin.setSystemRole("PLAYER");
 
         when(userRepository.findById(3L)).thenReturn(Optional.of(nonAdmin));
         when(userRepository.findById(2L)).thenReturn(Optional.of(playerUser));
@@ -88,7 +88,7 @@ public class OrganizerServiceTest {
 
     @Test
     public void testConvertPlayerToOrganizer_AlreadyOrganizer() {
-        playerUser.setRole(UserRole.ORGANIZER);
+        playerUser.setSystemRole("ORGANIZER");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(adminUser));
         when(userRepository.findById(2L)).thenReturn(Optional.of(playerUser));
@@ -102,7 +102,7 @@ public class OrganizerServiceTest {
     public void testIsOrganizer_True() {
         UserEntity organizer = new UserEntity();
         organizer.setId(1L);
-        organizer.setRole(UserRole.ORGANIZER);
+        organizer.setSystemRole("ORGANIZER");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(organizer));
 
@@ -124,7 +124,7 @@ public class OrganizerServiceTest {
     public void testCanOrganizerPerformAction_AllowedAction() {
         UserEntity organizer = new UserEntity();
         organizer.setId(1L);
-        organizer.setRole(UserRole.ORGANIZER);
+        organizer.setSystemRole("ORGANIZER");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(organizer));
 
@@ -137,7 +137,7 @@ public class OrganizerServiceTest {
     public void testCanOrganizerPerformAction_DeleteUserNotAllowed() {
         UserEntity organizer = new UserEntity();
         organizer.setId(1L);
-        organizer.setRole(UserRole.ORGANIZER);
+        organizer.setSystemRole("ORGANIZER");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(organizer));
 
@@ -150,7 +150,7 @@ public class OrganizerServiceTest {
     public void testCanOrganizerPerformAction_ConvertToOrganizerNotAllowed() {
         UserEntity organizer = new UserEntity();
         organizer.setId(1L);
-        organizer.setRole(UserRole.ORGANIZER);
+        organizer.setSystemRole("ORGANIZER");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(organizer));
 

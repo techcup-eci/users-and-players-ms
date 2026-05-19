@@ -60,6 +60,27 @@ public class JoinRequestEntity {
         return this.status == JoinRequestStatus.PENDING;
     }
 
+    public boolean belongsToTeam(Long teamId) {
+        if (teamId == null || this.teamId == null) {
+            return false;
+        }
+        return this.teamId.equals(teamId);
+    }
+
+    public void accept() {
+        if (!isPending()) {
+            throw new IllegalStateException("Request is not pending and cannot be accepted");
+        }
+        this.status = JoinRequestStatus.ACCEPTED;
+    }
+
+    public void reject() {
+        if (!isPending()) {
+            throw new IllegalStateException("Request is not pending and cannot be rejected");
+        }
+        this.status = JoinRequestStatus.REJECTED;
+    }
+
     // Validation
     public void setPlayer(UserEntity player) {
         if (player == null) {

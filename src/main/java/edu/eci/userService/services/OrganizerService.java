@@ -2,7 +2,6 @@ package edu.eci.userService.services;
 
 import org.springframework.stereotype.Service;
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
 import edu.eci.userService.exception.UserNotFoundException;
 import edu.eci.userService.repository.UserRepository;
 
@@ -24,7 +23,7 @@ public class OrganizerService {
         UserEntity admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new UserNotFoundException("Admin not found"));
 
-        if (admin.getRole() != UserRole.ADMINISTRATOR) {
+        if (!"ADMIN".equals(admin.getSystemRole())) {
             throw new IllegalArgumentException("Only administrators can convert players to organizers");
         }
 
@@ -33,12 +32,12 @@ public class OrganizerService {
                 .orElseThrow(() -> new UserNotFoundException("Player not found"));
 
         // Verificar que no sea ya un organizador
-        if (player.getRole() == UserRole.ORGANIZER) {
+        if ("ORGANIZER".equals(player.getSystemRole())) {
             throw new IllegalArgumentException("User is already an organizer");
         }
 
         // Convertir el rol
-        player.setRole(UserRole.ORGANIZER);
+        player.setSystemRole("ORGANIZER");
         userRepository.save(player);
     }
 
@@ -47,7 +46,7 @@ public class OrganizerService {
      */
     public boolean isOrganizer(Long userId) {
         return userRepository.findById(userId)
-                .map(user -> user.getRole() == UserRole.ORGANIZER)
+                .map(user -> "ORGANIZER".equals(user.getSystemRole()))
                 .orElse(false);
     }
 
@@ -60,7 +59,7 @@ public class OrganizerService {
         UserEntity organizer = userRepository.findById(organizerId)
                 .orElseThrow(() -> new UserNotFoundException("Organizer not found"));
 
-        if (organizer.getRole() != UserRole.ORGANIZER) {
+        if (!"ORGANIZER".equals(organizer.getSystemRole())) {
             return false;
         }
 

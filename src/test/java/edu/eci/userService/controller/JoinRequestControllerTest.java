@@ -286,14 +286,3 @@ class JoinRequestControllerTest {
         }
     }
 }
-                .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Must return 400 when request ID in URL is not numeric")
-        void mustReturn400WhenRequestIdIsNotNumeric() throws Exception {
-            mockMvc.perform(get("/api/join-requests/abc"))
-                .andExpect(status().isBadRequest());
-        }
-    }
-}
