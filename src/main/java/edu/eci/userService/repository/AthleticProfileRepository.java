@@ -1,6 +1,7 @@
 package edu.eci.userService.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,15 +11,13 @@ import edu.eci.userService.entities.AthleticProfileEntity;
 @Repository
 public interface AthleticProfileRepository extends JpaRepository<AthleticProfileEntity, Long> {
 
-    public List<AthleticProfileEntity> findAll();
+    Optional<AthleticProfileEntity> findByUserId(Long userId);
 
-    public AthleticProfileEntity findByEmail(String email);
+    List<AthleticProfileEntity> findByPosition(String position);
 
-    public List<AthleticProfileEntity> findByPosition(String position);
+    List<AthleticProfileEntity> findByLaterality(String laterality);
 
-    public List<AthleticProfileEntity> findByLaterality(String laterality);
+    boolean existsByUserId(Long userId);
 
-    public boolean existsByEmail(String email);
-
-    public void deleteByEmail(String email);
+    void deleteByUserId(Long userId);
 }
