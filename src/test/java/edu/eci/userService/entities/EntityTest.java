@@ -22,7 +22,7 @@ class EntityTest {
         entity.setEmail("email@test.com");
         entity.setBirthDate(birthDate);
         entity.setRole(UserRoleEnum.STUDENT);
-        entity.setRelationShip("staff");
+        entity.setRelationship("staff");
         entity.setAcademicProgram("Program");
         entity.setSemester(1);
         entity.setIdentificationType("CC");
@@ -35,7 +35,7 @@ class EntityTest {
         assertThat(entity.getEmail()).isEqualTo("email@test.com");
         assertThat(entity.getBirthDate()).isEqualTo(birthDate);
         assertThat(entity.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-        assertThat(entity.getRelationShip()).isEqualTo("staff");
+        assertThat(entity.getRelationship()).isEqualTo("staff");
         assertThat(entity.getAcademicProgram()).isEqualTo("Program");
         assertThat(entity.getSemester()).isEqualTo(1);
         assertThat(entity.getIdentificationType()).isEqualTo("CC");

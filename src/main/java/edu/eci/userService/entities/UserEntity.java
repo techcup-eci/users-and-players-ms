@@ -77,7 +77,7 @@ public class UserEntity {
         return role;
     }
 
-    public String getRelationShip() {
+    public String getRelationship() {
         return relationship;
     }
 
@@ -124,7 +124,7 @@ public class UserEntity {
     public void setRole(UserRoleEnum role) {
         this.role = role;
     }
-    public void setRelationShip(String relationship) {
+    public void setRelationship(String relationship) {
         this.relationship = relationship;
     }
 

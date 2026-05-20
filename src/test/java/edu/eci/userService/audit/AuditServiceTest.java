@@ -35,7 +35,17 @@ class AuditServiceTest {
         AuditLog log = new AuditLog();
         when(auditLogRepository.save(any(AuditLog.class))).thenReturn(log);
 
-        AuditLog result = auditService.log("ACT", "GET", "/uri", "User", "1", "IP", "SUCCESS", null);
+        AuditLogRequest request = new AuditLogRequest();
+        request.setAction("ACT");
+        request.setHttpMethod("GET");
+        request.setEndpoint("/uri");
+        request.setEntityType("User");
+        request.setEntityId("1");
+        request.setPerformedBy("IP");
+        request.setStatus("SUCCESS");
+        request.setDetail(null);
+
+        AuditLog result = auditService.log(request);
 
         assertThat(result).isEqualTo(log);
         verify(auditLogRepository).save(any(AuditLog.class));

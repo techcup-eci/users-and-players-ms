@@ -56,7 +56,7 @@ public class UserService {
         entitie.setEmail(userDTO.getEmail());
         entitie.setBirthDate(userDTO.getBirthDate());
         entitie.setRole(userDTO.getRole());
-        entitie.setRelationShip(userDTO.getRelationShip());
+        entitie.setRelationship(userDTO.getRelationship());
         entitie.setAcademicProgram(userDTO.getAcademicProgram());
         entitie.setSemester(userDTO.getSemester());
         entitie.setIdentificationType(userDTO.getIdentificationType());

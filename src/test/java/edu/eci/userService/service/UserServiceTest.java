@@ -59,7 +59,7 @@ class UserServiceTest {
         sampleEntity.setEmail("juan.perez@eci.edu.co");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleEntity.setRole(UserRoleEnum.STUDENT);
-        sampleEntity.setRelationShip("student");
+        sampleEntity.setRelationship("student");
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
@@ -73,7 +73,7 @@ class UserServiceTest {
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationShip("student");
+        sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
@@ -171,6 +171,26 @@ class UserServiceTest {
             assertThat(result.getSemester()).isEqualTo(5);
             assertThat(result.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
         }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña es null")
+        void shouldThrowWhenPasswordIsNull() {
+            sampleDTO.setPassword(null);
+
+            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Password");
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña esta vacia")
+        void shouldThrowWhenPasswordIsBlank() {
+            sampleDTO.setPassword(" ");
+
+            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Password");
+        }
     }
 
     // ── updateUser ───────────────────────────────────────────────────────────
@@ -187,7 +207,7 @@ class UserServiceTest {
             updatedDTO.setEmail("juan.perez@eci.edu.co");
             updatedDTO.setBirthDate(LocalDate.of(2000, 5, 15));
             updatedDTO.setRole(UserRoleEnum.STUDENT);
-            updatedDTO.setRelationShip("student");
+            updatedDTO.setRelationship("student");
             updatedDTO.setAcademicProgram("Ingeniería de IA");
             updatedDTO.setSemester(6);
             updatedDTO.setIdentificationType("CC");
@@ -211,6 +231,36 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.updateUser(99L, sampleDTO))
                     .isInstanceOf(NoSuchElementException.class)
                     .hasMessageContaining("99");
+        }
+
+        @Test
+        @DisplayName("Debe actualizar el password cuando se envia uno nuevo")
+        void shouldUpdatePasswordWhenProvided() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(passwordEncoder.encode("new_password")).thenReturn("hashed_new_password");
+            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
+
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setPassword("new_password");
+
+            userService.updateUser(1L, updatedDTO);
+
+            verify(passwordEncoder).encode("new_password");
+            assertThat(sampleEntity.getPassword()).isEqualTo("hashed_new_password");
+        }
+
+        @Test
+        @DisplayName("No debe actualizar el password cuando esta vacio")
+        void shouldNotUpdatePasswordWhenBlank() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
+
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setPassword(" ");
+
+            userService.updateUser(1L, updatedDTO);
+
+            verify(passwordEncoder, never()).encode(any());
         }
     }
 
@@ -254,7 +304,6 @@ class UserServiceTest {
         void shouldAuthenticateWhenCredentialsAreValid() {
             when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
             when(passwordEncoder.matches("plain_password", "hashed_password")).thenReturn(true);
-            when(userMapper.toDTO(sampleEntity)).thenReturn(sampleDTO);
 
             UserDTO result = userService.authenticate("juan.perez@eci.edu.co", "plain_password");
 
@@ -289,6 +338,20 @@ class UserServiceTest {
 
             assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", ""))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando email es null")
+        void shouldThrowWhenEmailIsNull() {
+            assertThatThrownBy(() -> userService.authenticate(null, "plain_password"))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando password es null")
+        void shouldThrowWhenPasswordIsNull() {
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", null))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

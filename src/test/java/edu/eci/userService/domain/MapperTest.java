@@ -46,7 +46,7 @@ class MapperTest {
             assertThat(dto.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(dto.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
             assertThat(dto.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-            assertThat(dto.getRelationShip()).isEqualTo("student");
+            assertThat(dto.getRelationship()).isEqualTo("student");
             assertThat(dto.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(dto.getSemester()).isEqualTo(5);
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
@@ -66,7 +66,7 @@ class MapperTest {
             assertThat(entity.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(entity.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
             assertThat(entity.getRole()).isEqualTo(UserRoleEnum.STUDENT);
-            assertThat(entity.getRelationShip()).isEqualTo("student");
+            assertThat(entity.getRelationship()).isEqualTo("student");
             assertThat(entity.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(entity.getSemester()).isEqualTo(5);
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
@@ -107,7 +107,7 @@ class MapperTest {
             e.setEmail("juan@eci.edu.co");
             e.setBirthDate(LocalDate.of(2000, 5, 15));
             e.setRole(UserRoleEnum.STUDENT);
-            e.setRelationShip("student");
+            e.setRelationship("student");
             e.setAcademicProgram("Ingeniería de Sistemas");
             e.setSemester(5);
             e.setIdentificationType("CC");
@@ -124,7 +124,7 @@ class MapperTest {
             dto.setEmail("juan@eci.edu.co");
             dto.setBirthDate(LocalDate.of(2000, 5, 15));
             dto.setRole(UserRoleEnum.STUDENT);
-            dto.setRelationShip("student");
+            dto.setRelationship("student");
             dto.setAcademicProgram("Ingeniería de Sistemas");
             dto.setSemester(5);
             dto.setIdentificationType("CC");
@@ -144,11 +144,23 @@ class MapperTest {
         void toEntityShouldReturnNullWhenDTOIsNull() {
             assertThat(userMapper.toEntity(null)).isNull();
         }
+
+        @Test
+        @DisplayName("toEntity no debe setear id cuando es 0")
+        void toEntityShouldIgnoreZeroId() {
+            UserDTO dto = buildUserDTO();
+            dto.setId(0);
+
+            UserEntity entity = userMapper.toEntity(dto);
+
+            assertThat(entity.getId()).isNull();
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
     // AthleticProfileMapper
     // ════════════════════════════════════
+    @Nested
     @DisplayName("AthleticProfileMapper")
     class AthleticProfileMapperTests {
 

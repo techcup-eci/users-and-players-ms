@@ -55,7 +55,7 @@ class UserControllerTest {
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationShip("student");
+        sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");

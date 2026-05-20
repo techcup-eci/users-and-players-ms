@@ -13,7 +13,7 @@ public class UserDTO {
     private String email;
     private LocalDate birthDate;
     private UserRoleEnum role;
-    private String relationShip;
+    private String relationship;
     private String academicProgram;
     private int semester;
     private String identificationType;
@@ -25,7 +25,7 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationShip,
+    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationship,
             String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone,
             String password) {
         this.id = id;
@@ -33,7 +33,7 @@ public class UserDTO {
         this.email = email;
         this.birthDate = birthDate;
         this.role = role;
-        this.relationShip = relationShip;
+        this.relationship = relationship;
         this.academicProgram = academicProgram;
         this.semester = semester;
         this.identificationType = identificationType;
@@ -62,8 +62,8 @@ public class UserDTO {
         return role;
     }
 
-    public String getRelationShip() {
-        return relationShip;
+    public String getRelationship() {
+        return relationship;
     }
 
     public String getAcademicProgram() {
@@ -110,8 +110,8 @@ public class UserDTO {
         this.role = role;
     }
 
-    public void setRelationShip(String relationShip) {
-        this.relationShip = relationShip;
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
     }
 
     public void setAcademicProgram(String academicProgram) {

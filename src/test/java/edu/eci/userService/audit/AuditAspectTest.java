@@ -66,7 +66,16 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("result");
-        verify(auditService).log(eq("CREATE_USER"), eq("POST"), eq("/User"), eq("User"), any(), eq("127.0.0.1"), eq("SUCCESS"), isNull());
+        verify(auditService).log(argThat(request ->
+            "CREATE_USER".equals(request.getAction())
+                && "POST".equals(request.getHttpMethod())
+                && "/User".equals(request.getEndpoint())
+                && "User".equals(request.getEntityType())
+                && request.getEntityId() == null
+                && "127.0.0.1".equals(request.getPerformedBy())
+                && "SUCCESS".equals(request.getStatus())
+                && request.getDetail() == null
+        ));
     }
 
     @Test
@@ -82,7 +91,12 @@ class AuditAspectTest {
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(any(), any(), any(), any(), eq("1"), any(), any(), any());
+        verify(auditService).log(argThat(request ->
+            "GET_USER".equals(request.getAction())
+                && "User".equals(request.getEntityType())
+                && "1".equals(request.getEntityId())
+                && "SUCCESS".equals(request.getStatus())
+        ));
     }
 
     @Test
@@ -97,7 +111,14 @@ class AuditAspectTest {
         assertThatThrownBy(() -> auditAspect.auditUser(proceedingJoinPoint))
                 .isInstanceOf(RuntimeException.class);
 
-        verify(auditService).log(eq("DELETE_USER"), any(), any(), eq("User"), eq("99"), any(), eq("ERROR"), contains("Test Exception"));
+        verify(auditService).log(argThat(request ->
+            "DELETE_USER".equals(request.getAction())
+                && "User".equals(request.getEntityType())
+                && "99".equals(request.getEntityId())
+                && "ERROR".equals(request.getStatus())
+                && request.getDetail() != null
+                && request.getDetail().contains("Test Exception")
+        ));
     }
 
     @Test
@@ -111,7 +132,7 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("list");
-        verify(auditService, never()).log(any(), any(), any(), any(), any(), any(), any(), any());
+        verify(auditService, never()).log(any());
     }
 
     @Test
@@ -122,10 +143,15 @@ class AuditAspectTest {
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L});
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn("10.0.0.1, 192.168.1.1");
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+        when(httpServletRequest.getRequestURI()).thenReturn("/User/1");
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(any(), any(), any(), any(), any(), eq("10.0.0.1"), any(), any());
+        verify(auditService).log(argThat(request ->
+            "10.0.0.1".equals(request.getPerformedBy())
+                && "SUCCESS".equals(request.getStatus())
+        ));
     }
 
     @Test
@@ -138,9 +164,53 @@ class AuditAspectTest {
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{});
+        when(httpServletRequest.getMethod()).thenReturn("POST");
+        when(httpServletRequest.getRequestURI()).thenReturn("/AthleticProfile/customOp");
 
         auditAspect.auditAthleticProfile(proceedingJoinPoint);
 
-        verify(auditService).log(eq("CUSTOMOP_ATHLETICPROFILE"), any(), any(), eq("AthleticProfile"), any(), any(), any(), any());
+        verify(auditService).log(argThat(request ->
+            "CUSTOMOP_ATHLETICPROFILE".equals(request.getAction())
+                && "AthleticProfile".equals(request.getEntityType())
+        ));
+    }
+
+    @Test
+    @DisplayName("Debe auditar UPDATE con ID")
+    void auditUpdateWithIdTest() throws Throwable {
+        Method method = UserController.class.getMethod("updateUser", long.class, UserDTO.class);
+        when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
+        when(methodSignature.getMethod()).thenReturn(method);
+        when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L, new UserDTO()});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
+        when(httpServletRequest.getMethod()).thenReturn("PUT");
+        when(httpServletRequest.getRequestURI()).thenReturn("/User/1");
+
+        auditAspect.auditUser(proceedingJoinPoint);
+
+        verify(auditService).log(argThat(request ->
+            "UPDATE_USER".equals(request.getAction())
+                && "1".equals(request.getEntityId())
+                && "SUCCESS".equals(request.getStatus())
+        ));
+    }
+
+    @Test
+    @DisplayName("Debe manejar ausencia de contexto HTTP")
+    void auditWithoutRequestContextTest() throws Throwable {
+        RequestContextHolder.resetRequestAttributes();
+        Method method = UserController.class.getMethod("createUser", UserDTO.class);
+        when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
+        when(methodSignature.getMethod()).thenReturn(method);
+        when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{new UserDTO()});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
+
+        auditAspect.auditUser(proceedingJoinPoint);
+
+        verify(auditService).log(argThat(request ->
+            "UNKNOWN".equals(request.getHttpMethod())
+                && "UNKNOWN".equals(request.getEndpoint())
+                && "UNKNOWN".equals(request.getPerformedBy())
+        ));
     }
 }

@@ -17,7 +17,7 @@ public class UserMapper {
         dto.setEmail(entity.getEmail());
         dto.setBirthDate(entity.getBirthDate());
         dto.setRole(entity.getRole());
-        dto.setRelationShip(entity.getRelationShip());
+        dto.setRelationship(entity.getRelationship());
         dto.setAcademicProgram(entity.getAcademicProgram());
         dto.setSemester(entity.getSemester());
         dto.setIdentificationType(entity.getIdentificationType());
@@ -37,7 +37,7 @@ public class UserMapper {
         entity.setEmail(dto.getEmail());
         entity.setBirthDate(dto.getBirthDate());
         entity.setRole(dto.getRole());
-        entity.setRelationShip(dto.getRelationShip());
+        entity.setRelationship(dto.getRelationship());
         entity.setAcademicProgram(dto.getAcademicProgram());
         entity.setSemester(dto.getSemester());
         entity.setIdentificationType(dto.getIdentificationType());
