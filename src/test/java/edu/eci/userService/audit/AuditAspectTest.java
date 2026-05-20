@@ -67,15 +67,17 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("result");
-        verify(auditService).log(ArgumentMatchers.argThat(req ->
-            "CREATE_USER".equals(req.getAction()) &&
-            "POST".equals(req.getHttpMethod()) &&
-            "/User".equals(req.getEndpoint()) &&
-            "User".equals(req.getEntityType()) &&
-            "127.0.0.1".equals(req.getPerformedBy()) &&
-            "SUCCESS".equals(req.getStatus()) &&
-            req.getDetail() == null
-        ));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getAction()).isEqualTo("CREATE_USER");
+        assertThat(req.getHttpMethod()).isEqualTo("POST");
+        assertThat(req.getEndpoint()).isEqualTo("/api/users");
+        assertThat(req.getEntityType()).isEqualTo("User");
+        assertThat(req.getPerformedBy()).isEqualTo("127.0.0.1");
+        assertThat(req.getStatus()).isEqualTo("SUCCESS");
+        assertThat(req.getDetail()).isNull();
     }
 
     @Test
@@ -92,9 +94,11 @@ class AuditAspectTest {
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(ArgumentMatchers.argThat(req ->
-            "1".equals(req.getEntityId())
-        ));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getEntityId()).isEqualTo("1");
     }
 
     @Test
@@ -112,13 +116,15 @@ class AuditAspectTest {
         assertThatThrownBy(() -> auditAspect.auditUser(proceedingJoinPoint))
                 .isInstanceOf(RuntimeException.class);
 
-        verify(auditService).log(ArgumentMatchers.argThat(req ->
-            "DELETE_USER".equals(req.getAction()) &&
-            "User".equals(req.getEntityType()) &&
-            "99".equals(req.getEntityId()) &&
-            "ERROR".equals(req.getStatus()) &&
-            req.getDetail() != null && req.getDetail().contains("Test Exception")
-        ));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getAction()).isEqualTo("DELETE_USER");
+        assertThat(req.getEntityType()).isEqualTo("User");
+        assertThat(req.getEntityId()).isEqualTo("99");
+        assertThat(req.getStatus()).isEqualTo("ERROR");
+        assertThat(req.getDetail()).contains("Test Exception");
     }
 
     @Test
@@ -149,9 +155,11 @@ class AuditAspectTest {
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        verify(auditService).log(ArgumentMatchers.argThat(req ->
-            "10.0.0.1".equals(req.getPerformedBy())
-        ));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getPerformedBy()).isEqualTo("10.0.0.1");
     }
 
     @Test
@@ -171,9 +179,11 @@ class AuditAspectTest {
 
         auditAspect.auditAthleticProfile(proceedingJoinPoint);
 
-        verify(auditService).log(ArgumentMatchers.argThat(req ->
-            "CUSTOMOP_ATHLETICPROFILE".equals(req.getAction()) &&
-            "AthleticProfile".equals(req.getEntityType())
-        ));
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getAction()).isEqualTo("CUSTOMOP_ATHLETICPROFILE");
+        assertThat(req.getEntityType()).isEqualTo("AthleticProfile");
     }
 }

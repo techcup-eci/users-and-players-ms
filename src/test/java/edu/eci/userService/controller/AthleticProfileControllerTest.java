@@ -192,14 +192,14 @@ class AthleticProfileControllerTest {
         }
 
         @Test
-        @DisplayName("Debe retornar 400 cuando el perfil no existe")
-        void shouldReturn400WhenProfileNotFound() throws Exception {
-            doThrow(new IllegalArgumentException("Athletic profile not found"))
+        @DisplayName("Debe retornar 404 cuando el perfil no existe")
+        void shouldReturn404WhenProfileNotFound() throws Exception {
+            doThrow(new java.util.NoSuchElementException("Athletic profile not found"))
                     .when(athleticProfileService)
                     .deleteAthleticProfile(99L);
 
-            mockMvc.perform(delete("/AthleticProfile/99"))
-                    .andExpect(status().isBadRequest())
+            mockMvc.perform(delete("/api/athletic-profiles/99"))
+                    .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.error", is("Athletic profile not found")));
         }
     }
