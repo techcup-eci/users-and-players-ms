@@ -211,17 +211,17 @@ class JoinRequestControllerTest {
             when(joinRequestService.rejectRequest(100L, 5L))
                 .thenThrow(new IllegalStateException("Request is not pending and cannot be rejected"));
 
-            mockMvc.perform(patch("/api/teams/5/join-requests/100/reject"))
+            mockMvc.perform(patch("/join-requests/100/reject?teamId=5"))
                 .andExpect(status().isConflict());
         }
 
         @Test
-        @DisplayName("Must return 400 when request does not belong to the captain team")
-        void mustReturn400WhenRequestDoesNotBelongToCaptainTeam() throws Exception {
+        @DisplayName("Must return 409 when request does not belong to the captain team")
+        void mustReturn409WhenRequestDoesNotBelongToCaptainTeam() throws Exception {
             when(joinRequestService.rejectRequest(100L, 8L))
                 .thenThrow(new IllegalArgumentException("Request does not belong to this team"));
 
-            mockMvc.perform(patch("/join-requests/100/reject?teamId=5"))
+            mockMvc.perform(patch("/join-requests/100/reject?teamId=8"))
                 .andExpect(status().isConflict());
         }
     }

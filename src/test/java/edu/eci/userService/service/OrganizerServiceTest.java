@@ -79,7 +79,6 @@ public class OrganizerServiceTest {
         nonAdmin.setSystemRole("PLAYER");
 
         when(userRepository.findById(3L)).thenReturn(Optional.of(nonAdmin));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(playerUser));
 
         assertThatThrownBy(() -> organizerService.convertPlayerToOrganizer(2L, 3L))
                 .isInstanceOf(IllegalArgumentException.class)
