@@ -65,6 +65,7 @@ class UserServiceTest {
         sampleEntity.setIdentificationType("CC");
         sampleEntity.setIdentificationNumber(1000123456L);
         sampleEntity.setPhone(3001234567L);
+        sampleEntity.setSystemRole("PLAYER");
         sampleEntity.setPassword("hashed_password");
 
         sampleDTO = new UserDTO();

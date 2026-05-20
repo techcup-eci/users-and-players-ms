@@ -1,17 +1,18 @@
 package edu.eci.userService.entities;
 
+import java.time.LocalDate;
+
+import edu.eci.userService.enums.UserRoleEnum;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import java.time.LocalDate;
-import edu.eci.userService.enums.UserRoleEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +27,9 @@ public class UserEntity {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column
+    private String password;
 
     @Column(nullable = false)
     private LocalDate birthDate;
@@ -49,10 +53,10 @@ public class UserEntity {
     private Long identificationNumber;
 
     @Column(nullable = false)
-    private Long phone;
+    private Long phone = 0L;
 
-    @Column(nullable = false)
-    private String password;
+    @Column
+    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private AthleticProfileEntity athleticProfile;
@@ -67,6 +71,10 @@ public class UserEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public LocalDate getBirthDate() {
@@ -101,8 +109,8 @@ public class UserEntity {
         return phone;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSystemRole() {
+        return systemRole;
     }
 
     public void setId(Long id) {
@@ -115,6 +123,10 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setBirthDate(LocalDate birthDate) {
@@ -148,7 +160,15 @@ public class UserEntity {
         this.phone = phone;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSystemRole(String systemRole) {
+        this.systemRole = systemRole;
+    }
+
+    public AthleticProfileEntity getAthleticProfile() {
+        return athleticProfile;
+    }
+
+    public void setAthleticProfile(AthleticProfileEntity athleticProfile) {
+        this.athleticProfile = athleticProfile;
     }
 }

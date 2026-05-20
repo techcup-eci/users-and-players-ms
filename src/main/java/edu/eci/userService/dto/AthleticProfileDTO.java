@@ -7,6 +7,7 @@ public class AthleticProfileDTO {
     private int dorsalNumber;
     private Long id;
     private UserEntity user;
+    private String email;
     private String nickName;
     private String position;
     private String laterality;
@@ -40,6 +41,14 @@ public class AthleticProfileDTO {
 
     public UserEntity getUser() {
         return user;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNickName() {

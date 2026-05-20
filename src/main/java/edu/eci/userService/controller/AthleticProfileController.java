@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
-import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.services.AthleticProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 @RestController
-@RequestMapping("/AthleticProfile")
+@RequestMapping("/api/athletic-profiles")
 public class AthleticProfileController {
 
     private final AthleticProfileService athleticProfileService;
@@ -61,9 +60,7 @@ public class AthleticProfileController {
     private AthleticProfileDTO toDTO(AthleticProfileRequestBody requestBody) {
         AthleticProfileDTO dto = new AthleticProfileDTO();
         dto.setDorsalNumber(requestBody.dorsalNumber());
-        dto.setId(requestBody.id());
-        dto.setUser(requestBody.user());
-        dto.setNickName(requestBody.nickName());
+        dto.setEmail(requestBody.email());
         dto.setPosition(requestBody.position());
         dto.setLaterality(requestBody.laterality());
         dto.setStature(requestBody.stature());
@@ -73,9 +70,7 @@ public class AthleticProfileController {
 
     public record AthleticProfileRequestBody(
             int dorsalNumber,
-            long id,
-            UserEntity user,
-            String nickName,
+            String email,
             String position,
             String laterality,
             String stature,

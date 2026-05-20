@@ -3,20 +3,25 @@ package edu.eci.userService.services;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import edu.eci.userService.repository.AthleticProfileRepository;
+import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.mappers.AthleticProfileMapper;
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
+import edu.eci.userService.entities.UserEntity;
 
 @Service
 public class AthleticProfileService {
 
     private final AthleticProfileRepository athleticProfileRepository;
     private final AthleticProfileMapper athleticProfileMapper;
+    private final UserRepository userRepository;
 
     public AthleticProfileService(AthleticProfileRepository athleticProfileRepository,
-            AthleticProfileMapper athleticProfileMapper) {
+            AthleticProfileMapper athleticProfileMapper,
+            UserRepository userRepository) {
         this.athleticProfileRepository = athleticProfileRepository;
         this.athleticProfileMapper = athleticProfileMapper;
+        this.userRepository = userRepository;
     }
 
     public List<AthleticProfileDTO> getAllAthleticProfiles() {
@@ -50,21 +55,69 @@ public class AthleticProfileService {
     }
 
     public AthleticProfileDTO createAthleticProfile(AthleticProfileDTO athleticProfileDTO) {
-        AthleticProfileEntity entity = athleticProfileMapper.toEntity(athleticProfileDTO);
+        UserEntity user = userRepository.findByEmail(athleticProfileDTO.getEmail());
+        if (user == null) {
+            throw new NoSuchElementException("User not found with email: " + athleticProfileDTO.getEmail());
+        }
+
+        // If profile already exists, update it instead of creating a duplicate
+        if (user.getAthleticProfile() != null) {
+            AthleticProfileEntity existing = user.getAthleticProfile();
+            existing.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
+            existing.setPosition(athleticProfileDTO.getPosition());
+            existing.setLaterality(athleticProfileDTO.getLaterality());
+            existing.setStature(athleticProfileDTO.getStature());
+            existing.setState(athleticProfileDTO.getState());
+            if (existing.getNickName() == null || existing.getNickName().isBlank()) {
+                existing.setNickName(user.getName() != null ? user.getName().split("@")[0] : user.getEmail().split("@")[0]);
+            }
+            return athleticProfileMapper.toDTO(athleticProfileRepository.save(existing));
+        }
+
+        // Create new profile — build manually to avoid mapper setting ID (conflicts with @MapsId)
+        AthleticProfileEntity entity = new AthleticProfileEntity();
+        entity.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
+        entity.setPosition(athleticProfileDTO.getPosition());
+        entity.setLaterality(athleticProfileDTO.getLaterality());
+        entity.setStature(athleticProfileDTO.getStature());
+        entity.setState(athleticProfileDTO.getState());
+
+        // Generate nickName if not provided
+        String nickName = athleticProfileDTO.getNickName();
+        if (nickName == null || nickName.isBlank()) {
+            String base = user.getName() != null ? user.getName() : user.getEmail();
+            nickName = base.split("@")[0].replaceAll("[^a-zA-Z0-9]", "");
+        }
+        entity.setNickName(nickName);
+
+        // Maintain BOTH sides of the bidirectional @OneToOne relationship
+        entity.setUser(user);
+        user.setAthleticProfile(entity);
+
         return athleticProfileMapper.toDTO(athleticProfileRepository.save(entity));
     }
 
     public AthleticProfileDTO updateAthleticProfile(Long userId, AthleticProfileDTO athleticProfileDTO) {
-        AthleticProfileEntity entitie = athleticProfileRepository.findById(userId).orElse(null);
-        if (entitie == null) {
-            throw new NoSuchElementException("No athletic profile found with user ID: " + userId);
+        AthleticProfileEntity entity = athleticProfileRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("No athletic profile found with user ID: " + userId));
+
+        // Update only the fields provided — preserve existing nickName
+        if (athleticProfileDTO.getDorsalNumber() != 0) {
+            entity.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
         }
-        entitie.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
-        entitie.setPosition(athleticProfileDTO.getPosition());
-        entitie.setLaterality(athleticProfileDTO.getLaterality());
-        entitie.setStature(athleticProfileDTO.getStature());
-        entitie.setState(athleticProfileDTO.getState());
-        return athleticProfileMapper.toDTO(athleticProfileRepository.save(entitie));
+        if (athleticProfileDTO.getPosition() != null) {
+            entity.setPosition(athleticProfileDTO.getPosition());
+        }
+        if (athleticProfileDTO.getLaterality() != null) {
+            entity.setLaterality(athleticProfileDTO.getLaterality());
+        }
+        if (athleticProfileDTO.getStature() != null) {
+            entity.setStature(athleticProfileDTO.getStature());
+        }
+        if (athleticProfileDTO.getState() != null) {
+            entity.setState(athleticProfileDTO.getState());
+        }
+        return athleticProfileMapper.toDTO(athleticProfileRepository.save(entity));
     }
 
     public void deleteAthleticProfile(Long userId) {

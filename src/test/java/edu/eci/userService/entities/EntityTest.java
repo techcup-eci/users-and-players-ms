@@ -28,7 +28,7 @@ class EntityTest {
         entity.setIdentificationType("CC");
         entity.setIdentificationNumber(123L);
         entity.setPhone(456L);
-        entity.setPassword("pass");
+        entity.setSystemRole("PLAYER");
 
         assertThat(entity.getId()).isEqualTo(1L);
         assertThat(entity.getName()).isEqualTo("Name");
@@ -41,7 +41,7 @@ class EntityTest {
         assertThat(entity.getIdentificationType()).isEqualTo("CC");
         assertThat(entity.getIdentificationNumber()).isEqualTo(123L);
         assertThat(entity.getPhone()).isEqualTo(456L);
-        assertThat(entity.getPassword()).isEqualTo("pass");
+        assertThat(entity.getSystemRole()).isEqualTo("PLAYER");
     }
 
     @Test

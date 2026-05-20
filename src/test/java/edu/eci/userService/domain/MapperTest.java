@@ -52,6 +52,7 @@ class MapperTest {
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
             assertThat(dto.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(dto.getPhone()).isEqualTo(3001234567L);
+            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -72,18 +73,17 @@ class MapperTest {
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
             assertThat(entity.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(entity.getPhone()).isEqualTo(3001234567L);
+            assertThat(entity.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
-        @DisplayName("toDTO no debe incluir la contraseña (campo excluido del DTO de respuesta)")
-        void toDTOShouldNotExposePassword() {
+        @DisplayName("toDTO debe mapear el systemRole (campo de identidad del sistema)")
+        void toDTOShouldMapSystemRole() {
             UserEntity entity = buildUserEntity();
-            entity.setPassword("secret_hash");
 
             UserDTO dto = userMapper.toDTO(entity);
 
-            // La contraseña no se mapea en la respuesta para no exponerla
-            assertThat(dto.getPassword()).isNull();
+            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -96,11 +96,12 @@ class MapperTest {
             assertThat(reconstructed.getName()).isEqualTo(original.getName());
             assertThat(reconstructed.getEmail()).isEqualTo(original.getEmail());
             assertThat(reconstructed.getRole()).isEqualTo(original.getRole());
+            assertThat(reconstructed.getSystemRole()).isEqualTo(original.getSystemRole());
         }
 
         // ── Builders ─────────────────────────────────────────────────────────
 
-        private UserEntity buildUserEntity() {
+            private UserEntity buildUserEntity() {
             UserEntity e = new UserEntity();
             e.setId(1L);
             e.setName("Juan Pérez");
@@ -113,7 +114,7 @@ class MapperTest {
             e.setIdentificationType("CC");
             e.setIdentificationNumber(1000123456L);
             e.setPhone(3001234567L);
-            e.setPassword("secret_hash");
+            e.setSystemRole("PLAYER");
             return e;
         }
 
@@ -130,6 +131,7 @@ class MapperTest {
             dto.setIdentificationType("CC");
             dto.setIdentificationNumber(1000123456L);
             dto.setPhone(3001234567L);
+            dto.setSystemRole("PLAYER");
             return dto;
         }
 

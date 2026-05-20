@@ -28,7 +28,7 @@ class DTOTest {
         dto.setIdentificationType("CC");
         dto.setIdentificationNumber(123L);
         dto.setPhone(456L);
-        dto.setPassword("pass");
+        dto.setSystemRole("PLAYER");
 
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getName()).isEqualTo("Name");
@@ -41,7 +41,7 @@ class DTOTest {
         assertThat(dto.getIdentificationType()).isEqualTo("CC");
         assertThat(dto.getIdentificationNumber()).isEqualTo(123L);
         assertThat(dto.getPhone()).isEqualTo(456L);
-        assertThat(dto.getPassword()).isEqualTo("pass");
+        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
     }
 
     @Test
@@ -86,8 +86,9 @@ class DTOTest {
                 "TI",
                 987L,
                 654L,
-                "secret"
+                "PLAYER"
         );
+        dto.setPassword("secret");
 
         assertThat(dto.getId()).isEqualTo(2L);
         assertThat(dto.getName()).isEqualTo("Ana");
@@ -100,6 +101,7 @@ class DTOTest {
         assertThat(dto.getIdentificationType()).isEqualTo("TI");
         assertThat(dto.getIdentificationNumber()).isEqualTo(987L);
         assertThat(dto.getPhone()).isEqualTo(654L);
+        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         assertThat(dto.getPassword()).isEqualTo("secret");
     }
 
