@@ -1,12 +1,12 @@
-name: Test Workflow
+name: Users Service CI/CD
 
 on:
   push:
+    branches:
+      - main
+      - develop
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Hello
-        run: echo "workflow funcionando"
+  pull_request:
+    branches:
+      - main
+      - develop
