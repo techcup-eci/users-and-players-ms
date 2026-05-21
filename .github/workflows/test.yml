@@ -11,10 +11,6 @@ jobs:
   build-test-docker-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: users-and-players-ms
-
     steps:
 
       - name: Checkout repository
