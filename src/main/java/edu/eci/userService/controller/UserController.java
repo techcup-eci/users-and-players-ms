@@ -27,6 +27,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping("/ping")
+    public String ping() {
+        return "ping";
+    }
+
     @GetMapping
     @Operation(summary = "List all users", description = "Get a list of all users in the system")
     public List<UserDTO> getAllUsers() {
