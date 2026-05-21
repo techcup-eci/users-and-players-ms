@@ -1,8 +1,5 @@
 package edu.eci.userService.audit;
 
-/**
- * DTO para encapsular los datos de un registro de auditoria.
- */
 public class AuditLogRequest {
 
     private String action;
@@ -15,8 +12,6 @@ public class AuditLogRequest {
     private String detail;
 
     public AuditLogRequest() {
-        // Intentionally empty: required by serializers and frameworks that
-        // instantiate DTOs via reflection before setters are applied.
     }
 
     public String getAction() { return action; }

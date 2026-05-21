@@ -1,4 +1,4 @@
-package edu.eci.userService.service;
+﻿package edu.eci.userService.service;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AthleticProfileService - Additional Branch Coverage Tests")
+@DisplayName("AthleticProfileService - casos adicionales")
 class AthleticProfileServiceAdditionalTest {
 
     @Mock
@@ -61,7 +61,6 @@ class AthleticProfileServiceAdditionalTest {
         existingProfile.setUser(sampleUser);
     }
 
-    // ── createAthleticProfile — rama: perfil ya existe ──────────────────────
 
     @Nested
     @DisplayName("createAthleticProfile() — perfil ya existente")
@@ -161,10 +160,9 @@ class AthleticProfileServiceAdditionalTest {
         }
     }
 
-    // ── updateAthleticProfile — ramas de campos con valores default ──────────
 
     @Nested
-    @DisplayName("updateAthleticProfile() — branch coverage de campos opcionales")
+    @DisplayName("updateAthleticProfile() - campos opcionales")
     class UpdateBranches {
 
         @Test
@@ -198,7 +196,6 @@ class AthleticProfileServiceAdditionalTest {
 
             athleticProfileService.updateAthleticProfile(1L, dto);
 
-            // Todos los campos deben permanecer con su valor original
             assertThat(existingProfile.getPosition()).isEqualTo("delantero");
             assertThat(existingProfile.getLaterality()).isEqualTo("diestro");
             assertThat(existingProfile.getStature()).isEqualTo("175cm");

@@ -1,4 +1,4 @@
-package edu.eci.userService.service;
+﻿package edu.eci.userService.service;
 
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.UserEntity;
@@ -26,14 +26,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para {@link UserService}.
- *
- * Estrategia TDD:
- *  - Cada método del servicio tiene un grupo @Nested con escenarios happy-path y de error.
- *  - Se usa Mockito para aislar el repositorio y el mapper.
- *  - AssertJ para aserciones expresivas.
- */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -85,7 +77,6 @@ class UserServiceTest {
         lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
 
-    // ── getAllUsers ──────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("getAllUsers()")
@@ -114,7 +105,6 @@ class UserServiceTest {
         }
     }
 
-    // ── getUserById ──────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("getUserById()")
@@ -143,7 +133,6 @@ class UserServiceTest {
         }
     }
 
-    // ── createUser ───────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("createUser()")
@@ -194,7 +183,6 @@ class UserServiceTest {
         }
     }
 
-    // ── updateUser ───────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("updateUser()")
@@ -265,7 +253,6 @@ class UserServiceTest {
         }
     }
 
-    // ── deleteUser ───────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("deleteUser()")
@@ -294,7 +281,6 @@ class UserServiceTest {
         }
     }
 
-    // ── authenticate ────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("authenticate()")

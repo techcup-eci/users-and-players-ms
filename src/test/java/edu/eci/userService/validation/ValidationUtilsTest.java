@@ -1,4 +1,4 @@
-package edu.eci.userService.validation;
+﻿package edu.eci.userService.validation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("ValidationUtils Tests")
 class ValidationUtilsTest {
 
-    // ── isValidName ─────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("isValidName: debe aceptar nombre válido")
@@ -61,7 +60,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidName("Carlos@Perez")).isFalse();
     }
 
-    // ── isValidEmail ────────────────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -104,7 +102,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidEmail("   ")).isFalse();
     }
 
-    // ── isValidAge ──────────────────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(ints = {18, 50, 100})
@@ -132,7 +129,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidAge(100)).isTrue();
     }
 
-    // ── isValidStature ──────────────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(ints = {100, 175, 300})
@@ -160,7 +156,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidStature(300)).isTrue();
     }
 
-    // ── isValidDorsal ───────────────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 50, 99})
@@ -188,7 +183,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidDorsal(99)).isTrue();
     }
 
-    // ── isValidPosition ─────────────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(strings = {"Delantero", "Portero", "Medio-centro"})
@@ -228,7 +222,6 @@ class ValidationUtilsTest {
         assertThat(ValidationUtils.isValidPosition("Centrocampista ofensivo")).isTrue();
     }
 
-    // ── getValidationErrorMessage ────────────────────────────────────────────
 
     @ParameterizedTest
     @ValueSource(strings = {"name", "email", "age", "stature", "dorsal", "position"})

@@ -1,4 +1,4 @@
-package edu.eci.userService.controller;
+﻿package edu.eci.userService.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.eci.userService.dto.UserDTO;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @Import(GlobalExceptionHandler.class)
-@DisplayName("UserController - Additional Branch Coverage Tests")
+@DisplayName("UserController - casos adicionales")
 class UserControllerAdditionalTest {
 
     @Autowired
@@ -62,7 +62,6 @@ class UserControllerAdditionalTest {
         sampleDTO.setSystemRole("PLAYER");
     }
 
-    // ── POST /api/users/login ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("POST /api/users/login")
@@ -105,7 +104,6 @@ class UserControllerAdditionalTest {
         }
     }
 
-    // ── POST /api/users/validate-jerseys ────────────────────────────────────
 
     @Nested
     @DisplayName("POST /api/users/validate-jerseys")
@@ -142,7 +140,6 @@ class UserControllerAdditionalTest {
         }
     }
 
-    // ── POST /api/users/validate-programs ───────────────────────────────────
 
     @Nested
     @DisplayName("POST /api/users/validate-programs")
@@ -169,7 +166,6 @@ class UserControllerAdditionalTest {
         }
     }
 
-    // ── PUT /api/users/{id}/system-role ─────────────────────────────────────
 
     @Nested
     @DisplayName("PUT /api/users/{id}/system-role")
@@ -209,7 +205,6 @@ class UserControllerAdditionalTest {
         }
     }
 
-    // ── GET /api/users/{id} — edge cases ────────────────────────────────────
 
     @Nested
     @DisplayName("GET /api/users/{id} — edge cases")

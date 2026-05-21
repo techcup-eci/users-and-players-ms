@@ -1,4 +1,4 @@
-package edu.eci.userService.enums;
+﻿package edu.eci.userService.enums;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Enum Coverage Tests")
 class EnumCoverageTest {
 
-    // ── UserRoleEnum ────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("UserRoleEnum: debe contener los valores esperados")
@@ -33,7 +32,6 @@ class EnumCoverageTest {
         assertThat(UserRoleEnum.valueOf("OTHER")).isEqualTo(UserRoleEnum.OTHER);
     }
 
-    // ── JoinRequestStatus ───────────────────────────────────────────────────
 
     @Test
     @DisplayName("JoinRequestStatus: debe contener exactamente tres valores")
@@ -53,7 +51,6 @@ class EnumCoverageTest {
         assertThat(JoinRequestStatus.valueOf("REJECTED")).isEqualTo(JoinRequestStatus.REJECTED);
     }
 
-    // ── UserStatus ──────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("UserStatus: debe contener ACTIVE e INACTIVE")
@@ -78,7 +75,6 @@ class EnumCoverageTest {
         assertThat(UserStatus.valueOf("INACTIVE")).isEqualTo(UserStatus.INACTIVE);
     }
 
-    // ── IdentificationType ──────────────────────────────────────────────────
 
     @Test
     @DisplayName("IdentificationType: debe contener los valores esperados")
@@ -112,7 +108,6 @@ class EnumCoverageTest {
         assertThat(IdentificationType.valueOf("OTRO")).isEqualTo(IdentificationType.OTRO);
     }
 
-    // ── UserRole ────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("UserRole: debe contener los valores esperados")
@@ -147,7 +142,6 @@ class EnumCoverageTest {
         assertThat(UserRole.valueOf("ORGANIZER")).isEqualTo(UserRole.ORGANIZER);
     }
 
-    // ── ProfileStatus ───────────────────────────────────────────────────────
 
     @Test
     @DisplayName("ProfileStatus: debe contener ACTIVE e INACTIVE")
@@ -172,7 +166,6 @@ class EnumCoverageTest {
         assertThat(ProfileStatus.valueOf("INACTIVE")).isEqualTo(ProfileStatus.INACTIVE);
     }
 
-    // ── SchoolRelation ──────────────────────────────────────────────────────
 
     @Test
     @DisplayName("SchoolRelation: debe contener los valores esperados")
@@ -202,7 +195,6 @@ class EnumCoverageTest {
         assertThat(SchoolRelation.valueOf("GUEST")).isEqualTo(SchoolRelation.GUEST);
     }
 
-    // ── AcademicLevel ───────────────────────────────────────────────────────
 
     @Test
     @DisplayName("AcademicLevel: debe contener los valores esperados")
@@ -231,7 +223,6 @@ class EnumCoverageTest {
         assertThat(AcademicLevel.valueOf("DOCTORATE")).isEqualTo(AcademicLevel.DOCTORATE);
     }
 
-    // ── LateralityType ──────────────────────────────────────────────────────
 
     @Test
     @DisplayName("LateralityType: debe contener los valores esperados")

@@ -86,9 +86,6 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    /**
-     * Updates only the systemRole field (synced from identity-ms).
-     */
     public void updateSystemRole(Long id, String systemRole) {
         UserEntity entity = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + id));

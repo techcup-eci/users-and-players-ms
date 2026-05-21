@@ -1,4 +1,4 @@
-package edu.eci.userService.domain;
+﻿package edu.eci.userService.domain;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.dto.UserDTO;
@@ -15,27 +15,17 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests unitarios para {@link UserMapper} y {@link AthleticProfileMapper}.
- *
- * Los mappers son POJOs puros — no necesitan contexto de Spring.
- * Estos tests verifican que la conversión entity↔DTO sea correcta y sin pérdida de datos.
- */
 class MapperTest {
 
     private final UserMapper userMapper = new UserMapper();
     private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
 
     @Test
-    @DisplayName("Los mappers están listos para las pruebas anidadas")
+    @DisplayName("Mappers instanciados")
     void mappersAreInstantiable() {
         assertThat(userMapper).isNotNull();
         assertThat(athleticProfileMapper).isNotNull();
     }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // UserMapper
-    // ══════════════════════════════════════════════════════════════════════════
 
     @Nested
     @DisplayName("UserMapper")
@@ -106,7 +96,6 @@ class MapperTest {
             assertThat(reconstructed.getSystemRole()).isEqualTo(original.getSystemRole());
         }
 
-        // ── Builders ─────────────────────────────────────────────────────────
 
             private UserEntity buildUserEntity() {
             UserEntity e = new UserEntity();
@@ -166,9 +155,6 @@ class MapperTest {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // AthleticProfileMapper
-    // ════════════════════════════════════
     @Nested
     @DisplayName("AthleticProfileMapper")
     class AthleticProfileMapperTests {
@@ -218,7 +204,6 @@ class MapperTest {
             assertThat(reconstructed.getNickName()).isEqualTo(original.getNickName());
         }
 
-        // ── Builders ─────────────────────────────────────────────────────────
 
         private AthleticProfileEntity buildEntity() {
             UserEntity user = new UserEntity();

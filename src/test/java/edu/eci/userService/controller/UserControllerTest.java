@@ -27,9 +27,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Tests de integracion de la capa web para UserController.
- */
 @WebMvcTest(UserController.class)
 @Import(GlobalExceptionHandler.class)
 class UserControllerTest {

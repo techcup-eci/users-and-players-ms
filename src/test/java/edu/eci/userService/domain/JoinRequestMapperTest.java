@@ -1,4 +1,4 @@
-package edu.eci.userService.domain;
+﻿package edu.eci.userService.domain;
 
 import edu.eci.userService.dto.JoinRequestDTO;
 import edu.eci.userService.dto.UserDTO;
@@ -31,15 +31,12 @@ class JoinRequestMapperTest {
         userMapper = new UserMapper();
         joinRequestMapper = new JoinRequestMapper(userMapper);
 
-        // IMPORTANTE: UserMapper.toDTO llama entity.getSemester() que es Integer.
-        // Si es null, el autoboxing a int lanza NullPointerException.
-        // Se deben setear todos los campos requeridos por UserMapper.
         playerEntity = new UserEntity();
         playerEntity.setId(1L);
         playerEntity.setName("Luis Martinez");
         playerEntity.setEmail("luis@gmail.com");
-        playerEntity.setSemester(0);          // evita NPE en autoboxing
-        playerEntity.setPhone(0L);            // evita NPE en UserMapper
+        playerEntity.setSemester(0);
+        playerEntity.setPhone(0L);
         playerEntity.setBirthDate(LocalDate.of(2000, 1, 1));
         playerEntity.setRelationship("student");
         playerEntity.setIdentificationType("CC");
@@ -53,7 +50,6 @@ class JoinRequestMapperTest {
         playerDTO.setPhone(0L);
     }
 
-    // ── toDTO ───────────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("toDTO")
@@ -123,7 +119,6 @@ class JoinRequestMapperTest {
         }
     }
 
-    // ── toEntity ────────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("toEntity")
@@ -175,7 +170,6 @@ class JoinRequestMapperTest {
         }
     }
 
-    // ── Round trip ──────────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("Round trip entity → DTO → entity")

@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import edu.eci.userService.exceptions.InvalidCredentialsException;
 
-/**
- * Centralized exception handling for controller layer.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

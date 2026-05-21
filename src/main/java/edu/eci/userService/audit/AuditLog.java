@@ -1,23 +1,8 @@
-package edu.eci.userService.audit;
+﻿package edu.eci.userService.audit;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidad que registra cada acción auditada sobre el microservicio de
- * usuarios y jugadores.
- *
- * Campos registrados:
- *  - action      : nombre lógico de la operación (CREATE_USER, UPDATE_PROFILE…)
- *  - httpMethod  : GET | POST | PUT | DELETE
- *  - endpoint    : ruta real invocada (/api/users/3, /AthleticProfile…)
- *  - entityType  : "User" o "AthleticProfile"
- *  - entityId    : ID del recurso afectado (puede ser null en listados)
- *  - performedBy : IP del cliente que realizó la petición
- *  - status      : SUCCESS | ERROR
- *  - detail      : mensaje adicional o descripción del error
- *  - timestamp   : momento exacto de la operación
- */
 @Entity
 @Table(name = "audit_logs")
 public class AuditLog {
@@ -53,7 +38,6 @@ public class AuditLog {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // ── Constructores ────────────────────────────────────────────────────────
 
     public AuditLog() {
     }
@@ -72,7 +56,6 @@ public class AuditLog {
         this.timestamp = LocalDateTime.now();
     }
 
-    // ── Getters y Setters ────────────────────────────────────────────────────
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

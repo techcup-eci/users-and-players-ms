@@ -1,4 +1,4 @@
-package edu.eci.userService.exception;
+﻿package edu.eci.userService.exception;
 
 import edu.eci.userService.exceptions.InvalidCredentialsException;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("Exception Coverage Tests")
 class ExceptionCoverageTest {
 
-    // ── TeamNotAvailableException ───────────────────────────────────────────
 
     @Test
     @DisplayName("TeamNotAvailableException: constructor con mensaje")
@@ -38,7 +37,6 @@ class ExceptionCoverageTest {
             .hasMessage("thrown");
     }
 
-    // ── UserNotFoundException ───────────────────────────────────────────────
 
     @Test
     @DisplayName("UserNotFoundException: constructor con mensaje")
@@ -65,7 +63,6 @@ class ExceptionCoverageTest {
             .hasMessage("thrown");
     }
 
-    // ── PendingJoinRequestException ─────────────────────────────────────────
 
     @Test
     @DisplayName("PendingJoinRequestException: constructor con mensaje")
@@ -92,7 +89,6 @@ class ExceptionCoverageTest {
             .hasMessage("thrown");
     }
 
-    // ── InvalidCredentialsException (paquete exceptions con 's') ───────────
 
     @Test
     @DisplayName("InvalidCredentialsException: constructor sin argumentos")

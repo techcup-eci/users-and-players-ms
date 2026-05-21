@@ -1,4 +1,4 @@
-package edu.eci.userService.service;
+﻿package edu.eci.userService.service;
 
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.UserEntity;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UserService - Additional Branch Coverage Tests")
+@DisplayName("UserService - casos adicionales")
 class UserServiceAdditionalTest {
 
     @Mock
@@ -60,10 +60,9 @@ class UserServiceAdditionalTest {
         sampleEntity.setPassword("hashed_password");
     }
 
-    // ── updateUser — ramas adicionales ──────────────────────────────────────
 
     @Nested
-    @DisplayName("updateUser() — branch coverage adicional")
+    @DisplayName("updateUser() - casos adicionales")
     class UpdateUserBranches {
 
         @Test
@@ -109,7 +108,6 @@ class UserServiceAdditionalTest {
         }
     }
 
-    // ── updateSystemRole ─────────────────────────────────────────────────────
 
     @Nested
     @DisplayName("updateSystemRole()")
@@ -138,10 +136,9 @@ class UserServiceAdditionalTest {
         }
     }
 
-    // ── authenticate — ramas adicionales ────────────────────────────────────
 
     @Nested
-    @DisplayName("authenticate() — branch coverage adicional")
+    @DisplayName("authenticate() - casos adicionales")
     class AuthenticateBranches {
 
         @Test
@@ -178,7 +175,6 @@ class UserServiceAdditionalTest {
         }
     }
 
-    // ── getUserById — rama con null ──────────────────────────────────────────
 
     @Nested
     @DisplayName("getUserById() — rama null")
