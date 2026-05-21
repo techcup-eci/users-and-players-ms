@@ -6,15 +6,22 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientResponseException;
 
 import edu.eci.userService.dto.LoginRequest;
+import edu.eci.userService.dto.RoleChangeRequest;
 import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.dto.UserRegisterRequest;
+import edu.eci.userService.services.IdentityRoleService;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 @RestController
@@ -22,9 +29,11 @@ import io.swagger.v3.oas.annotations.Operation;
 public class UserController {
 
     private final UserService userService;
+    private final IdentityRoleService identityRoleService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, IdentityRoleService identityRoleService) {
         this.userService = userService;
+        this.identityRoleService = identityRoleService;
     }
 
     @GetMapping("/ping")
@@ -46,8 +55,8 @@ public class UserController {
 
     @PostMapping("/register")
     @Operation(summary = "Create a new user", description = "Create a new user with the provided information")
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-        return userService.createUser(userDTO);
+    public UserDTO createUser(@RequestBody UserRegisterRequest request) {
+        return userService.createUser(request);
     }
 
     @PostMapping("/login")
@@ -90,14 +99,25 @@ public class UserController {
         return result;
     }
 
-    @PutMapping("/{id}/system-role")
-    @Operation(summary = "Update system role", description = "Update the systemRole field synced from identity-ms")
-    public Map<String, String> updateSystemRole(@PathVariable long id, @RequestBody Map<String, String> body) {
-        String systemRole = body.get("systemRole");
-        if (systemRole == null || systemRole.isEmpty()) {
-            return Map.of("error", "El campo 'systemRole' es requerido");
+    @PatchMapping("/{id}/system-role")
+    @Operation(summary = "Update system role", description = "Forward role change to identity-ms via the gateway")
+    public ResponseEntity<Map<String, String>> updateSystemRole(
+            @PathVariable long id,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestBody RoleChangeRequest request) {
+        String role = request != null ? request.getRole() : null;
+        if (role == null || role.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo 'role' es requerido"));
         }
-        userService.updateSystemRole(id, systemRole);
-        return Map.of("message", "System role updated successfully", "systemRole", systemRole);
+
+        try {
+            identityRoleService.updateUserRole(id, role, authorization);
+            return ResponseEntity.ok(Map.of("message", "Role updated successfully", "role", role));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        } catch (RestClientResponseException ex) {
+            return ResponseEntity.status(ex.getStatusCode())
+                    .body(Map.of("error", "Identity role update failed", "details", ex.getResponseBodyAsString()));
+        }
     }
 }

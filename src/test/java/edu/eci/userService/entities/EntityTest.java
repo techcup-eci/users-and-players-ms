@@ -1,6 +1,6 @@
 package edu.eci.userService.entities;
 
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.enums.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,27 +21,25 @@ class EntityTest {
         entity.setName("Name");
         entity.setEmail("email@test.com");
         entity.setBirthDate(birthDate);
-        entity.setRole(UserRoleEnum.STUDENT);
+        entity.setRole(UserRole.STUDENT);
         entity.setRelationship("staff");
         entity.setAcademicProgram("Program");
         entity.setSemester(1);
         entity.setIdentificationType("CC");
         entity.setIdentificationNumber(123L);
         entity.setPhone(456L);
-        entity.setSystemRole("PLAYER");
 
         assertThat(entity.getId()).isEqualTo(1L);
         assertThat(entity.getName()).isEqualTo("Name");
         assertThat(entity.getEmail()).isEqualTo("email@test.com");
         assertThat(entity.getBirthDate()).isEqualTo(birthDate);
-        assertThat(entity.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+        assertThat(entity.getRole()).isEqualTo(UserRole.STUDENT);
         assertThat(entity.getRelationship()).isEqualTo("staff");
         assertThat(entity.getAcademicProgram()).isEqualTo("Program");
         assertThat(entity.getSemester()).isEqualTo(1);
         assertThat(entity.getIdentificationType()).isEqualTo("CC");
         assertThat(entity.getIdentificationNumber()).isEqualTo(123L);
         assertThat(entity.getPhone()).isEqualTo(456L);
-        assertThat(entity.getSystemRole()).isEqualTo("PLAYER");
     }
 
     @Test

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.enums.UserRole;
 
 public class UserDTO {
 
@@ -12,23 +12,21 @@ public class UserDTO {
     private String name;
     private String email;
     private LocalDate birthDate;
-    private UserRoleEnum role;
+    private UserRole role;
     private String relationship;
     private String academicProgram;
     private int semester;
     private String identificationType;
     private Long identificationNumber;
     private Long phone;
-    private String systemRole;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     public UserDTO() {
     }
 
-    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRoleEnum role, String relationship,
-            String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone,
-            String systemRole) {
+    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRole role, String relationship,
+            String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -40,7 +38,6 @@ public class UserDTO {
         this.identificationType = identificationType;
         this.identificationNumber = identificationNumber;
         this.phone = phone;
-        this.systemRole = systemRole;
     }
 
     public long getId() {
@@ -59,7 +56,7 @@ public class UserDTO {
         return birthDate;
     }
 
-    public UserRoleEnum getRole() {
+    public UserRole getRole() {
         return role;
     }
 
@@ -87,10 +84,6 @@ public class UserDTO {
         return phone;
     }
 
-    public String getSystemRole() {
-        return systemRole;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -111,7 +104,7 @@ public class UserDTO {
         this.birthDate = birthDate;
     }
 
-    public void setRole(UserRoleEnum role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
@@ -137,10 +130,6 @@ public class UserDTO {
 
     public void setPhone(Long phone) {
         this.phone = phone;
-    }
-
-    public void setSystemRole(String systemRole) {
-        this.systemRole = systemRole;
     }
 
     public void setPassword(String password) {

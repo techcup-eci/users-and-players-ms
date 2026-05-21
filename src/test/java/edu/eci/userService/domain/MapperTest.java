@@ -1,19 +1,19 @@
 package edu.eci.userService.domain;
 
-import edu.eci.userService.dto.AthleticProfileDTO;
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.entities.AthleticProfileEntity;
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRoleEnum;
-import edu.eci.userService.mappers.AthleticProfileMapper;
-import edu.eci.userService.mappers.UserMapper;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.*;
+import edu.eci.userService.dto.AthleticProfileDTO;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.AthleticProfileEntity;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.mappers.AthleticProfileMapper;
+import edu.eci.userService.mappers.UserMapper;
 
 class MapperTest {
 
@@ -42,14 +42,13 @@ class MapperTest {
             assertThat(dto.getName()).isEqualTo("Juan Pérez");
             assertThat(dto.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(dto.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
-            assertThat(dto.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+            assertThat(dto.getRole()).isEqualTo(UserRole.STUDENT);
             assertThat(dto.getRelationship()).isEqualTo("student");
             assertThat(dto.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(dto.getSemester()).isEqualTo(5);
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
             assertThat(dto.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(dto.getPhone()).isEqualTo(3001234567L);
-            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -63,24 +62,13 @@ class MapperTest {
             assertThat(entity.getName()).isEqualTo("Juan Pérez");
             assertThat(entity.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(entity.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
-            assertThat(entity.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+            assertThat(entity.getRole()).isEqualTo(UserRole.STUDENT);
             assertThat(entity.getRelationship()).isEqualTo("student");
             assertThat(entity.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(entity.getSemester()).isEqualTo(5);
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
             assertThat(entity.getIdentificationNumber()).isEqualTo(1000123456L);
             assertThat(entity.getPhone()).isEqualTo(3001234567L);
-            assertThat(entity.getSystemRole()).isEqualTo("PLAYER");
-        }
-
-        @Test
-        @DisplayName("toDTO debe mapear el systemRole (campo de identidad del sistema)")
-        void toDTOShouldMapSystemRole() {
-            UserEntity entity = buildUserEntity();
-
-            UserDTO dto = userMapper.toDTO(entity);
-
-            assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         }
 
         @Test
@@ -93,7 +81,6 @@ class MapperTest {
             assertThat(reconstructed.getName()).isEqualTo(original.getName());
             assertThat(reconstructed.getEmail()).isEqualTo(original.getEmail());
             assertThat(reconstructed.getRole()).isEqualTo(original.getRole());
-            assertThat(reconstructed.getSystemRole()).isEqualTo(original.getSystemRole());
         }
 
 
@@ -103,14 +90,13 @@ class MapperTest {
             e.setName("Juan Pérez");
             e.setEmail("juan@eci.edu.co");
             e.setBirthDate(LocalDate.of(2000, 5, 15));
-            e.setRole(UserRoleEnum.STUDENT);
+            e.setRole(UserRole.STUDENT);
             e.setRelationship("student");
             e.setAcademicProgram("Ingeniería de Sistemas");
             e.setSemester(5);
             e.setIdentificationType("CC");
             e.setIdentificationNumber(1000123456L);
             e.setPhone(3001234567L);
-            e.setSystemRole("PLAYER");
             return e;
         }
 
@@ -120,14 +106,13 @@ class MapperTest {
             dto.setName("Juan Pérez");
             dto.setEmail("juan@eci.edu.co");
             dto.setBirthDate(LocalDate.of(2000, 5, 15));
-            dto.setRole(UserRoleEnum.STUDENT);
+            dto.setRole(UserRole.STUDENT);
             dto.setRelationship("student");
             dto.setAcademicProgram("Ingeniería de Sistemas");
             dto.setSemester(5);
             dto.setIdentificationType("CC");
             dto.setIdentificationNumber(1000123456L);
             dto.setPhone(3001234567L);
-            dto.setSystemRole("PLAYER");
             return dto;
         }
 

@@ -1,10 +1,13 @@
 package edu.eci.userService.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.dto.UserRegisterRequest;
 import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.UserRole;
 import edu.eci.userService.exceptions.InvalidCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -16,11 +19,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserRole defaultUserRole;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder,
+            @Value("${app.default.user-role:STUDENT}") String defaultUserRole) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.defaultUserRole = UserRole.valueOf(defaultUserRole);
     }
 
     public List<UserDTO> getAllUsers() {
@@ -37,9 +45,23 @@ public class UserService {
         return dto;
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
-        UserEntity entity = userMapper.toEntity(userDTO);
-        String rawPassword = userDTO.getPassword();
+    public UserDTO createUser(UserRegisterRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request is required");
+        }
+        UserEntity entity = new UserEntity();
+        entity.setName(request.getName());
+        entity.setEmail(request.getEmail());
+        entity.setBirthDate(request.getBirthDate());
+        entity.setRole(defaultUserRole);
+        entity.setRelationship(request.getRelationship());
+        entity.setAcademicProgram(request.getAcademicProgram());
+        entity.setSemester(request.getSemester());
+        entity.setIdentificationType(request.getIdentificationType());
+        entity.setIdentificationNumber(request.getIdentificationNumber());
+        entity.setPhone(request.getPhone() != null ? request.getPhone() : 0L);
+
+        String rawPassword = request.getPassword();
         if (rawPassword == null || rawPassword.isBlank()) {
             throw new IllegalArgumentException("Password is required");
         }
@@ -84,12 +106,5 @@ public class UserService {
             throw new NoSuchElementException("No user found with ID: " + id);
         }
         userRepository.deleteById(id);
-    }
-
-    public void updateSystemRole(Long id, String systemRole) {
-        UserEntity entity = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + id));
-        entity.setSystemRole(systemRole);
-        userRepository.save(entity);
     }
 }

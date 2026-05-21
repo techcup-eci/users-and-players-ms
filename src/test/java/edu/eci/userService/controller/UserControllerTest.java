@@ -3,7 +3,9 @@ package edu.eci.userService.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.dto.UserRegisterRequest;
+import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.services.IdentityRoleService;
 import edu.eci.userService.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +39,9 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private IdentityRoleService identityRoleService;
+
     private ObjectMapper objectMapper;
     private UserDTO sampleDTO;
 
@@ -50,14 +55,13 @@ class UserControllerTest {
         sampleDTO.setName("Juan Perez");
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRoleEnum.STUDENT);
+        sampleDTO.setRole(UserRole.STUDENT);
         sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
-        sampleDTO.setSystemRole("PLAYER");
     }
 
     // --- GET /api/users ---
@@ -116,16 +120,28 @@ class UserControllerTest {
         @Test
         @DisplayName("Debe retornar 200 con el usuario creado")
         void shouldReturn200WithCreatedUser() throws Exception {
-            when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
+            when(userService.createUser(any(UserRegisterRequest.class))).thenReturn(sampleDTO);
+
+            UserRegisterRequest request = new UserRegisterRequest();
+            request.setName("Juan Perez");
+            request.setEmail("juan.perez@eci.edu.co");
+            request.setBirthDate(LocalDate.of(2000, 5, 15));
+            request.setRelationship("student");
+            request.setAcademicProgram("Ingenieria de Sistemas");
+            request.setSemester(5);
+            request.setIdentificationType("CC");
+            request.setIdentificationNumber(1000123456L);
+            request.setPhone(3001234567L);
+            request.setPassword("plain_password");
 
             mockMvc.perform(post("/api/users/register")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(sampleDTO)))
+                .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is("Juan Perez")))
                     .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
 
-            verify(userService).createUser(any(UserDTO.class));
+            verify(userService).createUser(any(UserRegisterRequest.class));
         }
     }
 

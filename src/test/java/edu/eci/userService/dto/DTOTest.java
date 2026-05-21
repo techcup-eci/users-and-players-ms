@@ -3,7 +3,6 @@ package edu.eci.userService.dto;
 import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.enums.JoinRequestStatus;
 import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.enums.UserRoleEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,27 +23,25 @@ class DTOTest {
         dto.setName("Name");
         dto.setEmail("email@test.com");
         dto.setBirthDate(birthDate);
-        dto.setRole(UserRoleEnum.STUDENT);
+        dto.setRole(UserRole.STUDENT);
         dto.setRelationship("staff");
         dto.setAcademicProgram("Program");
         dto.setSemester(1);
         dto.setIdentificationType("CC");
         dto.setIdentificationNumber(123L);
         dto.setPhone(456L);
-        dto.setSystemRole("PLAYER");
 
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getName()).isEqualTo("Name");
         assertThat(dto.getEmail()).isEqualTo("email@test.com");
         assertThat(dto.getBirthDate()).isEqualTo(birthDate);
-        assertThat(dto.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+        assertThat(dto.getRole()).isEqualTo(UserRole.STUDENT);
         assertThat(dto.getRelationship()).isEqualTo("staff");
         assertThat(dto.getAcademicProgram()).isEqualTo("Program");
         assertThat(dto.getSemester()).isEqualTo(1);
         assertThat(dto.getIdentificationType()).isEqualTo("CC");
         assertThat(dto.getIdentificationNumber()).isEqualTo(123L);
         assertThat(dto.getPhone()).isEqualTo(456L);
-        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
     }
 
     @Test
@@ -82,14 +79,13 @@ class DTOTest {
                 "Ana",
                 "ana@test.com",
                 birthDate,
-                UserRoleEnum.TEACHER,
+                UserRole.TEACHER,
                 "teacher",
                 "Matematicas",
                 3,
                 "TI",
                 987L,
-                654L,
-                "PLAYER"
+            654L
         );
         dto.setPassword("secret");
 
@@ -97,14 +93,13 @@ class DTOTest {
         assertThat(dto.getName()).isEqualTo("Ana");
         assertThat(dto.getEmail()).isEqualTo("ana@test.com");
         assertThat(dto.getBirthDate()).isEqualTo(birthDate);
-        assertThat(dto.getRole()).isEqualTo(UserRoleEnum.TEACHER);
+        assertThat(dto.getRole()).isEqualTo(UserRole.TEACHER);
         assertThat(dto.getRelationship()).isEqualTo("teacher");
         assertThat(dto.getAcademicProgram()).isEqualTo("Matematicas");
         assertThat(dto.getSemester()).isEqualTo(3);
         assertThat(dto.getIdentificationType()).isEqualTo("TI");
         assertThat(dto.getIdentificationNumber()).isEqualTo(987L);
         assertThat(dto.getPhone()).isEqualTo(654L);
-        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
         assertThat(dto.getPassword()).isEqualTo("secret");
     }
 
@@ -179,11 +174,11 @@ class DTOTest {
     @Test
     @DisplayName("RoleChangeRequest: Constructor y accessors")
     void roleChangeRequestCoverageTest() {
-        RoleChangeRequest byConstructor = new RoleChangeRequest(UserRole.ORGANIZER);
-        assertThat(byConstructor.getNewRole()).isEqualTo(UserRole.ORGANIZER);
+        RoleChangeRequest byConstructor = new RoleChangeRequest("ORGANIZER");
+        assertThat(byConstructor.getRole()).isEqualTo("ORGANIZER");
 
         RoleChangeRequest bySetter = new RoleChangeRequest();
-        bySetter.setNewRole(UserRole.STUDENT);
-        assertThat(bySetter.getNewRole()).isEqualTo(UserRole.STUDENT);
+        bySetter.setRole("PLAYER");
+        assertThat(bySetter.getRole()).isEqualTo("PLAYER");
     }
 }

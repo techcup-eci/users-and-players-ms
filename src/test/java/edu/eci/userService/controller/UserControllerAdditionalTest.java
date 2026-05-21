@@ -2,8 +2,9 @@ package edu.eci.userService.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.enums.UserRole;
 import edu.eci.userService.exceptions.InvalidCredentialsException;
+import edu.eci.userService.services.IdentityRoleService;
 import edu.eci.userService.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,11 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +39,9 @@ class UserControllerAdditionalTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private IdentityRoleService identityRoleService;
+
     private ObjectMapper objectMapper;
     private UserDTO sampleDTO;
 
@@ -52,14 +55,13 @@ class UserControllerAdditionalTest {
         sampleDTO.setName("Juan Perez");
         sampleDTO.setEmail("juan@gmail.com");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRoleEnum.STUDENT);
+        sampleDTO.setRole(UserRole.STUDENT);
         sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
-        sampleDTO.setSystemRole("PLAYER");
     }
 
 
@@ -168,39 +170,40 @@ class UserControllerAdditionalTest {
 
 
     @Nested
-    @DisplayName("PUT /api/users/{id}/system-role")
+    @DisplayName("PATCH /api/users/{id}/system-role")
     class UpdateSystemRole {
 
         @Test
-        @DisplayName("Debe retornar 200 cuando el systemRole es válido")
+        @DisplayName("Debe retornar 200 cuando el role es válido")
         void shouldReturn200WithValidSystemRole() throws Exception {
-            doNothing().when(userService).updateSystemRole(1L, "CAPTAIN");
-
-            mockMvc.perform(put("/api/users/1/system-role")
+            mockMvc.perform(patch("/api/users/1/system-role")
+                    .header("Authorization", "Bearer token")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"systemRole\": \"CAPTAIN\"}"))
+                    .content("{\"role\": \"CAPTAIN\"}"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("System role updated successfully")))
-                    .andExpect(jsonPath("$.systemRole", is("CAPTAIN")));
+                    .andExpect(jsonPath("$.message", is("Role updated successfully")))
+                    .andExpect(jsonPath("$.role", is("CAPTAIN")));
         }
 
         @Test
-        @DisplayName("Debe retornar error cuando systemRole es vacío")
+        @DisplayName("Debe retornar 400 cuando role es vacío")
         void shouldReturnErrorWhenSystemRoleIsEmpty() throws Exception {
-            mockMvc.perform(put("/api/users/1/system-role")
+            mockMvc.perform(patch("/api/users/1/system-role")
+                    .header("Authorization", "Bearer token")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"systemRole\": \"\"}"))
-                    .andExpect(status().isOk())
+                    .content("{\"role\": \"\"}"))
+                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error").exists());
         }
 
         @Test
-        @DisplayName("Debe retornar error cuando falta el campo systemRole")
+        @DisplayName("Debe retornar 400 cuando falta el campo role")
         void shouldReturnErrorWhenSystemRoleFieldMissing() throws Exception {
-            mockMvc.perform(put("/api/users/1/system-role")
+            mockMvc.perform(patch("/api/users/1/system-role")
+                    .header("Authorization", "Bearer token")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{}"))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error").exists());
         }
     }

@@ -1,22 +1,23 @@
 package edu.eci.userService.dto;
 
-import edu.eci.userService.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class RoleChangeRequest {
-    private UserRole newRole;
+    @JsonAlias("systemRole")
+    private String role;
 
     public RoleChangeRequest() {
     }
 
-    public RoleChangeRequest(UserRole newRole) {
-        this.newRole = newRole;
+    public RoleChangeRequest(String role) {
+        this.role = role;
     }
 
-    public UserRole getNewRole() {
-        return newRole;
+    public String getRole() {
+        return role;
     }
 
-    public void setNewRole(UserRole newRole) {
-        this.newRole = newRole;
+    public void setRole(String role) {
+        this.role = role;
     }
 }

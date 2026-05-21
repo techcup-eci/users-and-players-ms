@@ -2,7 +2,7 @@ package edu.eci.userService.service;
 
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.enums.UserRole;
 import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.UserService;
@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -42,21 +41,20 @@ class UserServiceAdditionalTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper, passwordEncoder);
+        userService = new UserService(userRepository, userMapper, passwordEncoder, "STUDENT");
 
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
         sampleEntity.setEmail("juan@gmail.com");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleEntity.setRole(UserRoleEnum.STUDENT);
+        sampleEntity.setRole(UserRole.STUDENT);
         sampleEntity.setRelationship("student");
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
         sampleEntity.setIdentificationNumber(1000123456L);
         sampleEntity.setPhone(3001234567L);
-        sampleEntity.setSystemRole("PLAYER");
         sampleEntity.setPassword("hashed_password");
     }
 
@@ -90,7 +88,7 @@ class UserServiceAdditionalTest {
             updatedDTO.setName("Nombre Actualizado");
             updatedDTO.setEmail("nuevo@gmail.com");
             updatedDTO.setBirthDate(LocalDate.of(1999, 1, 1));
-            updatedDTO.setRole(UserRoleEnum.TEACHER);
+            updatedDTO.setRole(UserRole.TEACHER);
             updatedDTO.setRelationship("teacher");
             updatedDTO.setAcademicProgram("Matemáticas");
             updatedDTO.setSemester(0);
@@ -102,37 +100,9 @@ class UserServiceAdditionalTest {
 
             assertThat(sampleEntity.getName()).isEqualTo("Nombre Actualizado");
             assertThat(sampleEntity.getEmail()).isEqualTo("nuevo@gmail.com");
-            assertThat(sampleEntity.getRole()).isEqualTo(UserRoleEnum.TEACHER);
+            assertThat(sampleEntity.getRole()).isEqualTo(UserRole.TEACHER);
             assertThat(sampleEntity.getSemester()).isEqualTo(0);
             verify(userRepository).save(sampleEntity);
-        }
-    }
-
-
-    @Nested
-    @DisplayName("updateSystemRole()")
-    class UpdateSystemRole {
-
-        @Test
-        @DisplayName("Debe actualizar el systemRole cuando el usuario existe")
-        void shouldUpdateSystemRoleWhenUserExists() {
-            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
-            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
-
-            userService.updateSystemRole(1L, "CAPTAIN");
-
-            assertThat(sampleEntity.getSystemRole()).isEqualTo("CAPTAIN");
-            verify(userRepository).save(sampleEntity);
-        }
-
-        @Test
-        @DisplayName("Debe lanzar NoSuchElementException cuando el usuario no existe")
-        void shouldThrowWhenUserNotFound() {
-            when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> userService.updateSystemRole(99L, "CAPTAIN"))
-                    .isInstanceOf(NoSuchElementException.class)
-                    .hasMessageContaining("99");
         }
     }
 

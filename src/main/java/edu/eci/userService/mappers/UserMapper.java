@@ -23,7 +23,6 @@ public class UserMapper {
         dto.setIdentificationType(entity.getIdentificationType());
         dto.setIdentificationNumber(entity.getIdentificationNumber());
         dto.setPhone(entity.getPhone());
-        dto.setSystemRole(entity.getSystemRole());
         return dto;
     }
 
@@ -44,7 +43,6 @@ public class UserMapper {
         entity.setIdentificationType(dto.getIdentificationType());
         entity.setIdentificationNumber(dto.getIdentificationNumber());
         entity.setPhone(dto.getPhone() != null ? dto.getPhone() : 0L);
-        entity.setSystemRole(dto.getSystemRole());
         return entity;
     }
 }

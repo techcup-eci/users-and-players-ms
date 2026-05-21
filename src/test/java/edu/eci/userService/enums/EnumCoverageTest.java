@@ -11,29 +11,6 @@ class EnumCoverageTest {
 
 
     @Test
-    @DisplayName("UserRoleEnum: debe contener los valores esperados")
-    void userRoleEnumValues() {
-        assertThat(UserRoleEnum.values()).containsExactlyInAnyOrder(
-            UserRoleEnum.STUDENT,
-            UserRoleEnum.TEACHER,
-            UserRoleEnum.STAFF,
-            UserRoleEnum.GRADUATE,
-            UserRoleEnum.OTHER
-        );
-    }
-
-    @Test
-    @DisplayName("UserRoleEnum: valueOf debe funcionar correctamente")
-    void userRoleEnumValueOf() {
-        assertThat(UserRoleEnum.valueOf("STUDENT")).isEqualTo(UserRoleEnum.STUDENT);
-        assertThat(UserRoleEnum.valueOf("TEACHER")).isEqualTo(UserRoleEnum.TEACHER);
-        assertThat(UserRoleEnum.valueOf("STAFF")).isEqualTo(UserRoleEnum.STAFF);
-        assertThat(UserRoleEnum.valueOf("GRADUATE")).isEqualTo(UserRoleEnum.GRADUATE);
-        assertThat(UserRoleEnum.valueOf("OTHER")).isEqualTo(UserRoleEnum.OTHER);
-    }
-
-
-    @Test
     @DisplayName("JoinRequestStatus: debe contener exactamente tres valores")
     void joinRequestStatusValues() {
         assertThat(JoinRequestStatus.values()).containsExactlyInAnyOrder(
@@ -115,11 +92,11 @@ class EnumCoverageTest {
         assertThat(UserRole.values()).containsExactlyInAnyOrder(
             UserRole.STUDENT,
             UserRole.GRADUATE,
-            UserRole.PROFESSOR,
             UserRole.ADMINISTRATIVE_STAFF,
-            UserRole.FAMILY_MEMBER,
             UserRole.ADMINISTRATOR,
-            UserRole.ORGANIZER
+            UserRole.ORGANIZER,
+            UserRole.TEACHER,
+            UserRole.OTHER
         );
     }
 
@@ -128,11 +105,11 @@ class EnumCoverageTest {
     void userRoleToString() {
         assertThat(UserRole.STUDENT.toString()).isEqualTo("STUDENT");
         assertThat(UserRole.GRADUATE.toString()).isEqualTo("GRADUATE");
-        assertThat(UserRole.PROFESSOR.toString()).isEqualTo("PROFESSOR");
         assertThat(UserRole.ADMINISTRATIVE_STAFF.toString()).isEqualTo("ADMINISTRATIVE_STAFF");
-        assertThat(UserRole.FAMILY_MEMBER.toString()).isEqualTo("FAMILY_MEMBER");
         assertThat(UserRole.ADMINISTRATOR.toString()).isEqualTo("ADMINISTRATOR");
         assertThat(UserRole.ORGANIZER.toString()).isEqualTo("ORGANIZER");
+        assertThat(UserRole.TEACHER.toString()).isEqualTo("TEACHER");
+        assertThat(UserRole.OTHER.toString()).isEqualTo("OTHER");
     }
 
     @Test

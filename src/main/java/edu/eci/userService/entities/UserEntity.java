@@ -2,7 +2,7 @@ package edu.eci.userService.entities;
 
 import java.time.LocalDate;
 
-import edu.eci.userService.enums.UserRoleEnum;
+import edu.eci.userService.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,8 +34,8 @@ public class UserEntity {
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Enumerated(EnumType.STRING) // Enum relationes in the dir: enums.UserRoleEnum
-    private UserRoleEnum role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @Column(nullable = false)
     private String relationship; // Relationship with the university (student, teacher, etc)
@@ -54,9 +54,6 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Long phone = 0L;
-
-    @Column
-    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private AthleticProfileEntity athleticProfile;
@@ -81,7 +78,7 @@ public class UserEntity {
         return birthDate;
     }
 
-    public UserRoleEnum getRole() {
+    public UserRole getRole() {
         return role;
     }
 
@@ -109,9 +106,6 @@ public class UserEntity {
         return phone;
     }
 
-    public String getSystemRole() {
-        return systemRole;
-    }
 
     public void setId(Long id) {
         this.id = id;
@@ -133,7 +127,7 @@ public class UserEntity {
         this.birthDate = birthDate;
     }
 
-    public void setRole(UserRoleEnum role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
     public void setRelationship(String relationship) {
@@ -160,9 +154,6 @@ public class UserEntity {
         this.phone = phone;
     }
 
-    public void setSystemRole(String systemRole) {
-        this.systemRole = systemRole;
-    }
 
     public AthleticProfileEntity getAthleticProfile() {
         return athleticProfile;

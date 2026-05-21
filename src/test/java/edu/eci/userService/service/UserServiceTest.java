@@ -1,30 +1,34 @@
 package edu.eci.userService.service;
 
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRoleEnum;
-import edu.eci.userService.mappers.UserMapper;
-import edu.eci.userService.repository.UserRepository;
-import edu.eci.userService.services.UserService;
-import edu.eci.userService.exceptions.InvalidCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.mockito.Mock;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.dto.UserRegisterRequest;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import edu.eci.userService.mappers.UserMapper;
+import edu.eci.userService.repository.UserRepository;
+import edu.eci.userService.services.UserService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -41,23 +45,23 @@ class UserServiceTest {
 
     private UserEntity sampleEntity;
     private UserDTO sampleDTO;
+    private UserRegisterRequest sampleRegisterRequest;
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper, passwordEncoder);
+        userService = new UserService(userRepository, userMapper, passwordEncoder, "STUDENT");
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
         sampleEntity.setEmail("juan.perez@eci.edu.co");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleEntity.setRole(UserRoleEnum.STUDENT);
+        sampleEntity.setRole(UserRole.STUDENT);
         sampleEntity.setRelationship("student");
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
         sampleEntity.setIdentificationNumber(1000123456L);
         sampleEntity.setPhone(3001234567L);
-        sampleEntity.setSystemRole("PLAYER");
         sampleEntity.setPassword("hashed_password");
 
         sampleDTO = new UserDTO();
@@ -65,7 +69,7 @@ class UserServiceTest {
         sampleDTO.setName("Juan Pérez");
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRoleEnum.STUDENT);
+        sampleDTO.setRole(UserRole.STUDENT);
         sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
@@ -73,6 +77,18 @@ class UserServiceTest {
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
         sampleDTO.setPassword("plain_password");
+
+        sampleRegisterRequest = new UserRegisterRequest();
+        sampleRegisterRequest.setName("Juan Pérez");
+        sampleRegisterRequest.setEmail("juan.perez@eci.edu.co");
+        sampleRegisterRequest.setBirthDate(LocalDate.of(2000, 5, 15));
+        sampleRegisterRequest.setRelationship("student");
+        sampleRegisterRequest.setAcademicProgram("Ingeniería de Sistemas");
+        sampleRegisterRequest.setSemester(5);
+        sampleRegisterRequest.setIdentificationType("CC");
+        sampleRegisterRequest.setIdentificationNumber(1000123456L);
+        sampleRegisterRequest.setPhone(3001234567L);
+        sampleRegisterRequest.setPassword("plain_password");
 
         lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
@@ -143,7 +159,7 @@ class UserServiceTest {
         void shouldPersistAndReturnDTO() {
             when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            UserDTO result = userService.createUser(sampleDTO);
+            UserDTO result = userService.createUser(sampleRegisterRequest);
 
             assertThat(result).isNotNull();
             assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
@@ -155,9 +171,9 @@ class UserServiceTest {
         void shouldMapAllFieldsOnCreate() {
             when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            UserDTO result = userService.createUser(sampleDTO);
+            UserDTO result = userService.createUser(sampleRegisterRequest);
 
-            assertThat(result.getRole()).isEqualTo(UserRoleEnum.STUDENT);
+            assertThat(result.getRole()).isEqualTo(UserRole.STUDENT);
             assertThat(result.getSemester()).isEqualTo(5);
             assertThat(result.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
         }
@@ -165,9 +181,9 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña es null")
         void shouldThrowWhenPasswordIsNull() {
-            sampleDTO.setPassword(null);
+            sampleRegisterRequest.setPassword(null);
 
-            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+            assertThatThrownBy(() -> userService.createUser(sampleRegisterRequest))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Password");
         }
@@ -175,9 +191,9 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña esta vacia")
         void shouldThrowWhenPasswordIsBlank() {
-            sampleDTO.setPassword(" ");
+            sampleRegisterRequest.setPassword(" ");
 
-            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+            assertThatThrownBy(() -> userService.createUser(sampleRegisterRequest))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Password");
         }
@@ -195,7 +211,7 @@ class UserServiceTest {
             updatedDTO.setName("Juan Actualizado");
             updatedDTO.setEmail("juan.perez@eci.edu.co");
             updatedDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-            updatedDTO.setRole(UserRoleEnum.STUDENT);
+            updatedDTO.setRole(UserRole.STUDENT);
             updatedDTO.setRelationship("student");
             updatedDTO.setAcademicProgram("Ingeniería de IA");
             updatedDTO.setSemester(6);

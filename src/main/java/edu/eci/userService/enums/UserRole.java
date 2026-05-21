@@ -3,11 +3,12 @@ package edu.eci.userService.enums;
 public enum UserRole {
     STUDENT,
     GRADUATE,
-    PROFESSOR,
+    TEACHER,
     ADMINISTRATIVE_STAFF,
-    FAMILY_MEMBER,
     ADMINISTRATOR,
-    ORGANIZER;
+    ORGANIZER,
+    OTHER;
+     
 
     @Override
     public String toString() {
