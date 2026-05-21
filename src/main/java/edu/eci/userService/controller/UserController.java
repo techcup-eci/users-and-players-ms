@@ -27,7 +27,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/ping")
+    @GetMapping("/ping")
     public String ping() {
         return "ping";
     }
