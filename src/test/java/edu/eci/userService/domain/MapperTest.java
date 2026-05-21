@@ -26,6 +26,13 @@ class MapperTest {
     private final UserMapper userMapper = new UserMapper();
     private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
 
+    @Test
+    @DisplayName("Los mappers están listos para las pruebas anidadas")
+    void mappersAreInstantiable() {
+        assertThat(userMapper).isNotNull();
+        assertThat(athleticProfileMapper).isNotNull();
+    }
+
     // ══════════════════════════════════════════════════════════════════════════
     // UserMapper
     // ══════════════════════════════════════════════════════════════════════════
