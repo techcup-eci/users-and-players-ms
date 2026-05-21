@@ -68,4 +68,76 @@ class DTOTest {
         assertThat(dto.getState()).isEqualTo("Active");
         assertThat(dto.getUser()).isEqualTo(user);
     }
+
+    @Test
+    @DisplayName("UserDTO: Constructor completo")
+    void userDTOFullConstructorTest() {
+        LocalDate birthDate = LocalDate.of(1999, 12, 31);
+
+        UserDTO dto = new UserDTO(
+                2L,
+                "Ana",
+                "ana@test.com",
+                birthDate,
+                UserRoleEnum.TEACHER,
+                "teacher",
+                "Matematicas",
+                3,
+                "TI",
+                987L,
+                654L,
+                "PLAYER"
+        );
+        dto.setPassword("secret");
+
+        assertThat(dto.getId()).isEqualTo(2L);
+        assertThat(dto.getName()).isEqualTo("Ana");
+        assertThat(dto.getEmail()).isEqualTo("ana@test.com");
+        assertThat(dto.getBirthDate()).isEqualTo(birthDate);
+        assertThat(dto.getRole()).isEqualTo(UserRoleEnum.TEACHER);
+        assertThat(dto.getRelationship()).isEqualTo("teacher");
+        assertThat(dto.getAcademicProgram()).isEqualTo("Matematicas");
+        assertThat(dto.getSemester()).isEqualTo(3);
+        assertThat(dto.getIdentificationType()).isEqualTo("TI");
+        assertThat(dto.getIdentificationNumber()).isEqualTo(987L);
+        assertThat(dto.getPhone()).isEqualTo(654L);
+        assertThat(dto.getSystemRole()).isEqualTo("PLAYER");
+        assertThat(dto.getPassword()).isEqualTo("secret");
+    }
+
+    @Test
+    @DisplayName("AthleticProfileDTO: Constructor completo")
+    void athleticProfileDTOFullConstructorTest() {
+        UserEntity user = new UserEntity();
+        user.setId(7L);
+
+        AthleticProfileDTO dto = new AthleticProfileDTO(
+                9,
+                3L,
+                user,
+                "Nick",
+                "defensa",
+                "zurdo",
+                "170",
+                "activo"
+        );
+
+        assertThat(dto.getDorsalNumber()).isEqualTo(9);
+        assertThat(dto.getId()).isEqualTo(3L);
+        assertThat(dto.getUser()).isEqualTo(user);
+        assertThat(dto.getNickName()).isEqualTo("Nick");
+        assertThat(dto.getPosition()).isEqualTo("defensa");
+        assertThat(dto.getLaterality()).isEqualTo("zurdo");
+        assertThat(dto.getStature()).isEqualTo("170");
+        assertThat(dto.getState()).isEqualTo("activo");
+    }
+
+    @Test
+    @DisplayName("LoginRequest: Constructor completo")
+    void loginRequestFullConstructorTest() {
+        LoginRequest request = new LoginRequest("mail@test.com", "pwd");
+
+        assertThat(request.getEmail()).isEqualTo("mail@test.com");
+        assertThat(request.getPassword()).isEqualTo("pwd");
+    }
 }

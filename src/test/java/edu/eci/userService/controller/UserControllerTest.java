@@ -54,7 +54,7 @@ class UserControllerTest {
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationShip("student");
+        sampleDTO.setRelationship("student");
         sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
@@ -122,8 +122,8 @@ class UserControllerTest {
             when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
 
             mockMvc.perform(post("/api/users/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(sampleDTO)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(sampleDTO)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is("Juan Perez")))
                     .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
@@ -149,8 +149,8 @@ class UserControllerTest {
             when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedDTO);
 
             mockMvc.perform(put("/api/users/1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updatedDTO)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedDTO)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is("Juan Actualizado")));
         }

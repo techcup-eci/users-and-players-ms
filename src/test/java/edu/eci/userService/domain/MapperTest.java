@@ -146,11 +146,23 @@ class MapperTest {
         void toEntityShouldReturnNullWhenDTOIsNull() {
             assertThat(userMapper.toEntity(null)).isNull();
         }
+
+        @Test
+        @DisplayName("toEntity no debe setear id cuando es 0")
+        void toEntityShouldIgnoreZeroId() {
+            UserDTO dto = buildUserDTO();
+            dto.setId(0);
+
+            UserEntity entity = userMapper.toEntity(dto);
+
+            assertThat(entity.getId()).isNull();
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
     // AthleticProfileMapper
     // ════════════════════════════════════
+    @Nested
     @DisplayName("AthleticProfileMapper")
     class AthleticProfileMapperTests {
 

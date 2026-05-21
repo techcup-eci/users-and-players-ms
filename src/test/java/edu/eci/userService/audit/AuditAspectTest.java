@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -165,10 +164,9 @@ class AuditAspectTest {
     @Test
     @DisplayName("Debe manejar metodos desconocidos")
     void unknownMethodActionTest() throws Throwable {
-        // Creamos un metodo ficticio para probar el fallback de resolveAction
         class Fake { public void customOp() {} }
         Method method = Fake.class.getMethod("customOp");
-        
+
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
         when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{});
@@ -185,5 +183,49 @@ class AuditAspectTest {
 
         assertThat(req.getAction()).isEqualTo("CUSTOMOP_ATHLETICPROFILE");
         assertThat(req.getEntityType()).isEqualTo("AthleticProfile");
+    }
+
+    @Test
+    @DisplayName("Debe auditar UPDATE con ID")
+    void auditUpdateWithIdTest() throws Throwable {
+        Method method = UserController.class.getMethod("updateUser", long.class, UserDTO.class);
+        when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
+        when(methodSignature.getMethod()).thenReturn(method);
+        when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{1L, new UserDTO()});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
+        when(httpServletRequest.getMethod()).thenReturn("PUT");
+        when(httpServletRequest.getRequestURI()).thenReturn("/api/users/1");
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        auditAspect.auditUser(proceedingJoinPoint);
+
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getAction()).isEqualTo("UPDATE_USER");
+        assertThat(req.getEntityId()).isEqualTo("1");
+        assertThat(req.getStatus()).isEqualTo("SUCCESS");
+    }
+
+    @Test
+    @DisplayName("Debe manejar ausencia de contexto HTTP")
+    void auditWithoutRequestContextTest() throws Throwable {
+        RequestContextHolder.resetRequestAttributes();
+        Method method = UserController.class.getMethod("createUser", UserDTO.class);
+        when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
+        when(methodSignature.getMethod()).thenReturn(method);
+        when(proceedingJoinPoint.getArgs()).thenReturn(new Object[]{new UserDTO()});
+        when(proceedingJoinPoint.proceed()).thenReturn("result");
+
+        auditAspect.auditUser(proceedingJoinPoint);
+
+        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
+        verify(auditService).log(captor.capture());
+        AuditLogRequest req = captor.getValue();
+
+        assertThat(req.getHttpMethod()).isEqualTo("UNKNOWN");
+        assertThat(req.getEndpoint()).isEqualTo("UNKNOWN");
+        assertThat(req.getPerformedBy()).isEqualTo("UNKNOWN");
     }
 }

@@ -172,6 +172,26 @@ class UserServiceTest {
             assertThat(result.getSemester()).isEqualTo(5);
             assertThat(result.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
         }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña es null")
+        void shouldThrowWhenPasswordIsNull() {
+            sampleDTO.setPassword(null);
+
+            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Password");
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña esta vacia")
+        void shouldThrowWhenPasswordIsBlank() {
+            sampleDTO.setPassword(" ");
+
+            assertThatThrownBy(() -> userService.createUser(sampleDTO))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Password");
+        }
     }
 
     // ── updateUser ───────────────────────────────────────────────────────────
@@ -212,6 +232,36 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.updateUser(99L, sampleDTO))
                     .isInstanceOf(NoSuchElementException.class)
                     .hasMessageContaining("99");
+        }
+
+        @Test
+        @DisplayName("Debe actualizar el password cuando se envia uno nuevo")
+        void shouldUpdatePasswordWhenProvided() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(passwordEncoder.encode("new_password")).thenReturn("hashed_new_password");
+            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
+
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setPassword("new_password");
+
+            userService.updateUser(1L, updatedDTO);
+
+            verify(passwordEncoder).encode("new_password");
+            assertThat(sampleEntity.getPassword()).isEqualTo("hashed_new_password");
+        }
+
+        @Test
+        @DisplayName("No debe actualizar el password cuando esta vacio")
+        void shouldNotUpdatePasswordWhenBlank() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
+            when(userRepository.save(sampleEntity)).thenReturn(sampleEntity);
+
+            UserDTO updatedDTO = new UserDTO();
+            updatedDTO.setPassword(" ");
+
+            userService.updateUser(1L, updatedDTO);
+
+            verify(passwordEncoder, never()).encode(any());
         }
     }
 
@@ -289,6 +339,20 @@ class UserServiceTest {
 
             assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", ""))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando email es null")
+        void shouldThrowWhenEmailIsNull() {
+            assertThatThrownBy(() -> userService.authenticate(null, "plain_password"))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando password es null")
+        void shouldThrowWhenPasswordIsNull() {
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", null))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

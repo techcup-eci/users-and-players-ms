@@ -119,10 +119,6 @@ public class UserDTO {
         this.relationship = relationship;
     }
 
-    public void setRelationShip(String relationship) {
-        this.relationship = relationship;
-    }
-
     public void setAcademicProgram(String academicProgram) {
         this.academicProgram = academicProgram;
     }
