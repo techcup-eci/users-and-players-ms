@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.enums;
+package edu.eci.userService.enums;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

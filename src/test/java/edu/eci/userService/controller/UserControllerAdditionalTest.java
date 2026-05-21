@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.controller;
+package edu.eci.userService.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.eci.userService.dto.UserDTO;

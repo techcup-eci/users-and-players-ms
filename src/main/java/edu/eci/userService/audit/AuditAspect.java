@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.audit;
+package edu.eci.userService.audit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;

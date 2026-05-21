@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.service;
+package edu.eci.userService.service;
 
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.UserEntity;

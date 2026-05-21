@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.domain;
+package edu.eci.userService.domain;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.dto.UserDTO;

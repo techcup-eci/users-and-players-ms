@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.service;
+package edu.eci.userService.service;
 
 import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;

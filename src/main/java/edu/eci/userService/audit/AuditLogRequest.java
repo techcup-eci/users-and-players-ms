@@ -12,6 +12,7 @@ public class AuditLogRequest {
     private String detail;
 
     public AuditLogRequest() {
+        // Sin cuerpo: JPA/Spring instancian el DTO y rellenan campos con setters.
     }
 
     public String getAction() { return action; }

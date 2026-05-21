@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.exception;
+package edu.eci.userService.exception;
 
 import edu.eci.userService.exceptions.InvalidCredentialsException;
 import org.junit.jupiter.api.DisplayName;

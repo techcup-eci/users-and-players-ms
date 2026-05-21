@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.audit;
+package edu.eci.userService.audit;
 
 import org.springframework.stereotype.Service;
 

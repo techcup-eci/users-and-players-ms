@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.validation;
+package edu.eci.userService.validation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -40,6 +40,7 @@ public class AuditLog {
 
 
     public AuditLog() {
+        // Sin cuerpo: requerido por JPA para entidades @Entity.
     }
 
     public AuditLog(String action, String httpMethod, String endpoint,
