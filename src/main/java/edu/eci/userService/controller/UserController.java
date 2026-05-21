@@ -1,5 +1,6 @@
 package edu.eci.userService.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,6 @@ import edu.eci.userService.dto.LoginRequest;
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -113,4 +110,5 @@ public class UserController {
         userService.updateSystemRole(id, systemRole);
         return Map.of("message", "System role updated successfully", "systemRole", systemRole);
     }
+    // prueba ci/cd
 }
