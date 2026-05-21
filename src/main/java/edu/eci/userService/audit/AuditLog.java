@@ -1,4 +1,4 @@
-﻿package edu.eci.userService.audit;
+package edu.eci.userService.audit;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
