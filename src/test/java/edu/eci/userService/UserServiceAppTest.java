@@ -1,21 +1,26 @@
 package edu.eci.userService;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+@DisplayName("UserServiceApp Tests")
 class UserServiceAppTest {
 
     @Test
+    @DisplayName("La clase UserServiceApp puede ser instanciada")
     void applicationStarts() {
-        // Test simple para cubrir la clase principal y su constructor
         UserServiceApp app = new UserServiceApp();
         assertThat(app).isNotNull();
     }
-    
+
     @Test
-    void testMainMethod() {
-        // Test para verificar que el método main existe y puede ser ejecutado
+    @DisplayName("La clase UserServiceApp existe")
+    void testMainClass() {
         assertThat(UserServiceApp.class).isNotNull();
     }
 }
