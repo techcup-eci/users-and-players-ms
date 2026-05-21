@@ -55,9 +55,18 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Docker image to Azure Web App
+      - name: Configure Docker image in Azure Web App
         run: |
           az webapp config container set \
             --name usersandplayers \
             --resource-group TechCup \
-            --docker-custom-image-name ${{ secrets.DOCKER_USERNAME }}/users-service:latest
+            --docker-custom-image-name ${{ secrets.DOCKER_USERNAME }}/users-service:latest \
+            --docker-registry-server-url https://index.docker.io \
+            --docker-registry-server-user ${{ secrets.DOCKER_USERNAME }} \
+            --docker-registry-server-password ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Restart Azure Web App
+        run: |
+          az webapp restart \
+            --name usersandplayers \
+            --resource-group TechCup

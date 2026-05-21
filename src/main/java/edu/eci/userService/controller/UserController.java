@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping("/ping")
     public String ping() {
-        return "hola mundo";
+        return "hola mundo!";
     }
 
     @GetMapping
