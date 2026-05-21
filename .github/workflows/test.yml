@@ -55,9 +55,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Container App
+      - name: Deploy Docker image to Azure Web App
         run: |
-          az containerapp update \
-            --name users-service \
-            --resource-group techcup-rg \
-            --image ${{ secrets.DOCKER_USERNAME }}/users-service:latest
+          az webapp config container set \
+            --name usersandplayers \
+            --resource-group TechCup \
+            --docker-custom-image-name ${{ secrets.DOCKER_USERNAME }}/users-service:latest
