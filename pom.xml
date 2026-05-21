@@ -26,10 +26,12 @@
 		<sonar.projectName>userService</sonar.projectName>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
 
-		<!-- JaCoCo coverage -->
+		<!-- JaCoCo → SonarQube (ruta absoluta para que el scanner encuentre el XML) -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.coverage.jacoco.xmlReportPaths>
-			target/site/jacoco/jacoco.xml
+			${project.build.directory}/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
 	</properties>
 
 	<dependencies>
@@ -150,14 +152,58 @@
 						</goals>
 					</execution>
 
-					<!-- Generate coverage report -->
+					<!-- Reporte tras tests (disponible antes de verify, p. ej. sonar:sonar) -->
 					<execution>
 						<id>report</id>
-						<phase>verify</phase>
-
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
+					</execution>
+
+					<!-- Reporte final en verify (HTML/XML para revisión local) -->
+					<execution>
+						<id>report-verify</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+
+					<!-- Umbral mínimo 80% en capa de servicios (RNF-08) -->
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+								<rule>
+									<element>PACKAGE</element>
+									<includes>
+										<include>edu.eci.userService.services</include>
+									</includes>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
 					</execution>
 
 				</executions>

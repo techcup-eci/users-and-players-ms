@@ -24,9 +24,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Tests de integración de la capa web para {@link AthleticProfileController}.
- */
 @WebMvcTest(AthleticProfileController.class)
 @Import(GlobalExceptionHandler.class)
 class AthleticProfileControllerTest {
@@ -59,7 +56,6 @@ class AthleticProfileControllerTest {
         sampleDTO.setUser(user);
     }
 
-    // ── GET /api/athletic-profiles ─────────────────────────────────────────────────
 
     @Nested
     @DisplayName("GET /api/athletic-profiles")
@@ -88,7 +84,6 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── GET /api/athletic-profiles/{UserId} ────────────────────────────────────────
 
     @Nested
     @DisplayName("GET /api/athletic-profiles/{UserId}")
@@ -106,7 +101,6 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── POST /api/athletic-profiles ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("POST /api/athletic-profiles")
@@ -139,7 +133,6 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── PUT /api/athletic-profiles/{UserId} ────────────────────────────────────────
 
     @Nested
     @DisplayName("PUT /api/athletic-profiles/{UserId}")
@@ -175,7 +168,6 @@ class AthleticProfileControllerTest {
         }
     }
 
-    // ── DELETE /api/athletic-profiles/{UserId} ─────────────────────────────────────
 
     @Nested
     @DisplayName("DELETE /api/athletic-profiles/{UserId}")

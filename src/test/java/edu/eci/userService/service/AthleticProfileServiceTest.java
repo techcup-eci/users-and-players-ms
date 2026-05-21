@@ -24,9 +24,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para {@link AthleticProfileService}.
- */
 @ExtendWith(MockitoExtension.class)
 class AthleticProfileServiceTest {
 
@@ -74,7 +71,6 @@ class AthleticProfileServiceTest {
         sampleDTO.setUser(sampleUser);
     }
 
-    // ── getAllAthleticProfiles ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("getAllAthleticProfiles()")
@@ -103,7 +99,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── getAthleticProfilesByUserId ──────────────────────────────────────────
 
     @Nested
     @DisplayName("getAthleticProfilesByUserId()")
@@ -131,7 +126,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── getAthleticProfileByPosition ─────────────────────────────────────────
 
     @Nested
     @DisplayName("getAthleticProfileByPosition()")
@@ -162,7 +156,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── getAthleticProfileByLaterality ───────────────────────────────────────
 
     @Nested
     @DisplayName("getAthleticProfileByLaterality()")
@@ -181,7 +174,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── createAthleticProfile ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("createAthleticProfile()")
@@ -222,7 +214,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── updateAthleticProfile ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("updateAthleticProfile()")
@@ -271,9 +262,8 @@ class AthleticProfileServiceTest {
             when(athleticProfileRepository.findById(1L)).thenReturn(Optional.of(sampleEntity));
             when(athleticProfileRepository.save(any(AthleticProfileEntity.class))).thenReturn(sampleEntity);
 
-            AthleticProfileDTO result = athleticProfileService.updateAthleticProfile(1L, updatedDTO);
+            athleticProfileService.updateAthleticProfile(1L, updatedDTO);
 
-            // Verificar que la entidad recibió los nuevos valores
             assertThat(sampleEntity.getDorsalNumber()).isEqualTo(5);
             assertThat(sampleEntity.getPosition()).isEqualTo("defensa");
             assertThat(sampleEntity.getLaterality()).isEqualTo("diestro");
@@ -282,7 +272,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-    // ── deleteAthleticProfile ────────────────────────────────────────────────
 
     @Nested
     @DisplayName("deleteAthleticProfile()")

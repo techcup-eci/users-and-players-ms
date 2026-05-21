@@ -7,18 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Controller REST para consultar los registros de auditoría.
- *
- * Rutas expuestas (todas bajo /audit):
- *   GET /audit                        → todos los registros
- *   GET /audit/entity/{entityType}    → por tipo de entidad
- *   GET /audit/entity/{entityType}/{entityId} → por entidad e ID
- *   GET /audit/action/{action}        → por acción lógica
- *   GET /audit/status/{status}        → por estado (SUCCESS/ERROR)
- *   GET /audit/range?from=…&to=…     → por rango de fechas (ISO 8601)
- */
-
 @RestController
 @RequestMapping("/audit")
 public class AuditController {

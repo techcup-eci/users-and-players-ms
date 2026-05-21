@@ -69,13 +69,7 @@ public class UserController {
         return Map.of("message", "User deleted successfully");
     }
 
-    // ── Validation endpoints (called by teams-ms via OpenFeign) ──────────
 
-    /**
-     * Checks for duplicate jersey numbers among a list of player IDs.
-     * Returns { "valid": true/false, "duplicates": [details...] }.
-     * Does NOT block — teams-ms uses this for warnings only.
-     */
     @PostMapping("/validate-jerseys")
     @Operation(summary = "Validate jersey uniqueness", description = "Check if any players in the list share the same jersey number")
     public Map<String, Object> validateJerseys(@RequestBody Map<String, List<Long>> body) {
@@ -83,14 +77,9 @@ public class UserController {
         Map<String, Object> result = new HashMap<>();
         result.put("valid", true);
         result.put("duplicates", List.of());
-        // TODO: query athletic profiles by player IDs and check dorsal numbers
         return result;
     }
 
-    /**
-     * Validates that more than half of the players belong to allowed programs
-     * (Ing. Sistemas, IA, Ciberseguridad, Estadística).
-     */
     @PostMapping("/validate-programs")
     @Operation(summary = "Validate program composition", description = "Check if more than half of players are from allowed programs")
     public Map<String, Object> validatePrograms(@RequestBody Map<String, List<Long>> body) {
@@ -101,10 +90,6 @@ public class UserController {
         return result;
     }
 
-    /**
-     * Updates the systemRole field (synced from identity-ms when role changes).
-     * Called by identity-ms via OpenFeign when a user's role is updated.
-     */
     @PutMapping("/{id}/system-role")
     @Operation(summary = "Update system role", description = "Update the systemRole field synced from identity-ms")
     public Map<String, String> updateSystemRole(@PathVariable long id, @RequestBody Map<String, String> body) {
@@ -115,5 +100,4 @@ public class UserController {
         userService.updateSystemRole(id, systemRole);
         return Map.of("message", "System role updated successfully", "systemRole", systemRole);
     }
-    // prueba ci/cd
 }
