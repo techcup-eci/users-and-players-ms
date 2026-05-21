@@ -1,11 +1,14 @@
 package edu.eci.userService.dto;
 
 import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.JoinRequestStatus;
+import edu.eci.userService.enums.UserRole;
 import edu.eci.userService.enums.UserRoleEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -139,5 +142,48 @@ class DTOTest {
 
         assertThat(request.getEmail()).isEqualTo("mail@test.com");
         assertThat(request.getPassword()).isEqualTo("pwd");
+    }
+
+    @Test
+    @DisplayName("JoinRequestDTO: Constructor completo y getters/setters")
+    void joinRequestDTOFullCoverageTest() {
+        LocalDateTime now = LocalDateTime.of(2026, 5, 21, 10, 0);
+        UserDTO player = new UserDTO();
+        player.setId(3L);
+        player.setName("Player");
+
+        JoinRequestDTO dto = new JoinRequestDTO(10L, player, 5L, JoinRequestStatus.PENDING, now, now);
+
+        assertThat(dto.getId()).isEqualTo(10L);
+        assertThat(dto.getPlayer()).isEqualTo(player);
+        assertThat(dto.getTeamId()).isEqualTo(5L);
+        assertThat(dto.getStatus()).isEqualTo(JoinRequestStatus.PENDING);
+        assertThat(dto.getCreatedAt()).isEqualTo(now);
+        assertThat(dto.getUpdatedAt()).isEqualTo(now);
+
+        dto.setStatus(JoinRequestStatus.ACCEPTED);
+        assertThat(dto.getStatus()).isEqualTo(JoinRequestStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("SendJoinRequestRequest: Constructor y accessors")
+    void sendJoinRequestRequestCoverageTest() {
+        SendJoinRequestRequest byConstructor = new SendJoinRequestRequest(99L);
+        assertThat(byConstructor.getTeamId()).isEqualTo(99L);
+
+        SendJoinRequestRequest bySetter = new SendJoinRequestRequest();
+        bySetter.setTeamId(7L);
+        assertThat(bySetter.getTeamId()).isEqualTo(7L);
+    }
+
+    @Test
+    @DisplayName("RoleChangeRequest: Constructor y accessors")
+    void roleChangeRequestCoverageTest() {
+        RoleChangeRequest byConstructor = new RoleChangeRequest(UserRole.ORGANIZER);
+        assertThat(byConstructor.getNewRole()).isEqualTo(UserRole.ORGANIZER);
+
+        RoleChangeRequest bySetter = new RoleChangeRequest();
+        bySetter.setNewRole(UserRole.STUDENT);
+        assertThat(bySetter.getNewRole()).isEqualTo(UserRole.STUDENT);
     }
 }
