@@ -4,6 +4,7 @@ import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
 import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.mappers.AthleticProfileMapper;
+import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.AthleticProfileRepository;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.AthleticProfileService;
@@ -18,10 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AthleticProfileService - casos adicionales")
@@ -33,7 +32,9 @@ class AthleticProfileServiceAdditionalTest {
     @Mock
     private UserRepository userRepository;
 
-    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
+    // ← AthleticProfileMapper ahora necesita UserMapper
+    private final UserMapper userMapper = new UserMapper();
+    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper(userMapper);
 
     private AthleticProfileService athleticProfileService;
 
@@ -61,7 +62,6 @@ class AthleticProfileServiceAdditionalTest {
         existingProfile.setUser(sampleUser);
     }
 
-
     @Nested
     @DisplayName("createAthleticProfile() — perfil ya existente")
     class CreateWithExistingProfile {
@@ -69,7 +69,6 @@ class AthleticProfileServiceAdditionalTest {
         @Test
         @DisplayName("Debe actualizar perfil existente si el usuario ya tiene uno")
         void shouldUpdateExistingProfileWhenUserAlreadyHasOne() {
-            // El usuario ya tiene un perfil asociado
             sampleUser.setAthleticProfile(existingProfile);
 
             AthleticProfileDTO dto = new AthleticProfileDTO();
@@ -102,7 +101,6 @@ class AthleticProfileServiceAdditionalTest {
             dto.setLaterality("diestro");
             dto.setStature("175cm");
             dto.setState("activo");
-            // nickName no se setea → el servicio lo genera automáticamente
 
             when(userRepository.findByEmail("juan@gmail.com")).thenReturn(sampleUser);
             when(athleticProfileRepository.save(any(AthleticProfileEntity.class)))
@@ -160,7 +158,6 @@ class AthleticProfileServiceAdditionalTest {
         }
     }
 
-
     @Nested
     @DisplayName("updateAthleticProfile() - campos opcionales")
     class UpdateBranches {
@@ -172,12 +169,12 @@ class AthleticProfileServiceAdditionalTest {
             when(athleticProfileRepository.save(existingProfile)).thenReturn(existingProfile);
 
             AthleticProfileDTO dto = new AthleticProfileDTO();
-            dto.setDorsalNumber(0);       // debe ser ignorado
-            dto.setPosition("portero");   // debe ser actualizado
+            dto.setDorsalNumber(0);
+            dto.setPosition("portero");
 
             athleticProfileService.updateAthleticProfile(1L, dto);
 
-            assertThat(existingProfile.getDorsalNumber()).isEqualTo(10); // sin cambio
+            assertThat(existingProfile.getDorsalNumber()).isEqualTo(10);
             assertThat(existingProfile.getPosition()).isEqualTo("portero");
         }
 

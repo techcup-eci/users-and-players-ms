@@ -33,9 +33,9 @@ public class AthleticProfileService {
     }
 
     public AthleticProfileDTO getAthleticProfilesByUserId(Long userId) {
-        AthleticProfileDTO dto = new AthleticProfileDTO();
-        dto = athleticProfileMapper.toDTO(athleticProfileRepository.findById(userId).orElse(null));
-        return dto;
+        return athleticProfileRepository.findById(userId)
+                .map(athleticProfileMapper::toDTO)
+                .orElseThrow(() -> new NoSuchElementException("No athletic profile found for userId: " + userId));
     }
 
     public List<AthleticProfileDTO> getAthleticProfileByPosition(String position) {
@@ -69,12 +69,14 @@ public class AthleticProfileService {
             existing.setStature(athleticProfileDTO.getStature());
             existing.setState(athleticProfileDTO.getState());
             if (existing.getNickName() == null || existing.getNickName().isBlank()) {
-                existing.setNickName(user.getName() != null ? user.getName().split("@")[0] : user.getEmail().split("@")[0]);
+                existing.setNickName(
+                        user.getName() != null ? user.getName().split("@")[0] : user.getEmail().split("@")[0]);
             }
             return athleticProfileMapper.toDTO(athleticProfileRepository.save(existing));
         }
 
-        // Create new profile — build manually to avoid mapper setting ID (conflicts with @MapsId)
+        // Create new profile — build manually to avoid mapper setting ID (conflicts
+        // with @MapsId)
         AthleticProfileEntity entity = new AthleticProfileEntity();
         entity.setDorsalNumber(athleticProfileDTO.getDorsalNumber());
         entity.setPosition(athleticProfileDTO.getPosition());

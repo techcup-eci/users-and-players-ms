@@ -20,7 +20,8 @@ import edu.eci.userService.mappers.UserMapper;
 class MapperTest {
 
     private final UserMapper userMapper = new UserMapper();
-    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
+    // ← AthleticProfileMapper ahora necesita UserMapper en el constructor
+    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper(userMapper);
 
     @Test
     @DisplayName("Mappers instanciados")
@@ -87,8 +88,30 @@ class MapperTest {
             assertThat(reconstructed.getSchoolRelation()).isEqualTo(original.getSchoolRelation());
         }
 
+        @Test
+        @DisplayName("toDTO debe retornar null cuando el entity es null")
+        void toDTOShouldReturnNullWhenEntityIsNull() {
+            assertThat(userMapper.toDTO(null)).isNull();
+        }
 
-            private UserEntity buildUserEntity() {
+        @Test
+        @DisplayName("toEntity debe retornar null cuando el DTO es null")
+        void toEntityShouldReturnNullWhenDTOIsNull() {
+            assertThat(userMapper.toEntity(null)).isNull();
+        }
+
+        @Test
+        @DisplayName("toEntity no debe setear id cuando es 0")
+        void toEntityShouldIgnoreZeroId() {
+            UserDTO dto = buildUserDTO();
+            dto.setId(0);
+
+            UserEntity entity = userMapper.toEntity(dto);
+
+            assertThat(entity.getId()).isNull();
+        }
+
+        private UserEntity buildUserEntity() {
             UserEntity e = new UserEntity();
             e.setId(1L);
             e.setName("Juan Pérez");
@@ -121,29 +144,6 @@ class MapperTest {
             dto.setPhone(3001234567L);
             return dto;
         }
-
-        @Test
-        @DisplayName("toDTO debe retornar null cuando el entity es null")
-        void toDTOShouldReturnNullWhenEntityIsNull() {
-            assertThat(userMapper.toDTO(null)).isNull();
-        }
-
-        @Test
-        @DisplayName("toEntity debe retornar null cuando el DTO es null")
-        void toEntityShouldReturnNullWhenDTOIsNull() {
-            assertThat(userMapper.toEntity(null)).isNull();
-        }
-
-        @Test
-        @DisplayName("toEntity no debe setear id cuando es 0")
-        void toEntityShouldIgnoreZeroId() {
-            UserDTO dto = buildUserDTO();
-            dto.setId(0);
-
-            UserEntity entity = userMapper.toEntity(dto);
-
-            assertThat(entity.getId()).isNull();
-        }
     }
 
     @Nested
@@ -164,7 +164,9 @@ class MapperTest {
             assertThat(dto.getLaterality()).isEqualTo("diestro");
             assertThat(dto.getStature()).isEqualTo("175cm");
             assertThat(dto.getState()).isEqualTo("activo");
+            // user ahora es UserDTO, no UserEntity
             assertThat(dto.getUser()).isNotNull();
+            assertThat(dto.getUser().getId()).isEqualTo(1L);
         }
 
         @Test
@@ -195,6 +197,17 @@ class MapperTest {
             assertThat(reconstructed.getNickName()).isEqualTo(original.getNickName());
         }
 
+        @Test
+        @DisplayName("toDTO debe retornar null cuando el entity es null")
+        void toDTOShouldReturnNullWhenEntityIsNull() {
+            assertThat(athleticProfileMapper.toDTO(null)).isNull();
+        }
+
+        @Test
+        @DisplayName("toEntity debe retornar null cuando el DTO es null")
+        void toEntityShouldReturnNullWhenDTOIsNull() {
+            assertThat(athleticProfileMapper.toEntity(null)).isNull();
+        }
 
         private AthleticProfileEntity buildEntity() {
             UserEntity user = new UserEntity();
@@ -214,8 +227,10 @@ class MapperTest {
         }
 
         private AthleticProfileDTO buildDTO() {
-            UserEntity user = new UserEntity();
-            user.setId(1L);
+            // ← ahora usa UserDTO, no UserEntity
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(1L);
+            userDTO.setName("Juan Pérez");
 
             AthleticProfileDTO dto = new AthleticProfileDTO();
             dto.setId(1L);
@@ -225,20 +240,8 @@ class MapperTest {
             dto.setLaterality("diestro");
             dto.setStature("175cm");
             dto.setState("activo");
-            dto.setUser(user);
+            dto.setUser(userDTO); // ← UserDTO
             return dto;
-        }
-
-        @Test
-        @DisplayName("toDTO debe retornar null cuando el entity es null")
-        void toDTOShouldReturnNullWhenEntityIsNull() {
-            assertThat(athleticProfileMapper.toDTO(null)).isNull();
-        }
-
-        @Test
-        @DisplayName("toEntity debe retornar null cuando el DTO es null")
-        void toEntityShouldReturnNullWhenDTOIsNull() {
-            assertThat(athleticProfileMapper.toEntity(null)).isNull();
         }
     }
 }

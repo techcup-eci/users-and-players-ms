@@ -2,7 +2,7 @@ package edu.eci.userService.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.eci.userService.dto.AthleticProfileDTO;
-import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.services.AthleticProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,16 +34,14 @@ class AthleticProfileControllerTest {
     @MockBean
     private AthleticProfileService athleticProfileService;
 
-    private ObjectMapper objectMapper;
     private AthleticProfileDTO sampleDTO;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        user.setName("Juan Pérez");
+        // ← UserDTO en lugar de UserEntity
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setName("Juan Pérez");
 
         sampleDTO = new AthleticProfileDTO();
         sampleDTO.setId(1L);
@@ -53,9 +51,8 @@ class AthleticProfileControllerTest {
         sampleDTO.setLaterality("diestro");
         sampleDTO.setStature("175cm");
         sampleDTO.setState("activo");
-        sampleDTO.setUser(user);
+        sampleDTO.setUser(userDTO); // ← UserDTO, no UserEntity
     }
-
 
     @Nested
     @DisplayName("GET /api/athletic-profiles")
@@ -84,7 +81,6 @@ class AthleticProfileControllerTest {
         }
     }
 
-
     @Nested
     @DisplayName("GET /api/athletic-profiles/{UserId}")
     class GetByUserId {
@@ -100,7 +96,6 @@ class AthleticProfileControllerTest {
                     .andExpect(jsonPath("$.nickName", is("Juancho")));
         }
     }
-
 
     @Nested
     @DisplayName("POST /api/athletic-profiles")
@@ -124,15 +119,14 @@ class AthleticProfileControllerTest {
                     """;
 
             mockMvc.perform(post("/api/athletic-profiles")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(body))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nickName", is("Juancho")));
 
             verify(athleticProfileService).createAthleticProfile(any(AthleticProfileDTO.class));
         }
     }
-
 
     @Nested
     @DisplayName("PUT /api/athletic-profiles/{UserId}")
@@ -161,13 +155,12 @@ class AthleticProfileControllerTest {
                     """;
 
             mockMvc.perform(put("/api/athletic-profiles/1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(body))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nickName", is("Juancho2")));
         }
     }
-
 
     @Nested
     @DisplayName("DELETE /api/athletic-profiles/{UserId}")

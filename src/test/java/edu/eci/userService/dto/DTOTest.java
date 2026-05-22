@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.enums.AcademicLevel;
 import edu.eci.userService.enums.JoinRequestStatus;
 import edu.eci.userService.enums.ProfessorType;
@@ -20,7 +19,7 @@ class DTOTest {
     void userDTOTest() {
         UserDTO dto = new UserDTO();
         LocalDate birthDate = LocalDate.of(2000, 1, 1);
-        
+
         dto.setId(1L);
         dto.setName("Name");
         dto.setEmail("email@test.com");
@@ -49,11 +48,14 @@ class DTOTest {
     }
 
     @Test
-    @DisplayName("AthleticProfileDTO: Getters and Setters")
+    @DisplayName("AthleticProfileDTO: Getters and Setters con UserDTO")
     void athleticProfileDTOTest() {
         AthleticProfileDTO dto = new AthleticProfileDTO();
-        UserEntity user = new UserEntity();
-        
+        // ← UserDTO en lugar de UserEntity
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setName("Test User");
+
         dto.setId(1L);
         dto.setDorsalNumber(10);
         dto.setNickName("Nick");
@@ -61,7 +63,7 @@ class DTOTest {
         dto.setLaterality("Lat");
         dto.setStature("180");
         dto.setState("Active");
-        dto.setUser(user);
+        dto.setUser(userDTO); // ← UserDTO
 
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getDorsalNumber()).isEqualTo(10);
@@ -70,7 +72,8 @@ class DTOTest {
         assertThat(dto.getLaterality()).isEqualTo("Lat");
         assertThat(dto.getStature()).isEqualTo("180");
         assertThat(dto.getState()).isEqualTo("Active");
-        assertThat(dto.getUser()).isEqualTo(user);
+        assertThat(dto.getUser()).isEqualTo(userDTO);
+        assertThat(dto.getUser().getId()).isEqualTo(1L);
     }
 
     @Test
@@ -83,15 +86,14 @@ class DTOTest {
                 "Ana",
                 "ana@test.com",
                 birthDate,
-            SchoolRelation.PROFESSOR,
-            AcademicLevel.MASTER,
-            ProfessorType.CHAIR,
+                SchoolRelation.PROFESSOR,
+                AcademicLevel.MASTER,
+                ProfessorType.CHAIR,
                 "Matematicas",
                 3,
                 "TI",
                 987L,
-            654L
-        );
+                654L);
         dto.setPassword("secret");
 
         assertThat(dto.getId()).isEqualTo(2L);
@@ -110,25 +112,27 @@ class DTOTest {
     }
 
     @Test
-    @DisplayName("AthleticProfileDTO: Constructor completo")
+    @DisplayName("AthleticProfileDTO: Constructor completo con UserDTO")
     void athleticProfileDTOFullConstructorTest() {
-        UserEntity user = new UserEntity();
-        user.setId(7L);
+        // ← Constructor ahora recibe UserDTO, no UserEntity
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(7L);
+        userDTO.setName("Test");
 
         AthleticProfileDTO dto = new AthleticProfileDTO(
                 9,
                 3L,
-                user,
+                userDTO, // ← UserDTO
                 "Nick",
                 "defensa",
                 "zurdo",
                 "170",
-                "activo"
-        );
+                "activo");
 
         assertThat(dto.getDorsalNumber()).isEqualTo(9);
         assertThat(dto.getId()).isEqualTo(3L);
-        assertThat(dto.getUser()).isEqualTo(user);
+        assertThat(dto.getUser()).isEqualTo(userDTO);
+        assertThat(dto.getUser().getId()).isEqualTo(7L);
         assertThat(dto.getNickName()).isEqualTo("Nick");
         assertThat(dto.getPosition()).isEqualTo("defensa");
         assertThat(dto.getLaterality()).isEqualTo("zurdo");

@@ -4,6 +4,7 @@ import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
 import edu.eci.userService.entities.UserEntity;
 import edu.eci.userService.mappers.AthleticProfileMapper;
+import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.AthleticProfileRepository;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.AthleticProfileService;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,7 +33,9 @@ class AthleticProfileServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper();
+    // ← AthleticProfileMapper ahora necesita UserMapper
+    private final UserMapper userMapper = new UserMapper();
+    private final AthleticProfileMapper athleticProfileMapper = new AthleticProfileMapper(userMapper);
 
     private AthleticProfileService athleticProfileService;
 
@@ -43,7 +45,10 @@ class AthleticProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        athleticProfileService = new AthleticProfileService(athleticProfileRepository, athleticProfileMapper, userRepository);
+        // ← construcción manual porque el mapper ya no tiene constructor vacío
+        athleticProfileService = new AthleticProfileService(
+                athleticProfileRepository, athleticProfileMapper, userRepository);
+
         sampleUser = new UserEntity();
         sampleUser.setId(1L);
         sampleUser.setName("Juan Pérez");
@@ -68,9 +73,10 @@ class AthleticProfileServiceTest {
         sampleDTO.setLaterality("diestro");
         sampleDTO.setStature("175cm");
         sampleDTO.setState("activo");
-        sampleDTO.setUser(sampleUser);
+        // ← sampleDTO.setUser() ya no se llama con UserEntity
+        // el campo user del DTO se llena solo en las respuestas del mapper, no en el
+        // input
     }
-
 
     @Nested
     @DisplayName("getAllAthleticProfiles()")
@@ -99,7 +105,6 @@ class AthleticProfileServiceTest {
         }
     }
 
-
     @Nested
     @DisplayName("getAthleticProfilesByUserId()")
     class GetById {
@@ -116,16 +121,15 @@ class AthleticProfileServiceTest {
         }
 
         @Test
-        @DisplayName("Debe retornar null cuando el perfil no existe")
-        void shouldReturnNullWhenNotFound() {
+        @DisplayName("Debe lanzar NoSuchElementException cuando el perfil no existe")
+        void shouldThrowWhenNotFound() {
             when(athleticProfileRepository.findById(99L)).thenReturn(Optional.empty());
 
-            AthleticProfileDTO result = athleticProfileService.getAthleticProfilesByUserId(99L);
-
-            assertThat(result).isNull();
+            assertThatThrownBy(() -> athleticProfileService.getAthleticProfilesByUserId(99L))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
         }
     }
-
 
     @Nested
     @DisplayName("getAthleticProfileByPosition()")
@@ -137,8 +141,7 @@ class AthleticProfileServiceTest {
             when(athleticProfileRepository.findByPosition("delantero"))
                     .thenReturn(List.of(sampleEntity));
 
-            List<AthleticProfileDTO> result =
-                    athleticProfileService.getAthleticProfileByPosition("delantero");
+            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByPosition("delantero");
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).getPosition()).isEqualTo("delantero");
@@ -149,13 +152,11 @@ class AthleticProfileServiceTest {
         void shouldReturnEmptyListWhenNoMatch() {
             when(athleticProfileRepository.findByPosition("portero")).thenReturn(List.of());
 
-            List<AthleticProfileDTO> result =
-                    athleticProfileService.getAthleticProfileByPosition("portero");
+            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByPosition("portero");
 
             assertThat(result).isEmpty();
         }
     }
-
 
     @Nested
     @DisplayName("getAthleticProfileByLaterality()")
@@ -167,13 +168,11 @@ class AthleticProfileServiceTest {
             when(athleticProfileRepository.findByLaterality("diestro"))
                     .thenReturn(List.of(sampleEntity));
 
-            List<AthleticProfileDTO> result =
-                    athleticProfileService.getAthleticProfileByLaterality("diestro");
+            List<AthleticProfileDTO> result = athleticProfileService.getAthleticProfileByLaterality("diestro");
 
             assertThat(result).hasSize(1);
         }
     }
-
 
     @Nested
     @DisplayName("createAthleticProfile()")
@@ -213,7 +212,6 @@ class AthleticProfileServiceTest {
             verify(athleticProfileRepository, never()).save(any());
         }
     }
-
 
     @Nested
     @DisplayName("updateAthleticProfile()")
@@ -271,7 +269,6 @@ class AthleticProfileServiceTest {
             assertThat(sampleEntity.getState()).isEqualTo("inactivo");
         }
     }
-
 
     @Nested
     @DisplayName("deleteAthleticProfile()")
