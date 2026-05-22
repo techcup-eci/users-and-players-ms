@@ -46,6 +46,25 @@ public class UserService {
         if (userDTO == null) {
             throw new IllegalArgumentException("Request is required");
         }
+        if (userDTO.getName() == null || userDTO.getName().isBlank()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        if (userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (userDTO.getBirthDate() == null) {
+            throw new IllegalArgumentException("Birth date is required");
+        }
+        if (userDTO.getSchoolRelation() == null) {
+            throw new IllegalArgumentException("School relation (relationship) is required");
+        }
+        if (userDTO.getIdentificationType() == null || userDTO.getIdentificationType().isBlank()) {
+            throw new IllegalArgumentException("Identification type is required");
+        }
+        if (userDTO.getIdentificationNumber() == null) {
+            throw new IllegalArgumentException("Identification number is required");
+        }
+
         UserEntity entity = new UserEntity();
         entity.setName(userDTO.getName());
         entity.setEmail(userDTO.getEmail());
