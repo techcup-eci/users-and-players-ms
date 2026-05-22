@@ -20,7 +20,7 @@ public class UserMapper {
         dto.setAcademicLevel(entity.getAcademicLevel());
         dto.setProfessorType(entity.getProfessorType());
         dto.setAcademicProgram(entity.getAcademicProgram());
-        dto.setSemester(entity.getSemester());
+        dto.setSemester(entity.getSemester() != null ? entity.getSemester() : 0);
         dto.setIdentificationType(entity.getIdentificationType());
         dto.setIdentificationNumber(entity.getIdentificationNumber());
         dto.setPhone(entity.getPhone());

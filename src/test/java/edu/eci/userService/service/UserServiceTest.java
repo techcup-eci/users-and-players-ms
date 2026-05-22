@@ -144,13 +144,13 @@ class UserServiceTest {
         }
 
         @Test
-        @DisplayName("Debe retornar null cuando el usuario no existe")
-        void shouldReturnNullWhenNotFound() {
+        @DisplayName("Debe lanzar NoSuchElementException cuando el usuario no existe")
+        void shouldThrowWhenNotFound() {
             when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-            UserDTO result = userService.getUserById(99L);
-
-            assertThat(result).isNull();
+            assertThatThrownBy(() -> userService.getUserById(99L))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
         }
     }
 

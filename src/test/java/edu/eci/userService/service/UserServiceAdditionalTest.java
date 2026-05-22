@@ -1,6 +1,7 @@
 package edu.eci.userService.service;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -154,17 +155,17 @@ class UserServiceAdditionalTest {
 
 
     @Nested
-    @DisplayName("getUserById() — rama null")
-    class GetUserByIdNull {
+    @DisplayName("getUserById() — usuario no encontrado")
+    class GetUserByIdNotFound {
 
         @Test
-        @DisplayName("Debe retornar null cuando el repositorio no encuentra el usuario")
-        void shouldReturnNullWhenNotFound() {
+        @DisplayName("Debe lanzar NoSuchElementException cuando el repositorio no encuentra el usuario")
+        void shouldThrowWhenUserNotFound() {
             when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-            UserDTO result = userService.getUserById(99L);
-
-            assertThat(result).isNull();
+            assertThatThrownBy(() -> userService.getUserById(99L))
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("99");
         }
     }
 }
