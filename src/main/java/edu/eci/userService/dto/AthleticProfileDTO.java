@@ -1,12 +1,10 @@
 package edu.eci.userService.dto;
 
-import edu.eci.userService.entities.UserEntity;
-
 public class AthleticProfileDTO {
 
     private int dorsalNumber;
     private Long id;
-    private UserEntity user;
+    private UserDTO user; // ← era UserEntity, ahora UserDTO (no expone password)
     private String email;
     private String nickName;
     private String position;
@@ -17,10 +15,8 @@ public class AthleticProfileDTO {
     public AthleticProfileDTO() {
     }
 
-    public AthleticProfileDTO(int dorsalNumber, Long id, UserEntity user, String nickName, String position,
-            String laterality,
-            String stature,
-            String state) {
+    public AthleticProfileDTO(int dorsalNumber, Long id, UserDTO user, String nickName, String position,
+            String laterality, String stature, String state) {
         this.dorsalNumber = dorsalNumber;
         this.user = user;
         this.id = id;
@@ -39,16 +35,12 @@ public class AthleticProfileDTO {
         return id;
     }
 
-    public UserEntity getUser() {
+    public UserDTO getUser() {
         return user;
     }
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getNickName() {
@@ -79,8 +71,12 @@ public class AthleticProfileDTO {
         this.id = id;
     }
 
-    public void setUser(UserEntity user) {
+    public void setUser(UserDTO user) {
         this.user = user;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setNickName(String nickName) {
@@ -102,5 +98,4 @@ public class AthleticProfileDTO {
     public void setState(String state) {
         this.state = state;
     }
-
 }

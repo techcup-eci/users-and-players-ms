@@ -37,9 +37,9 @@ public class UserService {
     }
 
     public UserDTO getUserById(Long id) {
-        UserDTO dto = new UserDTO();
-        dto = userMapper.toDTO(userRepository.findById(id).orElse(null));
-        return dto;
+        return userRepository.findById(id)
+                .map(userMapper::toDTO)
+                .orElseThrow(() -> new NoSuchElementException("No user found with ID: " + id));
     }
 
     public UserDTO createUser(UserDTO userDTO) {

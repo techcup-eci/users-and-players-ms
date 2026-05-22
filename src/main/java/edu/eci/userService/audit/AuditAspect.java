@@ -32,6 +32,11 @@ public class AuditAspect {
         return audit(pjp, "AthleticProfile");
     }
 
+    @Around("execution(* edu.eci.userService.controller.JoinRequestController.*(..))")
+    public Object auditJoinRequest(ProceedingJoinPoint pjp) throws Throwable {
+        return audit(pjp, "JoinRequest");
+    }
+
     private Object audit(ProceedingJoinPoint pjp, String entityType) throws Throwable {
 
         MethodSignature signature = (MethodSignature) pjp.getSignature();
@@ -41,8 +46,8 @@ public class AuditAspect {
         String action = resolveAction(methodName, entityType);
 
         HttpServletRequest request = currentRequest();
-        String httpMethod  = request != null ? request.getMethod() : "UNKNOWN";
-        String endpoint    = request != null ? request.getRequestURI() : "UNKNOWN";
+        String httpMethod = request != null ? request.getMethod() : "UNKNOWN";
+        String endpoint = request != null ? request.getRequestURI() : "UNKNOWN";
         String performedBy = request != null ? resolveClientIp(request) : "UNKNOWN";
 
         String entityId = resolveEntityId(pjp.getArgs());
@@ -74,7 +79,8 @@ public class AuditAspect {
             auditRequest.setPerformedBy(performedBy);
             auditRequest.setStatus("ERROR");
             String rawDetail = ex.getClass().getSimpleName() + ": " + ex.getMessage();
-            auditRequest.setDetail(rawDetail != null && rawDetail.length() > 497 ? rawDetail.substring(0, 497) + "..." : rawDetail);
+            auditRequest.setDetail(
+                    rawDetail != null && rawDetail.length() > 497 ? rawDetail.substring(0, 497) + "..." : rawDetail);
             try {
                 auditService.log(auditRequest);
             } catch (Exception logEx) {
@@ -87,16 +93,28 @@ public class AuditAspect {
 
     private String resolveAction(String methodName, String entityType) {
         String upper = entityType.toUpperCase();
-        if (methodName.startsWith("create"))  return "CREATE_"  + upper;
-        if (methodName.startsWith("update"))  return "UPDATE_"  + upper;
-        if (methodName.startsWith("delete"))  return "DELETE_"  + upper;
-        if (methodName.startsWith("getAll"))  return "LIST_"    + upper;
-        if (methodName.startsWith("get"))     return "GET_"     + upper;
+        if (methodName.startsWith("create"))
+            return "CREATE_" + upper;
+        if (methodName.startsWith("update"))
+            return "UPDATE_" + upper;
+        if (methodName.startsWith("delete"))
+            return "DELETE_" + upper;
+        if (methodName.startsWith("getAll"))
+            return "LIST_" + upper;
+        if (methodName.startsWith("get"))
+            return "GET_" + upper;
+        if (methodName.startsWith("send"))
+            return "SEND_" + upper;
+        if (methodName.startsWith("accept"))
+            return "ACCEPT_" + upper;
+        if (methodName.startsWith("reject"))
+            return "REJECT_" + upper;
         return methodName.toUpperCase() + "_" + upper;
     }
 
     private String resolveEntityId(Object[] args) {
-        if (args == null) return null;
+        if (args == null)
+            return null;
         return Arrays.stream(args)
                 .filter(a -> a instanceof Long)
                 .map(a -> String.valueOf(a))
@@ -106,8 +124,7 @@ public class AuditAspect {
 
     private HttpServletRequest currentRequest() {
         try {
-            ServletRequestAttributes attrs =
-                    (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             return attrs.getRequest();
         } catch (IllegalStateException e) {
             return null;
