@@ -2,7 +2,9 @@ package edu.eci.userService.entities;
 
 import java.time.LocalDate;
 
-import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,10 +37,14 @@ public class UserEntity {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @Column(name = "relationship", nullable = false)
+    private SchoolRelation schoolRelation;
 
-    @Column(nullable = false)
-    private String relationship; // Relationship with the university (student, teacher, etc)
+    @Enumerated(EnumType.STRING)
+    private AcademicLevel academicLevel;
+
+    @Enumerated(EnumType.STRING)
+    private ProfessorType professorType;
 
     @Column
     private String academicProgram;
@@ -78,12 +84,16 @@ public class UserEntity {
         return birthDate;
     }
 
-    public UserRole getRole() {
-        return role;
+    public SchoolRelation getSchoolRelation() {
+        return schoolRelation;
     }
 
-    public String getRelationship() {
-        return relationship;
+    public AcademicLevel getAcademicLevel() {
+        return academicLevel;
+    }
+
+    public ProfessorType getProfessorType() {
+        return professorType;
     }
 
     public String getAcademicProgram() {
@@ -127,11 +137,16 @@ public class UserEntity {
         this.birthDate = birthDate;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setSchoolRelation(SchoolRelation schoolRelation) {
+        this.schoolRelation = schoolRelation;
     }
-    public void setRelationship(String relationship) {
-        this.relationship = relationship;
+
+    public void setAcademicLevel(AcademicLevel academicLevel) {
+        this.academicLevel = academicLevel;
+    }
+
+    public void setProfessorType(ProfessorType professorType) {
+        this.professorType = professorType;
     }
 
     public void setAcademicProgram(String academicProgram) {

@@ -1,27 +1,32 @@
 package edu.eci.userService.service;
 
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.mappers.UserMapper;
-import edu.eci.userService.repository.UserRepository;
-import edu.eci.userService.services.UserService;
-import edu.eci.userService.exceptions.InvalidCredentialsException;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import edu.eci.userService.mappers.UserMapper;
+import edu.eci.userService.repository.UserRepository;
+import edu.eci.userService.services.UserService;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -41,15 +46,16 @@ class UserServiceAdditionalTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper, passwordEncoder, "STUDENT");
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
 
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
         sampleEntity.setEmail("juan@gmail.com");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleEntity.setRole(UserRole.STUDENT);
-        sampleEntity.setRelationship("student");
+        sampleEntity.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleEntity.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleEntity.setProfessorType(ProfessorType.FULL_TIME);
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
@@ -88,8 +94,9 @@ class UserServiceAdditionalTest {
             updatedDTO.setName("Nombre Actualizado");
             updatedDTO.setEmail("nuevo@gmail.com");
             updatedDTO.setBirthDate(LocalDate.of(1999, 1, 1));
-            updatedDTO.setRole(UserRole.TEACHER);
-            updatedDTO.setRelationship("teacher");
+            updatedDTO.setSchoolRelation(SchoolRelation.PROFESSOR);
+            updatedDTO.setAcademicLevel(AcademicLevel.MASTER);
+            updatedDTO.setProfessorType(ProfessorType.CHAIR);
             updatedDTO.setAcademicProgram("Matemáticas");
             updatedDTO.setSemester(0);
             updatedDTO.setIdentificationType("TI");
@@ -100,7 +107,7 @@ class UserServiceAdditionalTest {
 
             assertThat(sampleEntity.getName()).isEqualTo("Nombre Actualizado");
             assertThat(sampleEntity.getEmail()).isEqualTo("nuevo@gmail.com");
-            assertThat(sampleEntity.getRole()).isEqualTo(UserRole.TEACHER);
+            assertThat(sampleEntity.getSchoolRelation()).isEqualTo(SchoolRelation.PROFESSOR);
             assertThat(sampleEntity.getSemester()).isEqualTo(0);
             verify(userRepository).save(sampleEntity);
         }

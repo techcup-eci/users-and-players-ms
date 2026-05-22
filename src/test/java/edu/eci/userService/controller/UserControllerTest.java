@@ -1,33 +1,43 @@
 package edu.eci.userService.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.dto.UserRegisterRequest;
-import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.services.IdentityRoleService;
-import edu.eci.userService.services.UserService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
+import edu.eci.userService.services.IdentityRoleService;
+import edu.eci.userService.services.UserService;
 
 @WebMvcTest(UserController.class)
 @Import(GlobalExceptionHandler.class)
@@ -55,8 +65,9 @@ class UserControllerTest {
         sampleDTO.setName("Juan Perez");
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRole.STUDENT);
-        sampleDTO.setRelationship("student");
+        sampleDTO.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleDTO.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleDTO.setProfessorType(ProfessorType.FULL_TIME);
         sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
@@ -120,13 +131,15 @@ class UserControllerTest {
         @Test
         @DisplayName("Debe retornar 200 con el usuario creado")
         void shouldReturn200WithCreatedUser() throws Exception {
-            when(userService.createUser(any(UserRegisterRequest.class))).thenReturn(sampleDTO);
+            when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
 
-            UserRegisterRequest request = new UserRegisterRequest();
+            UserDTO request = new UserDTO();
             request.setName("Juan Perez");
             request.setEmail("juan.perez@eci.edu.co");
             request.setBirthDate(LocalDate.of(2000, 5, 15));
-            request.setRelationship("student");
+            request.setSchoolRelation(SchoolRelation.STUDENT);
+            request.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+            request.setProfessorType(ProfessorType.FULL_TIME);
             request.setAcademicProgram("Ingenieria de Sistemas");
             request.setSemester(5);
             request.setIdentificationType("CC");
@@ -141,7 +154,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.name", is("Juan Perez")))
                     .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
 
-            verify(userService).createUser(any(UserRegisterRequest.class));
+            verify(userService).createUser(any(UserDTO.class));
         }
     }
 

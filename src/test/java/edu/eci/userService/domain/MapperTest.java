@@ -11,7 +11,9 @@ import edu.eci.userService.dto.AthleticProfileDTO;
 import edu.eci.userService.dto.UserDTO;
 import edu.eci.userService.entities.AthleticProfileEntity;
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 import edu.eci.userService.mappers.AthleticProfileMapper;
 import edu.eci.userService.mappers.UserMapper;
 
@@ -42,8 +44,9 @@ class MapperTest {
             assertThat(dto.getName()).isEqualTo("Juan Pérez");
             assertThat(dto.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(dto.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
-            assertThat(dto.getRole()).isEqualTo(UserRole.STUDENT);
-            assertThat(dto.getRelationship()).isEqualTo("student");
+            assertThat(dto.getSchoolRelation()).isEqualTo(SchoolRelation.PROFESSOR);
+            assertThat(dto.getAcademicLevel()).isEqualTo(AcademicLevel.MASTER);
+            assertThat(dto.getProfessorType()).isEqualTo(ProfessorType.FULL_TIME);
             assertThat(dto.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(dto.getSemester()).isEqualTo(5);
             assertThat(dto.getIdentificationType()).isEqualTo("CC");
@@ -62,8 +65,9 @@ class MapperTest {
             assertThat(entity.getName()).isEqualTo("Juan Pérez");
             assertThat(entity.getEmail()).isEqualTo("juan@eci.edu.co");
             assertThat(entity.getBirthDate()).isEqualTo(LocalDate.of(2000, 5, 15));
-            assertThat(entity.getRole()).isEqualTo(UserRole.STUDENT);
-            assertThat(entity.getRelationship()).isEqualTo("student");
+            assertThat(entity.getSchoolRelation()).isEqualTo(SchoolRelation.PROFESSOR);
+            assertThat(entity.getAcademicLevel()).isEqualTo(AcademicLevel.MASTER);
+            assertThat(entity.getProfessorType()).isEqualTo(ProfessorType.FULL_TIME);
             assertThat(entity.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
             assertThat(entity.getSemester()).isEqualTo(5);
             assertThat(entity.getIdentificationType()).isEqualTo("CC");
@@ -80,7 +84,7 @@ class MapperTest {
 
             assertThat(reconstructed.getName()).isEqualTo(original.getName());
             assertThat(reconstructed.getEmail()).isEqualTo(original.getEmail());
-            assertThat(reconstructed.getRole()).isEqualTo(original.getRole());
+            assertThat(reconstructed.getSchoolRelation()).isEqualTo(original.getSchoolRelation());
         }
 
 
@@ -90,8 +94,9 @@ class MapperTest {
             e.setName("Juan Pérez");
             e.setEmail("juan@eci.edu.co");
             e.setBirthDate(LocalDate.of(2000, 5, 15));
-            e.setRole(UserRole.STUDENT);
-            e.setRelationship("student");
+            e.setSchoolRelation(SchoolRelation.PROFESSOR);
+            e.setAcademicLevel(AcademicLevel.MASTER);
+            e.setProfessorType(ProfessorType.FULL_TIME);
             e.setAcademicProgram("Ingeniería de Sistemas");
             e.setSemester(5);
             e.setIdentificationType("CC");
@@ -106,8 +111,9 @@ class MapperTest {
             dto.setName("Juan Pérez");
             dto.setEmail("juan@eci.edu.co");
             dto.setBirthDate(LocalDate.of(2000, 5, 15));
-            dto.setRole(UserRole.STUDENT);
-            dto.setRelationship("student");
+            dto.setSchoolRelation(SchoolRelation.PROFESSOR);
+            dto.setAcademicLevel(AcademicLevel.MASTER);
+            dto.setProfessorType(ProfessorType.FULL_TIME);
             dto.setAcademicProgram("Ingeniería de Sistemas");
             dto.setSemester(5);
             dto.setIdentificationType("CC");

@@ -1,12 +1,14 @@
 package edu.eci.userService.entities;
 
-import edu.eci.userService.enums.UserRole;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 
 class EntityTest {
 
@@ -21,8 +23,9 @@ class EntityTest {
         entity.setName("Name");
         entity.setEmail("email@test.com");
         entity.setBirthDate(birthDate);
-        entity.setRole(UserRole.STUDENT);
-        entity.setRelationship("staff");
+        entity.setSchoolRelation(SchoolRelation.STUDENT);
+        entity.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        entity.setProfessorType(ProfessorType.FULL_TIME);
         entity.setAcademicProgram("Program");
         entity.setSemester(1);
         entity.setIdentificationType("CC");
@@ -33,8 +36,9 @@ class EntityTest {
         assertThat(entity.getName()).isEqualTo("Name");
         assertThat(entity.getEmail()).isEqualTo("email@test.com");
         assertThat(entity.getBirthDate()).isEqualTo(birthDate);
-        assertThat(entity.getRole()).isEqualTo(UserRole.STUDENT);
-        assertThat(entity.getRelationship()).isEqualTo("staff");
+        assertThat(entity.getSchoolRelation()).isEqualTo(SchoolRelation.STUDENT);
+        assertThat(entity.getAcademicLevel()).isEqualTo(AcademicLevel.UNDERGRADUATE);
+        assertThat(entity.getProfessorType()).isEqualTo(ProfessorType.FULL_TIME);
         assertThat(entity.getAcademicProgram()).isEqualTo("Program");
         assertThat(entity.getSemester()).isEqualTo(1);
         assertThat(entity.getIdentificationType()).isEqualTo("CC");

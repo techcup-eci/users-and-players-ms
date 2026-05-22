@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,13 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 
 import edu.eci.userService.dto.LoginRequest;
 import edu.eci.userService.dto.RoleChangeRequest;
 import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.dto.UserRegisterRequest;
 import edu.eci.userService.services.IdentityRoleService;
 import edu.eci.userService.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +54,7 @@ public class UserController {
 
     @PostMapping("/register")
     @Operation(summary = "Create a new user", description = "Create a new user with the provided information")
-    public UserDTO createUser(@RequestBody UserRegisterRequest request) {
+    public UserDTO createUser(@RequestBody UserDTO request) {
         return userService.createUser(request);
     }
 

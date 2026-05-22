@@ -4,7 +4,9 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 
 public class UserDTO {
 
@@ -12,8 +14,9 @@ public class UserDTO {
     private String name;
     private String email;
     private LocalDate birthDate;
-    private UserRole role;
-    private String relationship;
+    private SchoolRelation schoolRelation;
+    private AcademicLevel academicLevel;
+    private ProfessorType professorType;
     private String academicProgram;
     private int semester;
     private String identificationType;
@@ -25,14 +28,16 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(long id, String name, String email, LocalDate birthDate, UserRole role, String relationship,
-            String academicProgram, int semester, String identificationType, Long identificationNumber, Long phone) {
+    public UserDTO(long id, String name, String email, LocalDate birthDate, SchoolRelation schoolRelation,
+            AcademicLevel academicLevel, ProfessorType professorType, String academicProgram, int semester,
+            String identificationType, Long identificationNumber, Long phone) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.birthDate = birthDate;
-        this.role = role;
-        this.relationship = relationship;
+        this.schoolRelation = schoolRelation;
+        this.academicLevel = academicLevel;
+        this.professorType = professorType;
         this.academicProgram = academicProgram;
         this.semester = semester;
         this.identificationType = identificationType;
@@ -56,12 +61,16 @@ public class UserDTO {
         return birthDate;
     }
 
-    public UserRole getRole() {
-        return role;
+    public SchoolRelation getSchoolRelation() {
+        return schoolRelation;
     }
 
-    public String getRelationship() {
-        return relationship;
+    public AcademicLevel getAcademicLevel() {
+        return academicLevel;
+    }
+
+    public ProfessorType getProfessorType() {
+        return professorType;
     }
 
     public String getAcademicProgram() {
@@ -104,12 +113,16 @@ public class UserDTO {
         this.birthDate = birthDate;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setSchoolRelation(SchoolRelation schoolRelation) {
+        this.schoolRelation = schoolRelation;
     }
 
-    public void setRelationship(String relationship) {
-        this.relationship = relationship;
+    public void setAcademicLevel(AcademicLevel academicLevel) {
+        this.academicLevel = academicLevel;
+    }
+
+    public void setProfessorType(ProfessorType professorType) {
+        this.professorType = professorType;
     }
 
     public void setAcademicProgram(String academicProgram) {

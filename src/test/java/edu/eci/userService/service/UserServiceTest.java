@@ -22,9 +22,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.dto.UserRegisterRequest;
 import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 import edu.eci.userService.exceptions.InvalidCredentialsException;
 import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.UserRepository;
@@ -45,18 +46,19 @@ class UserServiceTest {
 
     private UserEntity sampleEntity;
     private UserDTO sampleDTO;
-    private UserRegisterRequest sampleRegisterRequest;
+    private UserDTO sampleRegisterDTO;
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper, passwordEncoder, "STUDENT");
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
         sampleEntity.setEmail("juan.perez@eci.edu.co");
         sampleEntity.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleEntity.setRole(UserRole.STUDENT);
-        sampleEntity.setRelationship("student");
+        sampleEntity.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleEntity.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleEntity.setProfessorType(ProfessorType.FULL_TIME);
         sampleEntity.setAcademicProgram("Ingeniería de Sistemas");
         sampleEntity.setSemester(5);
         sampleEntity.setIdentificationType("CC");
@@ -69,8 +71,9 @@ class UserServiceTest {
         sampleDTO.setName("Juan Pérez");
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRole.STUDENT);
-        sampleDTO.setRelationship("student");
+        sampleDTO.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleDTO.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleDTO.setProfessorType(ProfessorType.FULL_TIME);
         sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
@@ -78,17 +81,19 @@ class UserServiceTest {
         sampleDTO.setPhone(3001234567L);
         sampleDTO.setPassword("plain_password");
 
-        sampleRegisterRequest = new UserRegisterRequest();
-        sampleRegisterRequest.setName("Juan Pérez");
-        sampleRegisterRequest.setEmail("juan.perez@eci.edu.co");
-        sampleRegisterRequest.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleRegisterRequest.setRelationship("student");
-        sampleRegisterRequest.setAcademicProgram("Ingeniería de Sistemas");
-        sampleRegisterRequest.setSemester(5);
-        sampleRegisterRequest.setIdentificationType("CC");
-        sampleRegisterRequest.setIdentificationNumber(1000123456L);
-        sampleRegisterRequest.setPhone(3001234567L);
-        sampleRegisterRequest.setPassword("plain_password");
+        sampleRegisterDTO = new UserDTO();
+        sampleRegisterDTO.setName("Juan Pérez");
+        sampleRegisterDTO.setEmail("juan.perez@eci.edu.co");
+        sampleRegisterDTO.setBirthDate(LocalDate.of(2000, 5, 15));
+        sampleRegisterDTO.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleRegisterDTO.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleRegisterDTO.setProfessorType(ProfessorType.FULL_TIME);
+        sampleRegisterDTO.setAcademicProgram("Ingeniería de Sistemas");
+        sampleRegisterDTO.setSemester(5);
+        sampleRegisterDTO.setIdentificationType("CC");
+        sampleRegisterDTO.setIdentificationNumber(1000123456L);
+        sampleRegisterDTO.setPhone(3001234567L);
+        sampleRegisterDTO.setPassword("plain_password");
 
         lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
@@ -159,7 +164,7 @@ class UserServiceTest {
         void shouldPersistAndReturnDTO() {
             when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            UserDTO result = userService.createUser(sampleRegisterRequest);
+            UserDTO result = userService.createUser(sampleRegisterDTO);
 
             assertThat(result).isNotNull();
             assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
@@ -171,9 +176,9 @@ class UserServiceTest {
         void shouldMapAllFieldsOnCreate() {
             when(userRepository.save(any(UserEntity.class))).thenReturn(sampleEntity);
 
-            UserDTO result = userService.createUser(sampleRegisterRequest);
+            UserDTO result = userService.createUser(sampleRegisterDTO);
 
-            assertThat(result.getRole()).isEqualTo(UserRole.STUDENT);
+            assertThat(result.getSchoolRelation()).isEqualTo(SchoolRelation.STUDENT);
             assertThat(result.getSemester()).isEqualTo(5);
             assertThat(result.getAcademicProgram()).isEqualTo("Ingeniería de Sistemas");
         }
@@ -181,9 +186,9 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña es null")
         void shouldThrowWhenPasswordIsNull() {
-            sampleRegisterRequest.setPassword(null);
+                sampleRegisterDTO.setPassword(null);
 
-            assertThatThrownBy(() -> userService.createUser(sampleRegisterRequest))
+                assertThatThrownBy(() -> userService.createUser(sampleRegisterDTO))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Password");
         }
@@ -191,9 +196,9 @@ class UserServiceTest {
         @Test
         @DisplayName("Debe lanzar IllegalArgumentException cuando la contraseña esta vacia")
         void shouldThrowWhenPasswordIsBlank() {
-            sampleRegisterRequest.setPassword(" ");
+                sampleRegisterDTO.setPassword(" ");
 
-            assertThatThrownBy(() -> userService.createUser(sampleRegisterRequest))
+                assertThatThrownBy(() -> userService.createUser(sampleRegisterDTO))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Password");
         }
@@ -211,8 +216,9 @@ class UserServiceTest {
             updatedDTO.setName("Juan Actualizado");
             updatedDTO.setEmail("juan.perez@eci.edu.co");
             updatedDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-            updatedDTO.setRole(UserRole.STUDENT);
-            updatedDTO.setRelationship("student");
+            updatedDTO.setSchoolRelation(SchoolRelation.STUDENT);
+            updatedDTO.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+            updatedDTO.setProfessorType(ProfessorType.FULL_TIME);
             updatedDTO.setAcademicProgram("Ingeniería de IA");
             updatedDTO.setSemester(6);
             updatedDTO.setIdentificationType("CC");

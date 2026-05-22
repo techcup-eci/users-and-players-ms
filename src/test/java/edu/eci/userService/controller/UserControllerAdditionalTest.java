@@ -1,31 +1,34 @@
 package edu.eci.userService.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.exceptions.InvalidCredentialsException;
-import edu.eci.userService.services.IdentityRoleService;
-import edu.eci.userService.services.UserService;
+import java.time.LocalDate;
+
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDate;
-
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import edu.eci.userService.services.IdentityRoleService;
+import edu.eci.userService.services.UserService;
 
 
 @WebMvcTest(UserController.class)
@@ -55,8 +58,9 @@ class UserControllerAdditionalTest {
         sampleDTO.setName("Juan Perez");
         sampleDTO.setEmail("juan@gmail.com");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
-        sampleDTO.setRole(UserRole.STUDENT);
-        sampleDTO.setRelationship("student");
+        sampleDTO.setSchoolRelation(SchoolRelation.STUDENT);
+        sampleDTO.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        sampleDTO.setProfessorType(ProfessorType.FULL_TIME);
         sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");

@@ -1,9 +1,8 @@
 package edu.eci.userService.enums;
 
-public enum AcademicLevel {
-    UNDERGRADUATE, // Pregrado
-    POSTGRADUATE, // Posgrado
-    MASTER; // Maestría
+public enum ProfessorType {
+    FULL_TIME, // Tiempo completo
+    CHAIR; // Catedra
 
     @Override
     public String toString() {

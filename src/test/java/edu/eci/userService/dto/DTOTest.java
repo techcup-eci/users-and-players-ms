@@ -1,15 +1,17 @@
 package edu.eci.userService.dto;
 
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.JoinRequestStatus;
-import edu.eci.userService.enums.UserRole;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.JoinRequestStatus;
+import edu.eci.userService.enums.ProfessorType;
+import edu.eci.userService.enums.SchoolRelation;
 
 class DTOTest {
 
@@ -23,8 +25,9 @@ class DTOTest {
         dto.setName("Name");
         dto.setEmail("email@test.com");
         dto.setBirthDate(birthDate);
-        dto.setRole(UserRole.STUDENT);
-        dto.setRelationship("staff");
+        dto.setSchoolRelation(SchoolRelation.STUDENT);
+        dto.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
+        dto.setProfessorType(ProfessorType.FULL_TIME);
         dto.setAcademicProgram("Program");
         dto.setSemester(1);
         dto.setIdentificationType("CC");
@@ -35,8 +38,9 @@ class DTOTest {
         assertThat(dto.getName()).isEqualTo("Name");
         assertThat(dto.getEmail()).isEqualTo("email@test.com");
         assertThat(dto.getBirthDate()).isEqualTo(birthDate);
-        assertThat(dto.getRole()).isEqualTo(UserRole.STUDENT);
-        assertThat(dto.getRelationship()).isEqualTo("staff");
+        assertThat(dto.getSchoolRelation()).isEqualTo(SchoolRelation.STUDENT);
+        assertThat(dto.getAcademicLevel()).isEqualTo(AcademicLevel.UNDERGRADUATE);
+        assertThat(dto.getProfessorType()).isEqualTo(ProfessorType.FULL_TIME);
         assertThat(dto.getAcademicProgram()).isEqualTo("Program");
         assertThat(dto.getSemester()).isEqualTo(1);
         assertThat(dto.getIdentificationType()).isEqualTo("CC");
@@ -79,8 +83,9 @@ class DTOTest {
                 "Ana",
                 "ana@test.com",
                 birthDate,
-                UserRole.TEACHER,
-                "teacher",
+            SchoolRelation.PROFESSOR,
+            AcademicLevel.MASTER,
+            ProfessorType.CHAIR,
                 "Matematicas",
                 3,
                 "TI",
@@ -93,8 +98,9 @@ class DTOTest {
         assertThat(dto.getName()).isEqualTo("Ana");
         assertThat(dto.getEmail()).isEqualTo("ana@test.com");
         assertThat(dto.getBirthDate()).isEqualTo(birthDate);
-        assertThat(dto.getRole()).isEqualTo(UserRole.TEACHER);
-        assertThat(dto.getRelationship()).isEqualTo("teacher");
+        assertThat(dto.getSchoolRelation()).isEqualTo(SchoolRelation.PROFESSOR);
+        assertThat(dto.getAcademicLevel()).isEqualTo(AcademicLevel.MASTER);
+        assertThat(dto.getProfessorType()).isEqualTo(ProfessorType.CHAIR);
         assertThat(dto.getAcademicProgram()).isEqualTo("Matematicas");
         assertThat(dto.getSemester()).isEqualTo(3);
         assertThat(dto.getIdentificationType()).isEqualTo("TI");

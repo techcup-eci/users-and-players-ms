@@ -1,21 +1,23 @@
 package edu.eci.userService.domain;
 
-import edu.eci.userService.dto.JoinRequestDTO;
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.entities.JoinRequestEntity;
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.JoinRequestStatus;
-import edu.eci.userService.mappers.JoinRequestMapper;
-import edu.eci.userService.mappers.UserMapper;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import edu.eci.userService.dto.JoinRequestDTO;
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.JoinRequestEntity;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.enums.AcademicLevel;
+import edu.eci.userService.enums.JoinRequestStatus;
+import edu.eci.userService.enums.SchoolRelation;
+import edu.eci.userService.mappers.JoinRequestMapper;
+import edu.eci.userService.mappers.UserMapper;
 
 @DisplayName("JoinRequestMapper Tests")
 class JoinRequestMapperTest {
@@ -38,7 +40,8 @@ class JoinRequestMapperTest {
         playerEntity.setSemester(0);
         playerEntity.setPhone(0L);
         playerEntity.setBirthDate(LocalDate.of(2000, 1, 1));
-        playerEntity.setRelationship("student");
+        playerEntity.setSchoolRelation(SchoolRelation.STUDENT);
+        playerEntity.setAcademicLevel(AcademicLevel.UNDERGRADUATE);
         playerEntity.setIdentificationType("CC");
         playerEntity.setIdentificationNumber(123456L);
 

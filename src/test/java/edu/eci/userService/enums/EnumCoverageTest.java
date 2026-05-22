@@ -1,9 +1,8 @@
 package edu.eci.userService.enums;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DisplayName("Enum Coverage Tests")
@@ -87,40 +86,6 @@ class EnumCoverageTest {
 
 
     @Test
-    @DisplayName("UserRole: debe contener los valores esperados")
-    void userRoleValues() {
-        assertThat(UserRole.values()).containsExactlyInAnyOrder(
-            UserRole.STUDENT,
-            UserRole.GRADUATE,
-            UserRole.ADMINISTRATIVE_STAFF,
-            UserRole.ADMINISTRATOR,
-            UserRole.ORGANIZER,
-            UserRole.TEACHER,
-            UserRole.OTHER
-        );
-    }
-
-    @Test
-    @DisplayName("UserRole: toString debe retornar el nombre")
-    void userRoleToString() {
-        assertThat(UserRole.STUDENT.toString()).isEqualTo("STUDENT");
-        assertThat(UserRole.GRADUATE.toString()).isEqualTo("GRADUATE");
-        assertThat(UserRole.ADMINISTRATIVE_STAFF.toString()).isEqualTo("ADMINISTRATIVE_STAFF");
-        assertThat(UserRole.ADMINISTRATOR.toString()).isEqualTo("ADMINISTRATOR");
-        assertThat(UserRole.ORGANIZER.toString()).isEqualTo("ORGANIZER");
-        assertThat(UserRole.TEACHER.toString()).isEqualTo("TEACHER");
-        assertThat(UserRole.OTHER.toString()).isEqualTo("OTHER");
-    }
-
-    @Test
-    @DisplayName("UserRole: valueOf debe funcionar correctamente")
-    void userRoleValueOf() {
-        assertThat(UserRole.valueOf("STUDENT")).isEqualTo(UserRole.STUDENT);
-        assertThat(UserRole.valueOf("ORGANIZER")).isEqualTo(UserRole.ORGANIZER);
-    }
-
-
-    @Test
     @DisplayName("ProfileStatus: debe contener ACTIVE e INACTIVE")
     void profileStatusValues() {
         assertThat(ProfileStatus.values()).containsExactlyInAnyOrder(
@@ -150,10 +115,7 @@ class EnumCoverageTest {
         assertThat(SchoolRelation.values()).containsExactlyInAnyOrder(
             SchoolRelation.STUDENT,
             SchoolRelation.PROFESSOR,
-            SchoolRelation.GRADUATE,
-            SchoolRelation.GUEST,
-            SchoolRelation.ADMINISTRATIVE_STAFF,
-            SchoolRelation.FAMILY_MEMBER
+            SchoolRelation.GRADUATE
         );
     }
 
@@ -161,15 +123,15 @@ class EnumCoverageTest {
     @DisplayName("SchoolRelation: toString debe retornar el nombre")
     void schoolRelationToString() {
         assertThat(SchoolRelation.STUDENT.toString()).isEqualTo("STUDENT");
-        assertThat(SchoolRelation.GUEST.toString()).isEqualTo("GUEST");
         assertThat(SchoolRelation.PROFESSOR.toString()).isEqualTo("PROFESSOR");
+        assertThat(SchoolRelation.GRADUATE.toString()).isEqualTo("GRADUATE");
     }
 
     @Test
     @DisplayName("SchoolRelation: valueOf debe funcionar correctamente")
     void schoolRelationValueOf() {
         assertThat(SchoolRelation.valueOf("STUDENT")).isEqualTo(SchoolRelation.STUDENT);
-        assertThat(SchoolRelation.valueOf("GUEST")).isEqualTo(SchoolRelation.GUEST);
+        assertThat(SchoolRelation.valueOf("PROFESSOR")).isEqualTo(SchoolRelation.PROFESSOR);
     }
 
 
@@ -178,9 +140,8 @@ class EnumCoverageTest {
     void academicLevelValues() {
         assertThat(AcademicLevel.values()).containsExactlyInAnyOrder(
             AcademicLevel.UNDERGRADUATE,
-            AcademicLevel.SPECIALIZATION,
-            AcademicLevel.MASTER,
-            AcademicLevel.DOCTORATE
+            AcademicLevel.POSTGRADUATE,
+            AcademicLevel.MASTER
         );
     }
 
@@ -188,16 +149,15 @@ class EnumCoverageTest {
     @DisplayName("AcademicLevel: toString debe retornar el nombre")
     void academicLevelToString() {
         assertThat(AcademicLevel.UNDERGRADUATE.toString()).isEqualTo("UNDERGRADUATE");
-        assertThat(AcademicLevel.SPECIALIZATION.toString()).isEqualTo("SPECIALIZATION");
+        assertThat(AcademicLevel.POSTGRADUATE.toString()).isEqualTo("POSTGRADUATE");
         assertThat(AcademicLevel.MASTER.toString()).isEqualTo("MASTER");
-        assertThat(AcademicLevel.DOCTORATE.toString()).isEqualTo("DOCTORATE");
     }
 
     @Test
     @DisplayName("AcademicLevel: valueOf debe funcionar correctamente")
     void academicLevelValueOf() {
         assertThat(AcademicLevel.valueOf("MASTER")).isEqualTo(AcademicLevel.MASTER);
-        assertThat(AcademicLevel.valueOf("DOCTORATE")).isEqualTo(AcademicLevel.DOCTORATE);
+        assertThat(AcademicLevel.valueOf("POSTGRADUATE")).isEqualTo(AcademicLevel.POSTGRADUATE);
     }
 
 

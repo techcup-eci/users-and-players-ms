@@ -1,17 +1,17 @@
 package edu.eci.userService.services;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import edu.eci.userService.repository.UserRepository;
-import edu.eci.userService.mappers.UserMapper;
-import edu.eci.userService.dto.UserDTO;
-import edu.eci.userService.dto.UserRegisterRequest;
-import edu.eci.userService.entities.UserEntity;
-import edu.eci.userService.enums.UserRole;
-import edu.eci.userService.exceptions.InvalidCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import java.util.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import edu.eci.userService.dto.UserDTO;
+import edu.eci.userService.entities.UserEntity;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import edu.eci.userService.mappers.UserMapper;
+import edu.eci.userService.repository.UserRepository;
 
 @Service
 public class UserService {
@@ -19,16 +19,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UserRole defaultUserRole;
 
     public UserService(UserRepository userRepository,
             UserMapper userMapper,
-            PasswordEncoder passwordEncoder,
-            @Value("${app.default.user-role:STUDENT}") String defaultUserRole) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.defaultUserRole = UserRole.valueOf(defaultUserRole);
     }
 
     public List<UserDTO> getAllUsers() {
@@ -45,23 +42,24 @@ public class UserService {
         return dto;
     }
 
-    public UserDTO createUser(UserRegisterRequest request) {
-        if (request == null) {
+    public UserDTO createUser(UserDTO userDTO) {
+        if (userDTO == null) {
             throw new IllegalArgumentException("Request is required");
         }
         UserEntity entity = new UserEntity();
-        entity.setName(request.getName());
-        entity.setEmail(request.getEmail());
-        entity.setBirthDate(request.getBirthDate());
-        entity.setRole(defaultUserRole);
-        entity.setRelationship(request.getRelationship());
-        entity.setAcademicProgram(request.getAcademicProgram());
-        entity.setSemester(request.getSemester());
-        entity.setIdentificationType(request.getIdentificationType());
-        entity.setIdentificationNumber(request.getIdentificationNumber());
-        entity.setPhone(request.getPhone() != null ? request.getPhone() : 0L);
+        entity.setName(userDTO.getName());
+        entity.setEmail(userDTO.getEmail());
+        entity.setBirthDate(userDTO.getBirthDate());
+        entity.setSchoolRelation(userDTO.getSchoolRelation());
+        entity.setAcademicLevel(userDTO.getAcademicLevel());
+        entity.setProfessorType(userDTO.getProfessorType());
+        entity.setAcademicProgram(userDTO.getAcademicProgram());
+        entity.setSemester(userDTO.getSemester());
+        entity.setIdentificationType(userDTO.getIdentificationType());
+        entity.setIdentificationNumber(userDTO.getIdentificationNumber());
+        entity.setPhone(userDTO.getPhone() != null ? userDTO.getPhone() : 0L);
 
-        String rawPassword = request.getPassword();
+        String rawPassword = userDTO.getPassword();
         if (rawPassword == null || rawPassword.isBlank()) {
             throw new IllegalArgumentException("Password is required");
         }
@@ -77,8 +75,9 @@ public class UserService {
         entitie.setName(userDTO.getName());
         entitie.setEmail(userDTO.getEmail());
         entitie.setBirthDate(userDTO.getBirthDate());
-        entitie.setRole(userDTO.getRole());
-        entitie.setRelationship(userDTO.getRelationship());
+        entitie.setSchoolRelation(userDTO.getSchoolRelation());
+        entitie.setAcademicLevel(userDTO.getAcademicLevel());
+        entitie.setProfessorType(userDTO.getProfessorType());
         entitie.setAcademicProgram(userDTO.getAcademicProgram());
         entitie.setSemester(userDTO.getSemester());
         entitie.setIdentificationType(userDTO.getIdentificationType());
