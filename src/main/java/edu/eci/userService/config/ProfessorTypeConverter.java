@@ -3,9 +3,13 @@ package edu.eci.userService.config;
 import edu.eci.userService.enums.ProfessorType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Converter
 public class ProfessorTypeConverter implements AttributeConverter<ProfessorType, String> {
+
+    private static final Logger log = LoggerFactory.getLogger(ProfessorTypeConverter.class);
 
     @Override
     public String convertToDatabaseColumn(ProfessorType attribute) {
@@ -18,9 +22,8 @@ public class ProfessorTypeConverter implements AttributeConverter<ProfessorType,
         try {
             return ProfessorType.valueOf(dbData.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                "Invalid ProfessorType value in database: '" + dbData + "'. " +
-                "Expected one of: FULL_TIME, CHAIR");
+            log.warn("Unknown ProfessorType value in database: '{}'. Returning null.", dbData);
+            return null;
         }
     }
 }

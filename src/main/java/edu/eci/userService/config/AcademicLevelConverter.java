@@ -3,9 +3,13 @@ package edu.eci.userService.config;
 import edu.eci.userService.enums.AcademicLevel;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Converter
 public class AcademicLevelConverter implements AttributeConverter<AcademicLevel, String> {
+
+    private static final Logger log = LoggerFactory.getLogger(AcademicLevelConverter.class);
 
     @Override
     public String convertToDatabaseColumn(AcademicLevel attribute) {
@@ -18,9 +22,8 @@ public class AcademicLevelConverter implements AttributeConverter<AcademicLevel,
         try {
             return AcademicLevel.valueOf(dbData.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                "Invalid AcademicLevel value in database: '" + dbData + "'. " +
-                "Expected one of: UNDERGRADUATE, POSTGRADUATE, MASTER");
+            log.warn("Unknown AcademicLevel value in database: '{}'. Returning null.", dbData);
+            return null;
         }
     }
 }
