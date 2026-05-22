@@ -73,8 +73,13 @@ public class AuditAspect {
             auditRequest.setEntityId(entityId);
             auditRequest.setPerformedBy(performedBy);
             auditRequest.setStatus("ERROR");
-            auditRequest.setDetail(ex.getClass().getSimpleName() + ": " + ex.getMessage());
-            auditService.log(auditRequest);
+            String rawDetail = ex.getClass().getSimpleName() + ": " + ex.getMessage();
+            auditRequest.setDetail(rawDetail != null && rawDetail.length() > 497 ? rawDetail.substring(0, 497) + "..." : rawDetail);
+            try {
+                auditService.log(auditRequest);
+            } catch (Exception logEx) {
+                // No propagar errores de auditoría sobre el error original
+            }
             throw ex;
         }
         return result;
