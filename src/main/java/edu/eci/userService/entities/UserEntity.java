@@ -2,14 +2,16 @@ package edu.eci.userService.entities;
 
 import java.time.LocalDate;
 
+import edu.eci.userService.config.AcademicLevelConverter;
+import edu.eci.userService.config.ProfessorTypeConverter;
+import edu.eci.userService.config.SchoolRelationConverter;
 import edu.eci.userService.enums.AcademicLevel;
 import edu.eci.userService.enums.ProfessorType;
 import edu.eci.userService.enums.SchoolRelation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,14 +38,14 @@ public class UserEntity {
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = SchoolRelationConverter.class)
     @Column(name = "relationship", nullable = false)
     private SchoolRelation schoolRelation;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = AcademicLevelConverter.class)
     private AcademicLevel academicLevel;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = ProfessorTypeConverter.class)
     private ProfessorType professorType;
 
     @Column
