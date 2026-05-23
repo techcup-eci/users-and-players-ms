@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientResponseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.eci.userService.dto.LoginRequest;
 import edu.eci.userService.dto.RoleChangeRequest;
 import edu.eci.userService.dto.UserDTO;
@@ -26,6 +29,8 @@ import io.swagger.v3.oas.annotations.Operation;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
     private final IdentityRoleService identityRoleService;
@@ -55,6 +60,13 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "Create a new user", description = "Create a new user with the provided information")
     public UserDTO createUser(@RequestBody UserDTO request) {
+        log.info("=== REGISTER REQUEST RECEIVED ===");
+        log.info("name: {}", request.getName());
+        log.info("email: {}", request.getEmail());
+        log.info("academicLevel: {}", request.getAcademicLevel());
+        log.info("professorType: {}", request.getProfessorType());
+        log.info("schoolRelation: {}", request.getSchoolRelation());
+        log.info("=================================");
         return userService.createUser(request);
     }
 
