@@ -17,7 +17,9 @@ public class UserDTO {
     private LocalDate birthDate;
     @JsonAlias("relationship")
     private SchoolRelation schoolRelation;
+    @JsonAlias("academic_level")
     private AcademicLevel academicLevel;
+    @JsonAlias("professor_type")
     private ProfessorType professorType;
     private String academicProgram;
     private int semester;
