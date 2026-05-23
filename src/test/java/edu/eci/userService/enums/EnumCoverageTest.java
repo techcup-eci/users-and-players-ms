@@ -115,7 +115,10 @@ class EnumCoverageTest {
         assertThat(SchoolRelation.values()).containsExactlyInAnyOrder(
             SchoolRelation.STUDENT,
             SchoolRelation.PROFESSOR,
-            SchoolRelation.GRADUATE
+            SchoolRelation.TEACHER,
+            SchoolRelation.GRADUATE,
+            SchoolRelation.STAFF,
+            SchoolRelation.FAMILY
         );
     }
 
@@ -124,7 +127,10 @@ class EnumCoverageTest {
     void schoolRelationToString() {
         assertThat(SchoolRelation.STUDENT.toString()).isEqualTo("STUDENT");
         assertThat(SchoolRelation.PROFESSOR.toString()).isEqualTo("PROFESSOR");
+        assertThat(SchoolRelation.TEACHER.toString()).isEqualTo("TEACHER");
         assertThat(SchoolRelation.GRADUATE.toString()).isEqualTo("GRADUATE");
+        assertThat(SchoolRelation.STAFF.toString()).isEqualTo("STAFF");
+        assertThat(SchoolRelation.FAMILY.toString()).isEqualTo("FAMILY");
     }
 
     @Test
@@ -132,6 +138,10 @@ class EnumCoverageTest {
     void schoolRelationValueOf() {
         assertThat(SchoolRelation.valueOf("STUDENT")).isEqualTo(SchoolRelation.STUDENT);
         assertThat(SchoolRelation.valueOf("PROFESSOR")).isEqualTo(SchoolRelation.PROFESSOR);
+        assertThat(SchoolRelation.valueOf("TEACHER")).isEqualTo(SchoolRelation.TEACHER);
+        assertThat(SchoolRelation.valueOf("GRADUATE")).isEqualTo(SchoolRelation.GRADUATE);
+        assertThat(SchoolRelation.valueOf("STAFF")).isEqualTo(SchoolRelation.STAFF);
+        assertThat(SchoolRelation.valueOf("FAMILY")).isEqualTo(SchoolRelation.FAMILY);
     }
 
 
