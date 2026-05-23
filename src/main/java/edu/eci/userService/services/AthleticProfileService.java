@@ -55,6 +55,7 @@ public class AthleticProfileService {
     }
 
     public AthleticProfileDTO createAthleticProfile(AthleticProfileDTO athleticProfileDTO) {
+        System.out.println("Creating athletic profile for email: " + athleticProfileDTO.getEmail());
         UserEntity user = userRepository.findByEmail(athleticProfileDTO.getEmail());
         if (user == null) {
             throw new NoSuchElementException("User not found with email: " + athleticProfileDTO.getEmail());
