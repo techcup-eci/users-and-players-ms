@@ -191,4 +191,23 @@ class DTOTest {
         bySetter.setRole("PLAYER");
         assertThat(bySetter.getRole()).isEqualTo("PLAYER");
     }
+
+    @Test
+    @DisplayName("UserDTO: Deserialization with relationship alias")
+    void userDTODeserializationTest() throws Exception {
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+        String jsonWithRelationship = "{\"relationship\":\"STUDENT\",\"name\":\"Carlos\"}";
+        UserDTO dto = mapper.readValue(jsonWithRelationship, UserDTO.class);
+
+        assertThat(dto.getSchoolRelation()).isEqualTo(SchoolRelation.STUDENT);
+        assertThat(dto.getName()).isEqualTo("Carlos");
+
+        String jsonWithSchoolRelation = "{\"schoolRelation\":\"PROFESSOR\",\"name\":\"Juan\"}";
+        UserDTO dto2 = mapper.readValue(jsonWithSchoolRelation, UserDTO.class);
+
+        assertThat(dto2.getSchoolRelation()).isEqualTo(SchoolRelation.PROFESSOR);
+        assertThat(dto2.getName()).isEqualTo("Juan");
+    }
 }
