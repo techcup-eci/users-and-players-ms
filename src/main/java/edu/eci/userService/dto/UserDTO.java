@@ -2,6 +2,8 @@ package edu.eci.userService.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import edu.eci.userService.enums.UserRoleEnum;
 
 public class UserDTO {
@@ -17,7 +19,8 @@ public class UserDTO {
     private String identificationType;
     private Long identificationNumber;
     private Long phone;
-    private String systemRole;  // identity-ms system role: INVITED, PLAYER, CAPTAIN, ORGANIZER, REFEREE, ADMIN
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
     public UserDTO() {
     }

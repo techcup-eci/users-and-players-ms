@@ -6,6 +6,8 @@ import edu.eci.userService.enums.UserRoleEnum;
 import edu.eci.userService.mappers.UserMapper;
 import edu.eci.userService.repository.UserRepository;
 import edu.eci.userService.services.UserService;
+import edu.eci.userService.exceptions.InvalidCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,6 +42,9 @@ class UserServiceTest {
 
     private final UserMapper userMapper = new UserMapper();
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private UserService userService;
 
     private UserEntity sampleEntity;
@@ -47,7 +52,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper);
+        userService = new UserService(userRepository, userMapper, passwordEncoder);
         sampleEntity = new UserEntity();
         sampleEntity.setId(1L);
         sampleEntity.setName("Juan Pérez");
@@ -74,7 +79,9 @@ class UserServiceTest {
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
         sampleDTO.setPhone(3001234567L);
-        sampleDTO.setSystemRole("PLAYER");
+        sampleDTO.setPassword("plain_password");
+
+        lenient().when(passwordEncoder.encode("plain_password")).thenReturn("hashed_password");
     }
 
     // ── getAllUsers ──────────────────────────────────────────────────────────
@@ -233,6 +240,54 @@ class UserServiceTest {
                     .hasMessageContaining("99");
 
             verify(userRepository, never()).deleteById(any());
+        }
+    }
+
+    // ── authenticate ────────────────────────────────────────────────────────
+
+    @Nested
+    @DisplayName("authenticate()")
+    class Authenticate {
+
+        @Test
+        @DisplayName("Debe autenticar cuando las credenciales son correctas")
+        void shouldAuthenticateWhenCredentialsAreValid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("plain_password", "hashed_password")).thenReturn(true);
+
+            UserDTO result = userService.authenticate("juan.perez@eci.edu.co", "plain_password");
+
+            assertThat(result).isNotNull();
+            assertThat(result.getEmail()).isEqualTo("juan.perez@eci.edu.co");
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando la clave es incorrecta")
+        void shouldThrowWhenPasswordIsInvalid() {
+            when(userRepository.findByEmail("juan.perez@eci.edu.co")).thenReturn(sampleEntity);
+            when(passwordEncoder.matches("wrong_password", "hashed_password")).thenReturn(false);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", "wrong_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar InvalidCredentialsException cuando el usuario no existe")
+        void shouldThrowWhenUserNotFound() {
+            when(userRepository.findByEmail("missing@eci.edu.co")).thenReturn(null);
+
+            assertThatThrownBy(() -> userService.authenticate("missing@eci.edu.co", "plain_password"))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando faltan datos")
+        void shouldThrowWhenMissingData() {
+            assertThatThrownBy(() -> userService.authenticate("", "plain_password"))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThatThrownBy(() -> userService.authenticate("juan.perez@eci.edu.co", ""))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

@@ -52,7 +52,7 @@ class AuditAspectTest {
     }
 
     @Test
-    @DisplayName("Debe auditar correctamente una operación exitosa (Create)")
+    @DisplayName("Debe auditar correctamente una operacion exitosa (Create)")
     void auditSuccessTest() throws Throwable {
         Method method = UserController.class.getMethod("createUser", UserDTO.class);
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
@@ -66,15 +66,19 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("result");
-        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
-        verify(auditService).log(captor.capture());
-        AuditLogRequest req = captor.getValue();
-        assertThat(req.getAction()).isEqualTo("CREATE_USER");
-        assertThat(req.getStatus()).isEqualTo("SUCCESS");
+        verify(auditService).log(ArgumentMatchers.argThat(req ->
+            "CREATE_USER".equals(req.getAction()) &&
+            "POST".equals(req.getHttpMethod()) &&
+            "/User".equals(req.getEndpoint()) &&
+            "User".equals(req.getEntityType()) &&
+            "127.0.0.1".equals(req.getPerformedBy()) &&
+            "SUCCESS".equals(req.getStatus()) &&
+            req.getDetail() == null
+        ));
     }
 
     @Test
-    @DisplayName("Debe auditar correctamente una operación con ID (GetById)")
+    @DisplayName("Debe auditar correctamente una operacion con ID (GetById)")
     void auditWithIdTest() throws Throwable {
         Method method = UserController.class.getMethod("getUserById", long.class);
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
@@ -87,13 +91,13 @@ class AuditAspectTest {
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
-        verify(auditService).log(captor.capture());
-        assertThat(captor.getValue().getEntityId()).isEqualTo("1");
+        verify(auditService).log(ArgumentMatchers.argThat(req ->
+            "1".equals(req.getEntityId())
+        ));
     }
 
     @Test
-    @DisplayName("Debe auditar correctamente una operación fallida")
+    @DisplayName("Debe auditar correctamente una operacion fallida")
     void auditErrorTest() throws Throwable {
         Method method = UserController.class.getMethod("deleteUser", long.class);
         when(proceedingJoinPoint.getSignature()).thenReturn(methodSignature);
@@ -107,10 +111,13 @@ class AuditAspectTest {
         assertThatThrownBy(() -> auditAspect.auditUser(proceedingJoinPoint))
                 .isInstanceOf(RuntimeException.class);
 
-        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
-        verify(auditService).log(captor.capture());
-        assertThat(captor.getValue().getStatus()).isEqualTo("ERROR");
-        assertThat(captor.getValue().getDetail()).contains("Test Exception");
+        verify(auditService).log(ArgumentMatchers.argThat(req ->
+            "DELETE_USER".equals(req.getAction()) &&
+            "User".equals(req.getEntityType()) &&
+            "99".equals(req.getEntityId()) &&
+            "ERROR".equals(req.getStatus()) &&
+            req.getDetail() != null && req.getDetail().contains("Test Exception")
+        ));
     }
 
     @Test
@@ -124,7 +131,7 @@ class AuditAspectTest {
         Object result = auditAspect.auditUser(proceedingJoinPoint);
 
         assertThat(result).isEqualTo("list");
-        verify(auditService, never()).log(any());
+        verify(auditService, never()).log(any(AuditLogRequest.class));
     }
 
     @Test
@@ -141,14 +148,15 @@ class AuditAspectTest {
 
         auditAspect.auditUser(proceedingJoinPoint);
 
-        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
-        verify(auditService).log(captor.capture());
-        assertThat(captor.getValue().getPerformedBy()).isEqualTo("10.0.0.1");
+        verify(auditService).log(ArgumentMatchers.argThat(req ->
+            "10.0.0.1".equals(req.getPerformedBy())
+        ));
     }
 
     @Test
-    @DisplayName("Debe manejar métodos desconocidos")
+    @DisplayName("Debe manejar metodos desconocidos")
     void unknownMethodActionTest() throws Throwable {
+        // Creamos un metodo ficticio para probar el fallback de resolveAction
         class Fake { public void customOp() {} }
         Method method = Fake.class.getMethod("customOp");
         
@@ -162,8 +170,9 @@ class AuditAspectTest {
 
         auditAspect.auditAthleticProfile(proceedingJoinPoint);
 
-        ArgumentCaptor<AuditLogRequest> captor = ArgumentCaptor.forClass(AuditLogRequest.class);
-        verify(auditService).log(captor.capture());
-        assertThat(captor.getValue().getAction()).isEqualTo("CUSTOMOP_ATHLETICPROFILE");
+        verify(auditService).log(ArgumentMatchers.argThat(req ->
+            "CUSTOMOP_ATHLETICPROFILE".equals(req.getAction()) &&
+            "AthleticProfile".equals(req.getEntityType())
+        ));
     }
 }

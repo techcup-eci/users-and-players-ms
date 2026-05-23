@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,12 +28,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Tests de integración de la capa web para {@link UserController}.
- *
- * Se usa @WebMvcTest para levantar sólo el contexto del controller,
- * mockeando el servicio con @MockBean.
+ * Tests de integracion de la capa web para UserController.
  */
 @WebMvcTest(UserController.class)
+@Import(GlobalExceptionHandler.class)
 class UserControllerTest {
 
     @Autowired
@@ -51,12 +50,12 @@ class UserControllerTest {
 
         sampleDTO = new UserDTO();
         sampleDTO.setId(1L);
-        sampleDTO.setName("Juan Pérez");
+        sampleDTO.setName("Juan Perez");
         sampleDTO.setEmail("juan.perez@eci.edu.co");
         sampleDTO.setBirthDate(LocalDate.of(2000, 5, 15));
         sampleDTO.setRole(UserRoleEnum.STUDENT);
-        sampleDTO.setRelationship("student");
-        sampleDTO.setAcademicProgram("Ingeniería de Sistemas");
+        sampleDTO.setRelationShip("student");
+        sampleDTO.setAcademicProgram("Ingenieria de Sistemas");
         sampleDTO.setSemester(5);
         sampleDTO.setIdentificationType("CC");
         sampleDTO.setIdentificationNumber(1000123456L);
@@ -64,7 +63,7 @@ class UserControllerTest {
         sampleDTO.setSystemRole("PLAYER");
     }
 
-    // ── GET /api/users ────────────────────────────────────────────────────────────
+    // --- GET /api/users ---
 
     @Nested
     @DisplayName("GET /api/users")
@@ -78,12 +77,12 @@ class UserControllerTest {
             mockMvc.perform(get("/api/users"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))
-                    .andExpect(jsonPath("$[0].name", is("Juan Pérez")))
+                    .andExpect(jsonPath("$[0].name", is("Juan Perez")))
                     .andExpect(jsonPath("$[0].email", is("juan.perez@eci.edu.co")));
         }
 
         @Test
-        @DisplayName("Debe retornar 200 con lista vacía cuando no hay usuarios")
+        @DisplayName("Debe retornar 200 con lista vacia cuando no hay usuarios")
         void shouldReturn200WithEmptyList() throws Exception {
             when(userService.getAllUsers()).thenReturn(List.of());
 
@@ -93,7 +92,7 @@ class UserControllerTest {
         }
     }
 
-    // ── GET /api/users/{id} ───────────────────────────────────────────────────────
+    // --- GET /api/users/{id} ---
 
     @Nested
     @DisplayName("GET /api/users/{id}")
@@ -107,14 +106,14 @@ class UserControllerTest {
             mockMvc.perform(get("/api/users/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(1)))
-                    .andExpect(jsonPath("$.name", is("Juan Pérez")));
+                    .andExpect(jsonPath("$.name", is("Juan Perez")));
         }
     }
 
-    // ── POST /api/users ───────────────────────────────────────────────────────────
+    // --- POST /api/users/register ---
 
     @Nested
-    @DisplayName("POST /api/users")
+    @DisplayName("POST /api/users/register")
     class CreateUser {
 
         @Test
@@ -122,18 +121,18 @@ class UserControllerTest {
         void shouldReturn200WithCreatedUser() throws Exception {
             when(userService.createUser(any(UserDTO.class))).thenReturn(sampleDTO);
 
-            mockMvc.perform(post("/api/users")
+            mockMvc.perform(post("/api/users/register")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(sampleDTO)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.name", is("Juan Pérez")))
+                    .andExpect(jsonPath("$.name", is("Juan Perez")))
                     .andExpect(jsonPath("$.email", is("juan.perez@eci.edu.co")));
 
             verify(userService).createUser(any(UserDTO.class));
         }
     }
 
-    // ── PUT /api/users/{id} ───────────────────────────────────────────────────────
+    // --- PUT /api/users/{id} ---
 
     @Nested
     @DisplayName("PUT /api/users/{id}")
@@ -157,14 +156,14 @@ class UserControllerTest {
         }
     }
 
-    // ── DELETE /api/users/{id} ────────────────────────────────────────────────────
+    // --- DELETE /api/users/{id} ---
 
     @Nested
     @DisplayName("DELETE /api/users/{id}")
     class DeleteUser {
 
         @Test
-        @DisplayName("Debe retornar 200 con mensaje de éxito")
+        @DisplayName("Debe retornar 200 con mensaje de exito")
         void shouldReturn200WithSuccessMessage() throws Exception {
             doNothing().when(userService).deleteUser(1L);
 
@@ -176,13 +175,12 @@ class UserControllerTest {
         @Test
         @DisplayName("Debe retornar 404 cuando el usuario no existe")
         void shouldReturn404WhenUserNotFound() throws Exception {
-
             doThrow(new NoSuchElementException("No user found with ID: 99"))
                     .when(userService).deleteUser(99L);
 
             mockMvc.perform(delete("/api/users/99"))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.error", containsString("No user found")));
+                    .andExpect(jsonPath("$.error", is("No user found with ID: 99")));
         }
     }
 }

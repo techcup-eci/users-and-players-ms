@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -193,14 +192,15 @@ class AthleticProfileControllerTest {
         }
 
         @Test
-        void shouldReturn404WhenProfileNotFound() throws Exception {
-
+        @DisplayName("Debe retornar 400 cuando el perfil no existe")
+        void shouldReturn400WhenProfileNotFound() throws Exception {
             doThrow(new IllegalArgumentException("Athletic profile not found"))
                     .when(athleticProfileService)
                     .deleteAthleticProfile(99L);
 
-            mockMvc.perform(delete("/api/athletic-profiles/99"))
-                    .andExpect(status().isNotFound());
+            mockMvc.perform(delete("/AthleticProfile/99"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error", is("Athletic profile not found")));
         }
     }
 }
