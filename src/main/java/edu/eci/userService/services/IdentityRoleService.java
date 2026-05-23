@@ -28,7 +28,7 @@ public class IdentityRoleService {
             throw new IllegalArgumentException("Role is required");
         }
 
-        String url = gatewayConfig.getGatewayUrl() + "/api/auth/users/" + userId + "/role";
+        String url = gatewayConfig.getGatewayUrl() + "/api/identity/users/" + userId + "/role";
         restClient.patch()
                 .uri(url)
                 .header(HttpHeaders.AUTHORIZATION, authorization)
