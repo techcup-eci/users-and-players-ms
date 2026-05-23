@@ -24,6 +24,7 @@ public class AthleticProfileMapper {
         dto.setDorsalNumber(entity.getDorsalNumber());
         dto.setId(entity.getId());
         dto.setUser(userMapper.toDTO(entity.getUser())); // ← convierte a UserDTO, sin password
+        dto.setEmail(entity.getUser() != null ? entity.getUser().getEmail() : null);
         dto.setNickName(entity.getNickName());
         dto.setPosition(entity.getPosition());
         dto.setLaterality(entity.getLaterality());

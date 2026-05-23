@@ -38,6 +38,12 @@ public class AthleticProfileService {
                 .orElseThrow(() -> new NoSuchElementException("No athletic profile found for userId: " + userId));
     }
 
+    public AthleticProfileDTO getAthleticProfileByEmail(String email) {
+        return athleticProfileRepository.findByUserEmail(email)
+                .map(athleticProfileMapper::toDTO)
+                .orElseThrow(() -> new NoSuchElementException("No athletic profile found for email: " + email));
+    }
+
     public List<AthleticProfileDTO> getAthleticProfileByPosition(String position) {
         List<AthleticProfileDTO> dto = new ArrayList<>();
         for (AthleticProfileEntity entity : athleticProfileRepository.findByPosition(position)) {

@@ -3,7 +3,10 @@ package edu.eci.userService.enums;
 public enum SchoolRelation {
     STUDENT,
     PROFESSOR,
-    GRADUATE;
+    TEACHER,
+    GRADUATE,
+    STAFF,
+    FAMILY;
 
     @Override
     public String toString() {

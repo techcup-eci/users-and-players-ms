@@ -119,4 +119,14 @@ public class UserController {
                     .body(Map.of("error", "Identity role update failed", "details", ex.getResponseBodyAsString()));
         }
     }
+
+    @GetMapping("/{id}/has-active-enrollment")
+    @Operation(summary = "Check active tournament enrollment",
+            description = "Returns whether the user has an active enrollment in a tournament. " +
+                    "Delegated to tournament-ms; returns false if not implemented.")
+    public ResponseEntity<Boolean> hasActiveEnrollment(@PathVariable long id) {
+        // This check should be delegated to tournament-ms in a future iteration.
+        // For now, return false to allow user status changes.
+        return ResponseEntity.ok(false);
+    }
 }

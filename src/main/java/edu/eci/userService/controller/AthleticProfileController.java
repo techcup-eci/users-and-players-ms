@@ -37,6 +37,12 @@ public class AthleticProfileController {
         return athleticProfileService.getAthleticProfilesByUserId(UserId);
     }
 
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Get athletic profile by user email", description = "Get athletic profile that matches the specified user email")
+    public AthleticProfileDTO getProfileAthleticByEmail(@PathVariable String email) {
+        return athleticProfileService.getAthleticProfileByEmail(email);
+    }
+
     @PostMapping
     @Operation(summary = "Create a nre athletic profile", description = "Create a new athletic profile with the provided information")
     public AthleticProfileDTO createAthleticProfile(@RequestBody AthleticProfileRequestBody requestBody) {
